@@ -323,6 +323,27 @@ class Tensor
 		MPI_Comm* &bcast_send_comm,
 		MPI_Comm* &bcast_recv_comm);
 
+// Post MPI_Intercomm_Create from senders
+	void post_send_creates(
+		map<int, list<int> > recv_leader_block_map,
+		int bcast_dims_count,
+		int* &bcast_dims,
+		MPI_Comm &self_comm,
+		MPI_Comm &recv_comm,
+		MPI_Comm* &bcast_send_comm);
+
+// Post sends for redistribute
+	void post_broadcast_sends(
+		map< int, list<int> > &proc_block_map,
+		MPI_Comm* &bcast_send_comm,
+		MPI_Comm &recv_intra_comm,
+		int intra_comm_rank,
+		double** &bcast_blocks,
+		int** &bcast_addr,
+		double* &bcast_recv_blocks,
+		int* &bcast_recv_addr,
+		int &offset);
+
 	void copy_bcast_send_data(map< int, list<int> > proc_block_map, double** &bcast_blocks, int** &bcast_addr);
 
 	// Check if the address satisfies tensor symmetry criterion

@@ -252,6 +252,42 @@ void Tensor::get_bcast_groups(
 	}
 }
 
+// Post MPI_Intercomm_Create from senders
+void Tensor::post_send_creates(
+		map<int, list<int> > recv_leader_block_map,
+		int bcast_dims_count,
+		int* &bcast_dims,
+		MPI_Comm &self_comm,
+		MPI_Comm &recv_comm,
+		MPI_Comm* &bcast_send_comm)
+{
+		for(map<int, list<int> >::iterator s_it=recv_leader_block_map.begin(); s_it != recv_leader_block_map.end(); ++s_it)
+		{
+			int recv_leader = s_it->first;
+			int index = distance(recv_leader_block_map.begin(), s_it);
+
+			// Find out if the sender is a part of the recv group
+			int* addr = new int[grid_dims];
+			memcpy(addr, proc_addr, grid_dims*sizeof(int));
+			for(int i=0; i<bcast_dims_count; i++)
+			{
+				addr[bcast_dims[i]] = 0;
+			}
+			if(g->get_proc_rank(addr) == recv_leader) // sender is in recv group
+			{
+				//if(rank==0) cout << rank << " as a sender is in the recv group" << endl;
+				bcast_send_comm[index] = recv_comm;
+			}
+			else // sender is not in recv group
+			{
+				// Create the inter-communicator from sender
+				MPI_Comm intercomm; //= bcast_send_comm[index];
+				//cout << g->get_proc_addr_str(rank) << " creates intercomm with recvleader = " << g->get_proc_addr_str(recv_leader) << endl;
+				MPI_Intercomm_create(self_comm, 0, MPI_COMM_WORLD, recv_leader, 0, &intercomm);
+				bcast_send_comm[index] = intercomm;
+			}
+		}
+}
 
 // Create send buffers for the blocks to broadcast from this processor for redistributing the tensor
 void Tensor::copy_bcast_send_data(map< int, list<int> > proc_block_map, double** &bcast_blocks, int** &bcast_addr)
@@ -273,6 +309,41 @@ void Tensor::copy_bcast_send_data(map< int, list<int> > proc_block_map, double**
 	}
 }
 
+// Post sends for redistribute
+void Tensor::post_broadcast_sends(
+		map< int, list<int> > &proc_block_map,
+		MPI_Comm* &bcast_send_comm,
+		MPI_Comm &recv_intra_comm,
+		int intra_comm_rank,
+		double** &bcast_blocks,
+		int** &bcast_addr,
+		double* &bcast_recv_blocks,
+		int* &bcast_recv_addr,
+		int &offset
+)
+{
+		for(map<int, list<int> >::iterator send_it = proc_block_map.begin(); send_it != proc_block_map.end(); ++send_it)
+		{
+			int send_index = distance(proc_block_map.begin(), send_it);
+			int recv_leader = send_it->first;
+			MPI_Comm comm = bcast_send_comm[send_index];
+
+			int me = MPI_ROOT;
+			if(comm == recv_intra_comm) // sender is in the recv intracomm
+				me = intra_comm_rank;
+
+			MPI_Bcast(bcast_blocks[send_index], (send_it->second).size() * block_size, MPI_DOUBLE, me, comm);
+			MPI_Bcast(bcast_addr[send_index], (send_it->second).size() * dims, MPI_INT, me, comm);
+
+			// If sender is in the recv intracomm, retain the blocks sent in bcast_recv_blocks
+			if(comm == recv_intra_comm)
+			{
+				memcpy(bcast_recv_blocks + offset*block_size, bcast_blocks[send_index], (send_it->second).size() * block_size * sizeof(double));
+				memcpy(bcast_recv_addr + offset*dims, bcast_addr[send_index], (send_it->second).size() * dims * sizeof(int));
+				offset += (send_it->second).size();
+			}
+		}
+}
 
 void Tensor::redistribute_broadcast(int* &new_idx_map,
 		int bcast_proc_count,
