@@ -1,0 +1,402 @@
+NEWFILE: examples/cntr1a_4D
+
+Grid: 2 2 2 4
+
+Symmetry: A cccc
+Size:  A 128
+Block_Grid: A 4
+Idmap: A 0 1 2 3
+ 
+Size:  B 128
+Block_Grid: B 4 
+Idmap: B 2 3 0 1
+Symmetry: B cccc
+
+Dims:  C 4
+Size:  C 128
+Block_Grid: C 4
+Idmap: C 0 1 2 3
+Symmetry: C cccc
+
+CntrString:  C [ a,b,m,n ] = A [ a,b,k,l ] x B [ m,n,k,l ] 
+
+NEWFILE: examples/cntr1b_5D
+
+Grid: 2 2 2 2 2
+
+Symmetry: A cccc
+Size:  A 128
+Block_Grid: A 4
+Idmap: A 0 1 2 4
+ 
+Size:  B 128
+Block_Grid: B 4 
+Idmap: B 2 3 0 4
+Symmetry: B cccc
+
+Dims:  C 4
+Size:  C 128
+Block_Grid: C 4
+Idmap: C 0 1 2 3
+Symmetry: C cccc
+
+CntrString:  C [ a,b,m,n ] = A [ a,b,k,l ] x B [ m,n,k,l ] 
+
+NEWFILE: examples/cntr1c_4D
+
+Grid: 2 2 2 4
+
+Symmetry: A cccc
+Size:  A 128
+Block_Grid: A 4
+Idmap: A 0 1 4 4
+ 
+Size:  B 128
+Block_Grid: B 4 
+Idmap: B 2 3 4 4
+Symmetry: B cccc
+
+Dims:  C 4
+Size:  C 128
+Block_Grid: C 4
+Idmap: C 0 1 2 3
+Symmetry: C cccc
+
+CntrString:  C [ a,b,m,n ] = A [ a,b,k,l ] x B [ m,n,k,l ] 
+
+NEWFILE: examples/cntr2a_4D
+
+Grid: 2 2 2 4
+
+Symmetry: A cccc
+Size:  A 32
+Block_Grid: A 4
+Idmap: A 0 1 2 3
+ 
+Size:  B 32
+Block_Grid: B 4 
+Idmap: B 0 3 1 2
+Symmetry: B cccc
+
+Dims:  C 4
+Size:  C 32
+Block_Grid: C 4
+Idmap: C 0 1 2 3 4 4
+Symmetry: C cccccc
+
+CntrString:  C [ h,i,j,m,n,o ] = A [ h,i,j,k ] x B [ k,m,n,o ] 
+
+
+NEWFILE: examples/cntr2e_4D
+
+Grid: 2 2 2 4
+
+Symmetry: A cccc
+Size:  A 32
+Block_Grid: A 4
+Idmap: A 0 1 4 3
+ 
+Size:  B 32
+Block_Grid: B 4 
+Idmap: B 0 2 3 4
+Symmetry: B cccc
+
+Dims:  C 4
+Size:  C 32
+Block_Grid: C 4
+Idmap: C 0 1 2 3 4 4
+Symmetry: C cccccc
+
+CntrString:  C [ h,i,m,n,j,o ] = A [ h,i,j,k ] x B [ k,m,n,o ] 
+
+
+NEWFILE: examples/cntr2b_5D
+
+Grid: 2 2 2 2 2
+
+Symmetry: A cccc
+Size:  A 32
+Block_Grid: A 4
+Idmap: A 0 1 2 3
+ 
+Size:  B 32
+Block_Grid: B 4 
+Idmap: B 0 3 4 2
+Symmetry: B cccc
+
+Dims:  C 4
+Size:  C 32
+Block_Grid: C 4
+Idmap: C 0 1 2 3 4 5
+Symmetry: C cccccc
+
+CntrString:  C [ h,i,j,m,n,o ] = A [ h,i,j,k ] x B [ k,m,n,o ] 
+
+
+NEWFILE: examples/cntr2c_5D
+
+Grid: 2 2 2 2 2
+
+Symmetry: A cccc
+Size:  A 32
+Block_Grid: A 4
+Idmap: A 0 1 2 3
+ 
+Size:  B 32
+Block_Grid: B 4 
+Idmap: B 0 3 4 5
+Symmetry: B cccc
+
+Dims:  C 4
+Size:  C 32
+Block_Grid: C 4
+Idmap: C 0 1 2 3 4 5
+Symmetry: C cccccc
+
+CntrString:  C [ h,i,j,m,n,o ] = A [ h,i,j,k ] x B [ k,m,n,o ] 
+
+NEWFILE: examples/cntr2d_5D
+
+Grid: 2 2 2 2 2
+
+Symmetry: A cccc
+Size:  A 32
+Block_Grid: A 4
+Idmap: A 0 1 2 5
+ 
+Size:  B 32
+Block_Grid: B 4 
+Idmap: B 5 3 4 5
+Symmetry: B cccc
+
+Dims:  C 4
+Size:  C 32
+Block_Grid: C 4
+Idmap: C 0 1 2 3 4 5
+Symmetry: C cccccc
+
+CntrString:  C [ h,i,j,m,n,o ] = A [ h,i,j,k ] x B [ k,m,n,o ] 
+
+
+
+NEWFILE: examples/cntr3a_4D
+
+Grid: 2 2 2 4
+
+Symmetry: A cccc
+Size:  A 128
+Block_Grid: A 4
+Idmap: A 0 1 2 3
+ 
+Size:  B 128
+Block_Grid: B 4 
+Idmap: B 3 1 2 0 
+Symmetry: B cccc
+
+Dims:  C 4
+Size:  C 128
+Block_Grid: C 4
+Idmap: C 0 3
+Symmetry: C cc
+
+CntrString:  C [ i,m ] = A [ i,k,l,h ] x B [ m,k,l,h ] 
+
+NEWFILE: examples/cntr3d_4D
+
+Grid: 2 2 2 4
+
+Symmetry: A cccc
+Size:  A 128
+Block_Grid: A 4
+Idmap: A 0 1 2 4
+ 
+Size:  B 128
+Block_Grid: B 4 
+Idmap: B 3 1 2 4 
+Symmetry: B cccc
+
+Dims:  C 4
+Size:  C 128
+Block_Grid: C 4
+Idmap: C 0 3
+Symmetry: C cc
+
+CntrString:  C [ i,m ] = A [ i,k,l,h ] x B [ m,k,l,h ] 
+
+
+
+NEWFILE: examples/cntr3b_2D
+
+Grid: 8 4
+
+Symmetry: A cccc
+Size:  A 128
+Block_Grid: A 8
+Idmap: A 0 1 2 2
+ 
+Size:  B 128
+Block_Grid: B 8 
+Idmap: B 1 0 2 2 
+Symmetry: B cccc
+
+Size:  C 128
+Block_Grid: C 8
+Idmap: C 0 1
+Symmetry: C cc
+
+CntrString:  C [ i,m ] = A [ i,k,l,h ] x B [ m,k,l,h ] 
+
+
+NEWFILE: examples/cntr3c_5D
+
+Grid: 2 2 2 2 2
+
+Symmetry: A cccc
+Size:  A 128
+Block_Grid: A 8
+Idmap: A 0 2 3 4 
+ 
+Size:  B 128
+Block_Grid: B 8 
+Idmap: B 1 2 3 4 
+Symmetry: B cccc
+
+Size:  C 128
+Block_Grid: C 8
+Idmap: C 0 1
+Symmetry: C cc
+
+CntrString:  C [ i,m ] = A [ i,k,l,h ] x B [ m,k,l,h ] 
+
+
+NEWFILE: examples/cntr4a_4D
+
+Grid: 2 2 2 4
+
+Symmetry: A cccc
+Size:  A 128
+Block_Grid: A 4
+Idmap: A 0 1 2 3 
+ 
+Size:  B 128
+Block_Grid: B 4
+Idmap: B 0 3 
+Symmetry: B cc
+
+Size:  C 128
+Block_Grid: C 4
+Idmap: C 0 1 2 3
+Symmetry: C cccc
+
+CntrString:  C [ i,j,m,n ] = A [ i,j,m,k ] x B [ k,n ] 
+
+
+NEWFILE: examples/cntr4b_4D
+
+Grid: 2 2 2 4
+
+Symmetry: A cccc
+Size:  A 128
+Block_Grid: A 4
+Idmap: A 0 1 2 4
+ 
+Size:  B 128
+Block_Grid: B 4
+Idmap: B 4 3 
+Symmetry: B cc
+
+Size:  C 128
+Block_Grid: C 4
+Idmap: C 0 1 2 3
+Symmetry: C cccc
+
+CntrString:  C [ i,j,m,n ] = A [ i,j,m,k ] x B [ k,n ] 
+
+
+NEWFILE: examples/cntr5a_4D
+
+Grid: 2 2 2 4
+
+Symmetry: A cccc
+Size:  A 128
+Block_Grid: A 4
+Idmap: A 0 1 2 3
+ 
+Size:  B 128
+Block_Grid: B 4
+Idmap: B 0 3 2 
+Symmetry: B ccc
+
+Size:  C 128
+Block_Grid: C 4
+Idmap: C 0 1 2
+Symmetry: C ccc
+
+CntrString:  C [ i,j,m ] = A [ i,j,k,l ] x B [ k,l,m ] 
+
+
+NEWFILE: examples/cntr5b_5D
+
+Grid: 2 2 2 4
+
+Symmetry: A cccc
+Size:  A 128
+Block_Grid: A 4
+Idmap: A 0 1 2 3
+ 
+Size:  B 128
+Block_Grid: B 4
+Idmap: B 2 3 4 
+Symmetry: B ccc
+
+Size:  C 128
+Block_Grid: C 4
+Idmap: C 0 1 4
+Symmetry: C ccc
+
+CntrString:  C [ i,j,m ] = A [ i,j,k,l ] x B [ k,l,m ] 
+
+
+NEWFILE: examples/cntr5c_3D
+
+Grid: 2 2 2 4
+
+Symmetry: A cccc
+Size:  A 128
+Block_Grid: A 4
+Idmap: A 0 1 2 3
+ 
+Size:  B 128
+Block_Grid: B 4
+Idmap: B 0 3 2 
+Symmetry: B ccc
+
+Size:  C 128
+Block_Grid: C 4
+Idmap: C 0 1 2
+Symmetry: C ccc
+
+CntrString:  C [ i,j,m ] = A [ i,j,k,l ] x B [ k,l,m ] 
+
+
+NEWFILE: examples/cntr5d_3D
+
+Grid: 2 2 2 4
+
+Symmetry: A cccc
+Size:  A 128
+Block_Grid: A 4
+Idmap: A 0 1 3 3
+ 
+Size:  B 128
+Block_Grid: B 4
+Idmap: B 3 3 2 
+Symmetry: B ccc
+
+Size:  C 128
+Block_Grid: C 4
+Idmap: C 0 1 2
+Symmetry: C ccc
+
+CntrString:  C [ i,j,m ] = A [ i,j,k,l ] x B [ k,l,m ] 
+

@@ -1,0 +1,28 @@
+The executable takes the input form
+
+srun -N p1*p1*p2*p2 run.x p1 p2 Vb N
+
+THe number of nodes must be equal to p1*p1*p2*p2. The grid size is
+[p1,p1,p2,p2]. Vb is the number of blocks in each dimension and N
+is the size of the tensor in each dimension.
+
+The dgemm call is in localcontract.cc and the library required is
+included in localcontract.h. Make edit to these files to include the
+required libraries for BGQ and HOPPER.
+
+
+Parameters to run on
+
+p1 = 1 2 3 4 5 6 7 8
+
+p2 = 1 2 3 4 5 6 7 8
+
+Vb = 8 16 32 64
+
+N = 128, 256
+
+Run on all possible combinations of these. If the p1*p1*p2*p2 is
+too large then obviously cannot run on them so skip those. 
+
+
+ 

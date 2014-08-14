@@ -1,0 +1,33 @@
+
+1. C[i, j, m, n] = A[i, j, k, l] x B[k, l, m, n] -
+
+Run on a 4D Grid
+Run on a 5D grid with some replication 2.5D
+Run on a 4D grid with lots of replication and no communication
+
+2. C[h, i, j, m, n, o] = A[h, i, j, k] x B[k, m, n, o] -Rotation
+required on a 5D torus
+
+Run on a 4D Grid with rotation and RSumma
+Run on a 5D Grid with rotation and RSumma
+Run on a 5D Grid with no rotation and RSumma
+Run on a 5D Grid with no rotation and no RSUMMA
+
+3. C[i , m] = A[i, k, l, h] x B [m, k, l , h] - Reduction required
+on a 2+ D torus
+
+Run on 4D Grid with reduction + rsumma
+Run on a 2D Grid with just rsumma
+Run on a 5D Grid with replication and reduction
+
+4. C[i, j, m, n] = A[i, j, m, k] x B[k, n] - Replication
+possible. Also zero communication possible
+
+Run on 4D Grid with replication and Rsumma
+Run on a 4D Grid with replication and no communication
+
+5. C[i, j, m] = A [i, j, k, l] x B [k, l, m] - SUMMA, 2.5D, 3D
+SUMMA
+
+
+x
