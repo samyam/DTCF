@@ -280,6 +280,9 @@ class Tensor
 	int is_all_touched();
 
 	// Compare two tile addresses
+	bool compare_addresses(int* &addr_1, int* &addr_2);
+
+	// Compare two tile addresses
 	bool compare_addresses(int dims, int* &addr_1, int* &addr_2);
 
 	// Update physical grid
@@ -321,6 +324,10 @@ class Tensor
 		MPI_Comm* &bcast_recv_comm);
 
 	void copy_bcast_send_data(map< int, list<int> > proc_block_map, double** &bcast_blocks, int** &bcast_addr);
+
+	// Check if the address satisfies tensor symmetry criterion
+	bool satisfies_sym(int* &addr);
+
 
 	// Getter functions
 

@@ -1059,6 +1059,42 @@ bool Tensor::compare_addresses(int dims, int* &addr_1, int* &addr_2)
 	return true;
 }
 
+// Compare two tile addresses
+bool Tensor::compare_addresses(int* &addr_1, int* &addr_2)
+{
+	for(int d=0; d<dims; d++)
+	{
+		if(addr_1[d] != addr_2[d])
+			return false;
+	}
+	return true;
+}
+
+// Check if the address satisfies tensor symmetry criterion.
+// Ignores contraction indices while checking
+bool Tensor::satisfies_sym(int* &addr)
+{
+	for(int i=0; i < dims; i++)
+	{
+		if(SG_index_map_permanent[i] != NON_SYM)
+		{
+			int sym_id = SG_index_map_permanent[i];
+			int n = addr[i];
+			for(int j=i; j < dims; j++)
+			{
+				if(SG_index_map_permanent[j] == SG_index_map_permanent[i] &&
+				   ((cntr_map[i] > 0 &&  cntr_map[j] > 0) || (cntr_map[i] == 0 &&  cntr_map[j] == 0))) 
+				{
+					if(n >= addr[j])
+						n = addr[j];
+					else
+						return false;
+				}
+			}
+		}
+	}
+	return true;
+}
 
 //
 void printList(list<int> bounce)

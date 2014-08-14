@@ -94,6 +94,7 @@ class Contraction
 
 	double max_instigation_time, max_forward_receive_time;
 
+	map<int, list<pair<int*,int*>>> CRCT_map;
 	//returns a permutation map that combines the affect of 
 	//applying map1 and map2 consecutively
 	void compose_p_maps(Tensor* &T, int* &map1, int* &map2, int* &composed_map);
@@ -199,6 +200,18 @@ class Contraction
 
 	// Print information about the performance of this contraction
 	void print_time_flops();
+
+
+		void CRCT_generate_map(vector<pair<int,int>> contr_list);
+		void CRCT_print_map();
+		list<pair<int*,int*>> CRCT_enumerate_AB_addrs(int* &C_addr, int num_contr_idx, vector<pair<int,int>> contr_list);
+		void CRCT_check_blocks(int* &addrs_A, int num_blocks_A,	int* &addrs_B, int num_blocks_B);
+		void CRCT_final_validation();
+
+
+		void CRCT_get_AB_addr(list<pair<int*,int*>> &AB_addr_list, int* &A_addr, int* &B_addr, 
+				vector<pair<int,int>> contr_list, int k, int num_contr_idx, int* &contr_dim_sizes);
+
 
     public:
 

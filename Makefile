@@ -38,11 +38,11 @@ ifdef TIMER
 	FLAGS+=-DTIMER=$(TIMER)
 endif
 
-MAIN = examples/redistribute_test
+MAIN = CCSD
 LINK = $(CC)
 
-EXE = examples/redistribute_test.x 
-OBJS = block_grid.o grid.o tensor.o contraction.o redistribute.o helper.o transpose_helper.o test.o localcontract.o $(MAIN).o 
+EXE = CCSD.x
+OBJS = block_grid.o grid.o tensor.o contraction.o redistribute.o helper.o transpose_helper.o test.o localcontract.o correct.o $(MAIN).o 
 
 
 all: $(EXE)
