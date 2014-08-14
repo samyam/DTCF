@@ -48,6 +48,8 @@ map<int, list<int> > Tensor::get_generic_proc_addresses(int* &tile_addresses,
 		int non_common_repl_dims_count, 
 		int* &non_common_repl_dims)
 {
+	//print_tile_addr(g->grid_dims, g->proc_addr); cout << " now contains: "; print_tile_addrs(dims, tile_address, num_tiles); cout << endl;
+
 	map<int, list<int> > proc_block_map;
 
 	// Compute new processor address for each block
@@ -63,7 +65,7 @@ map<int, list<int> > Tensor::get_generic_proc_addresses(int* &tile_addresses,
 
 		// For the old replicated dims that are not replicated in the new mapping,
 		// check if the old and new processor addresses in that dimension are same
-		// If yes, set new proc addr in that dimension to zero, so that we can get
+		// Set new proc addr in the dimensions that are replicated in the new map to zero, so that we can get
 		// a generic proc id to broadcast/send to
 		bool match = true;
 		for(int j=0; j<non_common_repl_dims_count; j++)
@@ -85,7 +87,7 @@ map<int, list<int> > Tensor::get_generic_proc_addresses(int* &tile_addresses,
 				proc_block_map[r] = list<int>();
 			}
 			proc_block_map[r].push_back(i);
-
+			//if(rank==8) cout << rank << " wants to send " << i<< " to " << r << endl;
 		}
 	}
 
@@ -96,10 +98,10 @@ map<int, list<int> > Tensor::get_generic_proc_addresses(int* &tile_addresses,
 // Find senders for all the blocks this processor will hold after redistribution
 // and return a map of sender rank with a list of block offsets that will be received from it
 map<int , list<int> > Tensor::get_recv_proc_block_map(
-									int* &new_idx_map,
-									int old_repl_dims_count,
-									int* &old_repl_dims,
-									int &num_new_tiles)
+		int* &new_idx_map,
+		int old_repl_dims_count,
+		int* &old_repl_dims,
+		int &num_new_tiles)
 {
 	// Find out whom to receive from, the receive data size and broadcast groups
 	// new_addresses stores block addresses that needs to be stored on this processor based
@@ -110,6 +112,7 @@ map<int , list<int> > Tensor::get_recv_proc_block_map(
 	num_new_tiles = 0;
 	get_num_tiles(0, local_indices, offset, new_idx_map, proc_addr, new_addresses, pgrid, num_new_tiles); 
 
+	//print_tile_addr(g->grid_dims, g->proc_addr); cout << " wants: "; print_tile_addrs(dims, new_addresses, num_new_tiles); cout << endl;
 
 	//Maps the processors from which data is to be recieved to list of blocks which needs to be recieved. 
 	//Here the processor address used for the map is not generic since a reciever needs to find a unique
@@ -140,6 +143,8 @@ map<int , list<int> > Tensor::get_recv_proc_block_map(
 			recv_proc_block_map[r] = list<int>();
 		}
 		recv_proc_block_map[r].push_back(i);
+
+		//if(rank == 4) cout << rank << " expects " << i << " from " << r << endl;
 	}
 
 	return recv_proc_block_map;
@@ -189,46 +194,32 @@ void Tensor::get_bcast_groups(
 		}
 		recv_leader = g->get_proc_rank(recv_leader_addr);
 		recv_leader_block_map[recv_leader] = it->second;
+		//cout << rank << " sending to " << recv_leader << endl;//print_tile_addr(g->grid_dims, recv_leader_addr); cout <<endl;
 	}
+
+
 
 	// Call creates for the inter-communicators from the broadcast senders and receivers.
 	// If sender is already in the receive group, then use the intra-communicator.
 	// The order of calling creates is ascending w.r.t. ranks
 	bcast_send_comm = new MPI_Comm[recv_leader_block_map.size()];
 	bcast_recv_comm = new MPI_Comm[recv_proc_block_map.size()];
+	bool send_creates_done = false;
 	for(map<int, list<int> >::iterator r_it=recv_proc_block_map.begin(); r_it != recv_proc_block_map.end(); ++r_it)
 	{
+
 		int sender = r_it->first;
 		int index = distance(recv_proc_block_map.begin(), r_it);
+		//if(rank==4)cout << rank << " receiving from " << r_it->first << endl;
 
-		if(sender == rank)
+		//if(sender == rank)
+		if(sender >= rank && send_creates_done == false)
 		{
-			for(map<int, list<int> >::iterator s_it=recv_leader_block_map.begin(); s_it != recv_leader_block_map.end(); ++s_it)
-			{
-				int recv_leader = s_it->first;
-				int index = distance(recv_leader_block_map.begin(), s_it);
-
-				// Find out if the sender is a part of the recv group
-				int* addr = new int[grid_dims];
-				memcpy(addr, proc_addr, grid_dims*sizeof(int));
-				for(int i=0; i<bcast_dims_count; i++)
-				{
-					addr[bcast_dims[i]] = 0;
-				}
-				if(g->get_proc_rank(addr) == recv_leader) // sender is in recv group
-				{
-					bcast_send_comm[index] = recv_comm;
-				}
-				else // sender is not in recv group
-				{
-					// Create the inter-communicator from sender
-					MPI_Comm intercomm; //= bcast_send_comm[index];
-					MPI_Intercomm_create(self_comm, 0, MPI_COMM_WORLD, recv_leader, 0, &intercomm);
-					bcast_send_comm[index] = intercomm;
-				}
-			}
+			post_send_creates(recv_leader_block_map, bcast_dims_count, bcast_dims, self_comm, recv_comm, bcast_send_comm);
+			send_creates_done = true;
 		}
-		else
+		//else {
+		if(sender != rank)
 		{
 			// Create the inter-communicator from receiver only if the sender is not a part of recv_comm
 			int* sender_addr = new int[grid_dims];
@@ -240,17 +231,27 @@ void Tensor::get_bcast_groups(
 			int recv_leader = color; // Color is the smallest rank, i.e. leader in this recv_group
 			if(g->get_proc_rank(sender_addr) == recv_leader) // sender is in recv group
 			{
+				//if(rank==8) cout << rank << " sender " << sender << " is in the recv group" << endl;
 				bcast_recv_comm[index] = recv_comm;
 			}
 			else
 			{
 				MPI_Comm intercomm; // = bcast_recv_comm[index];
+				//cout << g->get_proc_addr_str(rank) << " creates intercomm with sender = " << g->get_proc_addr_str(sender) << endl;
 				MPI_Intercomm_create(recv_comm, 0, MPI_COMM_WORLD, sender, 0, &intercomm);
 				bcast_recv_comm[index] = intercomm;
 			}
 		}
 	}
+
+	if(!send_creates_done)
+	{
+		post_send_creates(recv_leader_block_map, bcast_dims_count, bcast_dims, self_comm, recv_comm, bcast_send_comm);
+		send_creates_done = true;
+	}
+
 }
+
 
 // Post MPI_Intercomm_Create from senders
 void Tensor::post_send_creates(
@@ -309,6 +310,7 @@ void Tensor::copy_bcast_send_data(map< int, list<int> > proc_block_map, double**
 	}
 }
 
+
 // Post sends for redistribute
 void Tensor::post_broadcast_sends(
 		map< int, list<int> > &proc_block_map,
@@ -345,6 +347,7 @@ void Tensor::post_broadcast_sends(
 		}
 }
 
+
 void Tensor::redistribute_broadcast(int* &new_idx_map,
 		int bcast_proc_count,
 		int* bcast_dims_sizes,
@@ -366,7 +369,7 @@ void Tensor::redistribute_broadcast(int* &new_idx_map,
 
 	int* num_send_blocks;// = new int[proc_block_map.size()];
 	int num_new_tiles = 0;
-	
+
 	map<int, list<int> > recv_proc_block_map = get_recv_proc_block_map(new_idx_map, old_repl_dims_count, old_repl_dims, num_new_tiles);
 
 	MPI_Comm *bcast_send_comm, *bcast_recv_comm, recv_intra_comm;
@@ -380,7 +383,7 @@ void Tensor::redistribute_broadcast(int* &new_idx_map,
 
 
 	// Broadcast
-	
+
 	//stores data and addresses to be sent to all the processors
 	double** bcast_blocks;
 	int** bcast_addr;
@@ -399,6 +402,7 @@ void Tensor::redistribute_broadcast(int* &new_idx_map,
 	// This processor sends all its sends in the increasing order of receiver group leader ranks.
 	// All the sends are embedded together in the list of receives such that all the receives that happen
 	// before the sends are to the receive leaders with ranks less than this processor.
+	bool sends_done = false;
 	for(map<int, list<int> >::iterator it=recv_proc_block_map.begin(); it != recv_proc_block_map.end(); ++it)
 	{
 		int recv_index = distance(recv_proc_block_map.begin(), it);
@@ -414,31 +418,15 @@ void Tensor::redistribute_broadcast(int* &new_idx_map,
 		int sender_intra_comm_rank = recv_ranks[0];
 
 		// Send broadcast
-		if(sender == rank)
+		//if(sender == rank)
+		if(sender >= rank && !sends_done)
 		{
-			for(map<int, list<int> >::iterator send_it = proc_block_map.begin(); send_it != proc_block_map.end(); ++send_it)
-			{
-				int send_index = distance(proc_block_map.begin(), send_it);
-				int recv_leader = send_it->first;
-				MPI_Comm comm = bcast_send_comm[send_index];
-
-				int me = MPI_ROOT;
-				if(comm == recv_intra_comm) // sender is in the recv intracomm
-					me = intra_comm_rank;
-			
-				MPI_Bcast(bcast_blocks[send_index], (send_it->second).size() * block_size, MPI_DOUBLE, me, comm);
-				MPI_Bcast(bcast_addr[send_index], (send_it->second).size() * dims, MPI_INT, me, comm);
-				
-				// If sender is in the recv intracomm, retain the blocks sent in bcast_recv_blocks
-				if(comm == recv_intra_comm)
-				{
-					memcpy(bcast_recv_blocks + offset*block_size, bcast_blocks[send_index], (send_it->second).size() * block_size * sizeof(double));
-					memcpy(bcast_recv_addr + offset*dims, bcast_addr[send_index], (send_it->second).size() * dims * sizeof(int));
-					offset += (send_it->second).size();
-				}
-			}
+			post_broadcast_sends(proc_block_map, bcast_send_comm, recv_intra_comm, intra_comm_rank,
+				bcast_blocks, bcast_addr, bcast_recv_blocks, bcast_recv_addr, offset);
+			sends_done = true;
 		}
-		else
+		//else
+		if(sender != rank)
 		{
 			// Receive broadcast
 			MPI_Comm comm = bcast_recv_comm[recv_index];
@@ -446,14 +434,21 @@ void Tensor::redistribute_broadcast(int* &new_idx_map,
 			int bcast_sender = 0;
 			if(comm == recv_intra_comm) // Sender is in the recv intracomm
 				bcast_sender = sender_intra_comm_rank;
-			
+
 			MPI_Bcast(bcast_recv_blocks + offset*block_size, num_recv_blocks * block_size, MPI_DOUBLE, bcast_sender, comm);
 			MPI_Bcast(bcast_recv_addr + offset*dims, num_recv_blocks * dims, MPI_INT, bcast_sender, comm);
 			offset += num_recv_blocks;
 		}
 	}
 
-	// Correctness checking code
+	if(!sends_done)
+	{
+		post_broadcast_sends(proc_block_map, bcast_send_comm, recv_intra_comm, intra_comm_rank,
+				bcast_blocks, bcast_addr, bcast_recv_blocks, bcast_recv_addr, offset);
+		sends_done = true;
+	}
+
+	//Correctness checking code
 	//{
 	//	int *local_indices = new int[dims];
 	//	int offset = 0;
@@ -471,7 +466,6 @@ void Tensor::redistribute_broadcast(int* &new_idx_map,
 	tile_address = bcast_recv_addr;
 	num_actual_tiles = num_new_tiles;
 }
-
 
 
 void Tensor::redistribute_point_to_point(int* &new_idx_map,
@@ -772,7 +766,11 @@ void Tensor::redistribute(int* &new_idx_map)
 	free_index_table();
 
 	// Update idmap
+	//cout << "New idx map: ";
+	//print_tile_addr(dims, new_idx_map); cout << endl;
 	memcpy(index_dimension_map, new_idx_map, dims*sizeof(int));
+	//cout << "New idx map copied: ";
+	//print_tile_addr(dims, index_dimension_map); cout << endl;
 
 	// Recompute index_table
 	init_index_table();
@@ -1381,4 +1379,5 @@ void TensorRedistributor::deserialize(int distr_tensor_dim, int distr_grid_dim)
 	T->init_index_table();
 	T->fill_index_table();
 }
+
 
