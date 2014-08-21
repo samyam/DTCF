@@ -1,4 +1,3 @@
-
 #ifndef _CONTRACTION_H_
 #define _CONTRACTION_H_
 
@@ -180,11 +179,16 @@ private:
     int parse_contr_str(std::string contr_str, std::string* &out);
 
     // Check if redistribution is required for an input tensor
-    bool check_redistr(Tensor* &T, Tensor* &C, int* &new_idmap, std::string* &t, std::string* &c);
+    void check_redistr(Tensor* &T, Tensor* &C, int* &new_idmap, std::string* &t, std::string* &c);
 
     // Performs recursive SUMMA
     void rec_summa(Tensor* &A, Tensor* &B, double* &C_buffer, std::list<std::pair<int,int>> contr_list,
 		   std::pair<int,int> prev_cdim1, std::pair<int,int> prev_cdim2);
+
+    void rec_summa1(Tensor* &A, Tensor* &B, Tensor* &C, vector<std::pair<int,int>> contr_list,
+		    std::pair<int,int> prev_cdim1, std::pair<int,int> prev_cdim2);
+    void rec_summa2(Tensor* &A, Tensor* &B, Tensor* &C, vector<std::pair<int,int>> contr_list,
+		    std::pair<int,int> prev_cdim1, std::pair<int,int> prev_cdim2);
 
     void temp_rec_summa(Tensor* &A, Tensor* &B, Tensor* &C, list<pair<int,int>> contr_list, 
 			pair<int,int> prev_cdim1, pair<int,int> prev_cdim2);
@@ -201,11 +205,14 @@ private:
     // Print information about the performance of this contraction
     void print_time_flops();
 
-
     void CRCT_generate_map(vector<pair<int,int>> contr_list);
+
     void CRCT_print_map();
+
     list<pair<int*,int*>> CRCT_enumerate_AB_addrs(int* &C_addr, int num_contr_idx, vector<pair<int,int>> contr_list);
+
     void CRCT_check_blocks(int* &addrs_A, int num_blocks_A,	int* &addrs_B, int num_blocks_B);
+
     void CRCT_final_validation();
 
 
