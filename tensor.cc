@@ -157,7 +157,7 @@ Tensor::Tensor(
 // Destructor
 Tensor::~Tensor()
 {
-    delete[] block_range;
+	delete[] block_range;
 	delete[] pgrid;
 	delete[] proc_addr; 
 	delete[] index_phase;
@@ -524,27 +524,23 @@ void Tensor::generate_data(int cur_dim, int* &cur_indices, int &offset)
 			if(isValid(cur_indices, proc_addr, index_dimension_map, pgrid))
 
 			{
-			    num_actual_tiles++;
+				num_actual_tiles++;
 				// Set data in this block
-			    double value = 0;
+				double value = 0;
+				for(int j=0; j<block_size; j++)
+				{
 
-			    //Uncomment this to fill the tensor data
-			    //Commented out to reduce running time
+					value = get_value(cur_indices);
+					tensor_tiles[offset] = value;
+					offset++;
+				}
 
-			    /*for(int j=0; j<block_size; j++)
-			    {
-				
-				value = get_value(cur_indices);
-				tensor_tiles[offset] = value;
-				offset++;
-				}*/
-			    offset+=block_size;
 				// Set address of this block
-			    
-			    for(int k=0; k<dims; k++)
-			    {
-				
-				tile_address[k+dims*(offset/block_size-1)] = cur_indices[k]*pgrid[index_dimension_map[k]] + proc_addr[index_dimension_map[k]];
+
+				for(int k=0; k<dims; k++)
+				{
+
+					tile_address[k+dims*(offset/block_size-1)] = cur_indices[k]*pgrid[index_dimension_map[k]] + proc_addr[index_dimension_map[k]];
 				}
 			}
 		}
@@ -824,7 +820,7 @@ int Tensor::get_receivers(
 		{
 			// If there are multiple contraction indices belonging to the same symmetry group,
 			// this condition maintains the order between these contraction indices
-		    if(contr_dim < i && cntr_map[i] > 0 )
+		if(contr_dim < i && cntr_map[i] > 0 )
 			{
 				break;
 			}
@@ -988,7 +984,7 @@ int Tensor::tile_exists(int* &search_addr)
 	for(int j=0; j < num_actual_tiles; j++)
 	{ 
 		int* target_addr = tile_address + j * dims;
-		if(compare_addresses(dims, search_addr, target_addr) == true)
+		if(compare_addresses(search_addr, target_addr) == true)
 		{
 			return j;
 		}
