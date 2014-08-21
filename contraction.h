@@ -103,7 +103,7 @@ private:
     void get_symm_permutation(Tensor* &T, int* &tile_address, int* &sym_permutation);
 
     //generates permutation maps for A, B and C for doing transpose before local dgemm can be performed
-    void generate_permutation_map(Tensor* &A, Tensor* &B, Tensor* &C, std::list<pair<int,int>> &contr_list);
+    void generate_permutation_map(Tensor* &A, Tensor* &B, Tensor* &C, std::vector<pair<int,int>> &contr_list);
 
     //gives the mapping of external indicies in the input to external
     //indicies in the output. This mapping is used to find tile address
@@ -187,7 +187,7 @@ private:
 			   bool &redistr_A, bool &redistr_B);
 
     // Performs recursive SUMMA
-    void rec_summa(Tensor* &A, Tensor* &B, double* &C_buffer, std::list<std::pair<int,int>> contr_list,
+    void rec_summa(Tensor* &A, Tensor* &B, double* &C_buffer, std::vector<std::pair<int,int>> contr_list,
 		   std::pair<int,int> prev_cdim1, std::pair<int,int> prev_cdim2);
 
     void rec_summa1(Tensor* &A, Tensor* &B, Tensor* &C, vector<std::pair<int,int>> contr_list,
@@ -195,7 +195,7 @@ private:
     void rec_summa2(Tensor* &A, Tensor* &B, Tensor* &C, vector<std::pair<int,int>> contr_list,
 		    std::pair<int,int> prev_cdim1, std::pair<int,int> prev_cdim2);
 
-    void temp_rec_summa(Tensor* &A, Tensor* &B, Tensor* &C, list<pair<int,int>> contr_list, 
+    void temp_rec_summa(Tensor* &A, Tensor* &B, Tensor* &C, vector<pair<int,int>> contr_list, 
 			pair<int,int> prev_cdim1, pair<int,int> prev_cdim2);
  
     // Perform transpose as required on input tensor blocks and call dgemm
@@ -248,7 +248,7 @@ public:
 		     * in place.*/
     void reduction(int* &reduction_dims, double* &reduction_buffer, int count, int allORreducex);  
 
-    void rotate(Tensor* &T_input, Tensor*& T_output, list<pair<int,int>> &contr_list, 
+    void rotate(Tensor* &T_input, Tensor*& T_output, vector<pair<int,int>> &contr_list, 
 		int is_rotate_A, list<int> &rotate_dims, Tensor* &T_rotate, 
 		double* &data_buffer, int* &address_buffer, int &count);
 

@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
     vgrid__a10043[3] = atoi(argv[3]);
     Tensor* _a10043 = new Tensor("ccaa", idmap__a10043, size__a10043, vgrid__a10043, grid);
     _a10043->initialize();
-
+    cout<<"Initialized first tensor"<<endl;
     int* size__a10086 = new int[4];
     size__a10086[0] = Ob;
     size__a10086[1] = Vb;

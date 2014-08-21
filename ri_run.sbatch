@@ -33,6 +33,6 @@ then
 else
 	n=$1
 fi
-EXE=examples/redistribute_test.x 
+EXE=CCSD.x 
 srun -N $1 -n $n ./$EXE $2 $3 $4 $5 $6 $7 $8 $9 $10
 #make

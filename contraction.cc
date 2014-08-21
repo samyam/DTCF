@@ -1,4 +1,5 @@
 #include "contraction.h"
+#define CCHECK 0
 #define RRANK 0
 #define DEBUG_T 0
 #define DISPLAY_TIME 0
@@ -120,7 +121,7 @@ void Contraction::get_symm_permutation(Tensor* &T, int* &tile_address, int* &sym
 
 //generates permutation maps for A, B and C for doing transpose before local dgemm can be performed
 //also generates the size of external and internal indices
-void Contraction::generate_permutation_map(Tensor* &A, Tensor* &B, Tensor* &C, list<pair<int,int>> &contr_list)
+void Contraction::generate_permutation_map(Tensor* &A, Tensor* &B, Tensor* &C, vector<pair<int,int>> &contr_list)
 {
 
 
@@ -224,7 +225,7 @@ void Contraction::generate_permutation_map(Tensor* &A, Tensor* &B, Tensor* &C, l
     assert(nk_a == nk_b);
     n_k = nk_a;
 
-    for (std::list<pair<int,int>>::iterator it = contr_list.begin(); it != contr_list.end(); it++)
+    for (std::vector<pair<int,int>>::iterator it = contr_list.begin(); it != contr_list.end(); it++)
     {
         p_map_A[(*it).first] = num_external_A + num_contr_indx;
         p_map_B[(*it).second] = num_external_B + num_contr_indx;;
@@ -261,13 +262,13 @@ void Contraction::assert_contr_validity(Tensor* &A, Tensor* &B)
         }
     }
 
-/* When there is no reduction
+    //When there is no reduction
     // Check if same contracting index in different tensors does not overlap
     for(int i=0; i<A->dims; i++)
     {
         for(int j=0; j<B->dims; j++)
         {
-            if(A->cntr_map[i] == 1  &&  B->cntr_map[j] == 1  &&  A->index_dimension_map[i] != serial  &&  B->index_dimension_map[j] != serial)
+            if(A->cntr_map[i] == B->cntr_map[j] &&  A->index_dimension_map[i] != serial  &&  B->index_dimension_map[j] != serial)
             {
                 if(A->contr_dim_str[i].compare(B->contr_dim_str[j]) == 0)
                 {
@@ -275,14 +276,14 @@ void Contraction::assert_contr_validity(Tensor* &A, Tensor* &B)
                 }
             }
         }
-	}*/
+    }
 
     // Find out number of contracting indices in each tensor, and check if they are equal
     int num_contr_ind_A = 0, num_contr_ind_B = 0;
     for(int i=0; i< A->get_dims(); i++)
-        if(A->cntr_map[i] == 1) num_contr_ind_A++;
+        if(A->cntr_map[i] > 0) num_contr_ind_A++;
     for(int i=0; i< B->get_dims(); i++)
-        if(B->cntr_map[i] == 1) num_contr_ind_B++;
+        if(B->cntr_map[i] > 0) num_contr_ind_B++;
 
     assert(num_contr_ind_A == num_contr_ind_B);
 }
@@ -1256,7 +1257,7 @@ int Contraction::get_deserialized_blocks(Tensor* &T, double* &blocks, int* &addr
 // Performs recursive SUMMA
 
 void Contraction::rec_summa(Tensor* &A, Tensor* &B, double* &C_buffer, 
-			    list<pair<int,int>> contr_list, 
+			    vector<pair<int,int>> contr_list, 
 			    pair<int,int> prev_cdim1, pair<int,int> prev_cdim2)
 {
 
@@ -1276,7 +1277,8 @@ void Contraction::rec_summa(Tensor* &A, Tensor* &B, double* &C_buffer,
 
 	
 	transpose_and_dgemm_preserve(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer);
-	    return;
+	if(CCHECK) CRCT_check_blocks(A->tile_address, A->num_actual_tiles, B->tile_address, B->num_actual_tiles);
+	return;
 	    
 	}
 	// List should not be empty here
@@ -1285,7 +1287,7 @@ void Contraction::rec_summa(Tensor* &A, Tensor* &B, double* &C_buffer,
 
     // Get the contracting dimension pair to work on
     pair<int,int> p = contr_list.front();
-    contr_list.pop_front();
+    contr_list.erase(contr_list.begin());
 
     int cdim_A = p.first;
     int cdim_B = p.second;
@@ -1466,6 +1468,24 @@ void Contraction::rec_summa(Tensor* &A, Tensor* &B, double* &C_buffer,
  * are transposed before using*/
 void Contraction::transpose_and_dgemm_preserve(int num_blocks_A, int num_blocks_B, double* &blocks_A, double* &blocks_B, int* &block_addr_A, int* &block_addr_B, double* &C_buffer)
 {
+	// Check correctness
+	if(CCHECK) {
+		CRCT_check_blocks(block_addr_A, num_blocks_A, block_addr_B, num_blocks_B);
+
+		/*cout << "A blocks: ";
+		for(int i=0; i<num_blocks_A; i++)
+		{
+			int* addr = block_addr_A + i*A->dims;
+			print_tile_addr(A->dims, addr);
+		}
+		cout << endl << "B blocks: ";
+		for(int i=0; i<num_blocks_B; i++)
+		{
+			int* addr = block_addr_B + i*B->dims;
+			print_tile_addr(B->dims, addr);
+		}
+		cout << endl;*/
+	}
 
 
 
@@ -1862,14 +1882,14 @@ int Contraction::parse_contr_str(string contr_str, string* &out)
 
 
 // Check if redistribution is required for an input tensor
-bool Contraction::check_redistr(Tensor* &T, Tensor* &C, int* &new_idmap, string* &t, string* &c)
+void Contraction::check_redistr(Tensor* &T, Tensor* &C, int* &new_idmap, string* &t, string* &c)
 {
 
     // Initialize new idmap to the default value (old idmap)
     new_idmap = new int[T->dims];
     memcpy(new_idmap, T->index_dimension_map, T->dims * sizeof(int)); 
 
-    bool redistr_flag = false;
+    //bool redistr_flag = false;
 
     for(int i=0; i < C->dims; i++)
     {
@@ -1892,7 +1912,7 @@ bool Contraction::check_redistr(Tensor* &T, Tensor* &C, int* &new_idmap, string*
                         }
                     }
                     new_idmap[k] = C->index_dimension_map[i];
-                    redistr_flag = true;
+                    //redistr_flag = true;
 
                     //if(rank==0) cout<< C->contr_dim_str[i] << "  " << T->contr_dim_str[k] << " i= " << i << " k= "<<k << " c_idmap= " <<C->index_dimension_map[i] << " t_idmap= " <<T->index_dimension_map[k] << "  new_idmap[i] = " << new_idmap[i] << "  new_idmap[k]= " << new_idmap[k] <<endl;
                     break;
@@ -1901,7 +1921,142 @@ bool Contraction::check_redistr(Tensor* &T, Tensor* &C, int* &new_idmap, string*
         }
     }
     //if(rank==0){ cout << endl << " new_idmap = " ; print_tile_addr(A->dims, new_idmap); cout << endl;}
-    return redistr_flag; 
+    //return redistr_flag; 
+}
+
+
+// Check if the new idmaps are not aligning same contraction indices along one dimension,
+// figure out new idmap by remapping contraction indices
+void Contraction::realign_new_idmap(int* &idmap_A, int* &idmap_B, vector<pair<int,int>> &contr_list,
+									bool &redistr_A, bool &redistr_B)
+{
+	// Check if same contracting indices are mapped along same dimension
+	bool aligned = false;
+	for(vector<pair<int,int>>::iterator it = contr_list.begin(); it != contr_list.end(); it++)
+	{
+		if(idmap_A[it->first] == idmap_B[it->second])
+		{
+			aligned = true;
+			break;
+		}
+	}	
+
+	if(aligned)
+	{
+		// Set idmap for contraction indices to -1
+		for(int i=0; i < A->dims; i++)
+		{
+			if(A->cntr_map[i] > 0)
+				idmap_A[i] = -1;
+		}
+		for(int i=0; i < B->dims; i++)
+		{
+			if(B->cntr_map[i] > 0)
+				idmap_B[i] = -1;
+		}
+
+		//if(rank==0) {
+		//	cout << "idmaps: " << endl;
+		//	print_tile_addr(A->dims, idmap_A);
+		//	print_tile_addr(B->dims, idmap_B);
+		//	cout << endl;
+		//}
+		
+		// Create a list of unmapped dimensions
+		vector<int> unmapped_dims;
+		for(int i=0; i < grid->grid_dims; i++)
+		{
+			int j=0;
+			for(j=0; j< A->dims; j++)
+			{
+				if(idmap_A[j] == i  &&  A->cntr_map[j] == 0)
+					break;
+			}
+			int k=0;
+			for(k=0; k< B->dims; k++)
+			{
+				if(idmap_B[k] == i  &&  B->cntr_map[k] == 0)
+					break;
+			}
+
+			if(j == A->dims && k == B->dims) // no external index is mapped to this dimension
+			{
+				//if(rank==0) cout << "Adding " << i << " to unmapped dims list" << endl;
+				unmapped_dims.push_back(i);
+			}
+		}
+
+		// Find the dimensions where A and B's external indices are mapped
+		vector<int> A_ext_dims;
+		vector<int> B_ext_dims;
+		for(int i=0; i < A->dims; i++)
+		{
+			if(A->cntr_map[i] == 0)
+				A_ext_dims.push_back(idmap_A[i]);
+		}
+		for(int i=0; i < B->dims; i++)
+		{
+			if(B->cntr_map[i] == 0)
+				B_ext_dims.push_back(idmap_B[i]);
+		}
+
+		//if(rank==0){
+		//	for(int i=0; i< contr_list.size(); i++){
+		//		cout << " contr_list["<<i<<"]= " << contr_list[i].first << " " << contr_list[i].second << endl;
+		//	}
+		//}
+
+		for(int i=0; i<unmapped_dims.size(); i++)
+		{
+			int dim = unmapped_dims[i];
+			//if(rank==0) cout << i << " c[i].first= "<<contr_list[i].first << " set to " << dim << endl; 
+			//if(rank==0) cout << i << " c[i+1].second= "<<contr_list[(i+1) % contr_list.size()].second << " set to " << dim << endl; 
+			idmap_A[contr_list[i].first] = dim;
+			idmap_B[contr_list[(i+1) % contr_list.size()].second] = dim;
+		}
+
+		for(int i=0; i < A->dims; i++)
+		{
+			// If any contraction index of A is still unmapped, find the dimension 
+			// where B's external index is mapped and use it
+			if(idmap_A[i] == -1)
+			{
+				//if(rank==0) cout << "idmap_A["<<i<<"]= "<<B_ext_dims[0];
+				idmap_A[i] = B_ext_dims[0];
+				B_ext_dims.erase(B_ext_dims.begin());
+			}
+		}
+		for(int i=0; i < B->dims; i++)
+		{
+			// If any contraction index of B is still unmapped, find the dimension 
+			// where A's external index is mapped and use it
+			if(idmap_B[i] == -1)
+			{
+				//if(rank==0) cout << "idmap_B["<<i<<"]= "<<A_ext_dims[0];
+				idmap_B[i] = A_ext_dims[0];
+				A_ext_dims.erase(A_ext_dims.begin());
+			}
+		}
+	}
+
+	// Check if idmaps are changed
+	redistr_A = false; 
+	redistr_B = false; 
+
+	for(int i=0; i < A->dims; i++)
+	{
+		if(A->index_dimension_map[i] != idmap_A[i])
+		{
+			redistr_A = true;
+		}
+	}
+	for(int i=0; i < B->dims; i++)
+	{
+		if(B->index_dimension_map[i] != idmap_B[i])
+		{
+			redistr_B = true;
+		}
+	}
 }
 
 //gives the mapping of external indicies in the input to external
@@ -1982,7 +2137,7 @@ void Contraction::reduction(int* &reduction_dims, double* &reduction_buffer, int
 
 /*This function does a pipelined broadcast of data buffer and
  * address buffer along the dimensions specified by rotate_dim.*/
-void Contraction::rotate(Tensor* &T_input, Tensor*& T_output, list<pair<int,int>> &contr_list,
+void Contraction::rotate(Tensor* &T_input, Tensor*& T_output, vector<pair<int,int>> &contr_list,
 			 int is_rotate_A, list<int> &rotate_dims, Tensor* &T_rotate, 
 			 double* &data_buffer, int* &address_buffer, int &count)
 {
@@ -2162,6 +2317,7 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
     dims_C = parse_contr_str(contr_str_C, C->contr_dim_str);
 
     if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl;     
+
     // Gives the mapping of external indices in the input to external indices in the output. 
     // This mapping is used to find tile address of the output tensor
     fill_input_to_output_map(A->contr_dim_str, dims_A, C->contr_dim_str, dims_C, A_to_C_map, EXT_A);
@@ -2169,9 +2325,9 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
 
     if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl; 
     // Identify contracting indices in A and B
-    list<pair<int,int>> contr_list = list<pair<int,int>>();
-    list<pair<int,int>> DDO_list = list<pair<int,int>>();
-    list<pair<int,int>> DDA_list = list<pair<int,int>>();
+    vector<pair<int,int>> contr_list = vector<pair<int,int>>();
+    vector<pair<int,int>> DDO_list = vector<pair<int,int>>();
+    vector<pair<int,int>> DDA_list = vector<pair<int,int>>();
     
     if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl; 
 
@@ -2187,7 +2343,7 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
     //}
 
 
-
+    int cntr_id = 1;
     for(int i=0; i<dims_A; i++)
     {
         for(int j=0; j<dims_B; j++)
@@ -2197,8 +2353,9 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
                 // i in A and j in B are contracting indices
                 pair<int,int> p(i, j);
                 contr_list.push_back(p);
-                A->cntr_map[i] = 1;
-                B->cntr_map[j] = 1;
+                A->cntr_map[i] = cntr_id;
+                B->cntr_map[j] = cntr_id;
+		cntr_id++;
             }
         }
     }
@@ -2210,24 +2367,78 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
     //generates the permutation maps required for local contraction
     generate_permutation_map(A,B,C, contr_list);
 
+    // Generate C_AB address map for correctness checking
+    if(CCHECK) CRCT_generate_map(contr_list);
+
+    redist_time = -MPI_Wtime();
+    // Check if redistribution is required for input tensors
+    int *new_idmap_A, *new_idmap_B;
+    check_redistr(A, C, new_idmap_A, A->contr_dim_str, C->contr_dim_str);
+    check_redistr(B, C, new_idmap_B, B->contr_dim_str, C->contr_dim_str);
+
+    bool redistr_A, redistr_B;
+    realign_new_idmap(new_idmap_A, new_idmap_B, contr_list, redistr_A, redistr_B);
+
+    if(rank==0 && DEBUG_T) 
+    {
+        cout << " Before Redistribution: " ;
+        print_tile_addr(A->dims, A->index_dimension_map);
+        print_tile_addr(B->dims, B->index_dimension_map);
+        print_tile_addr(C->dims, C->index_dimension_map);
+        
+		cout << endl << " New maps: ";
+        print_tile_addr(A->dims, new_idmap_A);
+        print_tile_addr(B->dims, new_idmap_B);
+        cout << endl << fflush;
+    }
+
+    // Perform redistribution if required
+    if(redistr_A)
+    {
+		A->redistribute(new_idmap_A);
+    }
+
+    if(redistr_B)
+    {
+		B->redistribute(new_idmap_B);
+    }
+    redist_time += MPI_Wtime();
+
+    if(rank==0 && DEBUG_T) 
+    {
+        cout << " After Redistribution: " ;
+        print_tile_addr(A->dims, A->index_dimension_map);
+        print_tile_addr(B->dims, B->index_dimension_map);
+        print_tile_addr(C->dims, C->index_dimension_map);
+        cout << endl;
+    }
+    
+    // Assert contraction validity
+    assert_contr_validity(A, B);
+
     if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl; 
+
     //Generate RSUMMA(DDO-Distributed Distributed Orthogonal) and 
     //Reduction(DDA-Distributed Distributed Aligned)V contraction lists
     int* reduction_dims = new int[grid_dims];
     memset(reduction_dims, 0, grid_dims*sizeof(int));
 
     if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl; 
-    for (std::list<pair<int,int>>::iterator cntr_it=contr_list.begin(); cntr_it != contr_list.end(); ++cntr_it)
+
+    for (std::vector<pair<int,int>>::iterator cntr_it=contr_list.begin(); cntr_it != contr_list.end(); ++cntr_it)
     {
 	int da = A->index_dimension_map[(*cntr_it).first];
 	int db = B->index_dimension_map[(*cntr_it).second] ;
+
 	if(da == db )
 	{
 
 	    DDA_list.push_back(*cntr_it);
+
 	    if(da != grid_dims)
 	    {
 		if(rank ==0) cout<<"The reduction dimension is : "<<da<<endl;
+
 		reduction_dims[da] = 1;
 		need_reduction = 1;
 	    }
@@ -2238,66 +2449,9 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
     }
     
     if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl; 
-    //Generate rotation list
- 
-/*   
-    redist_time = -MPI_Wtime();
-    // Check if redistribution is required for input tensors
-    int *new_idmap_A, *new_idmap_B;
-    bool redistr_A = check_redistr(A, C, new_idmap_A, A->contr_dim_str, C->contr_dim_str);
-    bool redistr_B = check_redistr(B, C, new_idmap_B, B->contr_dim_str, C->contr_dim_str);
-    if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl; 
-    if(rank==0) 
-    {
-        cout << " Before Redistribution: " ;
-        print_tile_addr(A->dims, A->index_dimension_map);
-        print_tile_addr(B->dims, B->index_dimension_map);
-        print_tile_addr(C->dims, C->index_dimension_map);
-        cout << endl;
-    }
-
-    // Perform redistribution if required
-
-    TensorRedistributor *td;
-    if(redistr_A)
-    {
-	//A->redistribute(new_idmap_A);
-    }
-    if(redistr_B)
-    {
-	//B->redistribute(new_idmap_B);
-    }
-
-    redist_time += MPI_Wtime();
-
-    if(rank==0) 
-    {
-        cout << " After Redistribution: "<<fflush ;
-        print_tile_addr(A->dims, A->index_dimension_map);
-        print_tile_addr(B->dims, B->index_dimension_map);
-        print_tile_addr(C->dims, C->index_dimension_map);
-        cout << endl<<fflush;
-    }
-    
-    
-    timer6 -= MPI_Wtime();
-    timer6 += MPI_Wtime();
-
-    
-    /*
-      if(rank==0) 
-      {
-      cout << " After Deserialization of input tensors: " ;
-      print_tile_addr(des_A->dims, des_A->index_dimension_map);
-      print_tile_addr(des_B->dims, des_B->index_dimension_map);
-      print_tile_addr(C->dims, C->index_dimension_map);
-      cout << endl;
-      }
-    
-    assert_contr_validity(A, B);
-*/
 
     if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl; 
+
 // Identify contracting indices in A and B
     list<int> rotate_dims;
     
@@ -2382,6 +2536,10 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
      else
      {
 
+	
+
+
+
 	 if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl; 
 	 //cmbines individial tiles of C into a 2D matrix called big_matrix_C
 	 std::map<int, std::map<int, int> >* big_matrix_map_C;
@@ -2460,6 +2618,9 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
 
     tr_time += tr_C_time;
     total_time += MPI_Wtime();
+
+    if(CCHECK) CRCT_final_validation();
+
     if(DISPLAY_TIME)
     {
 	MPI_Reduce(&timer1, &m_timer1, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);

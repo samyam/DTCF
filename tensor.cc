@@ -682,7 +682,7 @@ list<int>* Tensor::get_bounce_indx(int indx)
 			//k and l are the contraction indicies then no need to bounce
 			//A[i1,i2,i3,l,k,i4] since this will make l>k, but contracting
 			//k>l suffice to produce correct result
-			if(cntr_map[i] == 1 && i>indx)
+			if(cntr_map[i] > 0 && i>indx)
 			{
 				// bounce->remove(indx);
 				return bounce;
@@ -824,7 +824,7 @@ int Tensor::get_receivers(
 		{
 			// If there are multiple contraction indices belonging to the same symmetry group,
 			// this condition maintains the order between these contraction indices
-			if(contr_dim < i && cntr_map[i] == 1 )
+		    if(contr_dim < i && cntr_map[i] > 0 )
 			{
 				break;
 			}
@@ -847,7 +847,7 @@ int Tensor::get_receivers(
 			// Initialize receiver address
 			receivers[count] = new int[grid_dims];
 			memcpy(receivers[count], proc_addr, grid_dims * sizeof(int));
-
+			
 			// Permute the initialized address to get the receiver address
 			// depending on the position of this dimension respective of the contracting dimension
 			if(i<contr_dim)
@@ -893,6 +893,8 @@ Tensor* Tensor::generate_tensor(int contr_dim,
 	Tensor *X = new Tensor(tensor_str, index_dimension_map, new_tensor_size, new_vgrid, g);
 
 	memcpy(X->cntr_map, cntr_map, dims*sizeof(int));
+	memcpy(X->SG_index_map, SG_index_map, dims*sizeof(int));
+
 	X->removecntrIndex(contr_dim);
 	X->fill_data(data_blocks, block_addresses);
 	X->set_num_actual_tiles(num_tiles);
