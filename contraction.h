@@ -181,6 +181,11 @@ private:
     // Check if redistribution is required for an input tensor
     void check_redistr(Tensor* &T, Tensor* &C, int* &new_idmap, std::string* &t, std::string* &c);
 
+    // Check if the new idmaps are not aligning same contraction indices along one dimension,
+    // figure out new idmap by remapping contraction indices
+    void realign_new_idmap(int* &idmap_A, int* &idmap_B, vector<pair<int,int>> &contr_list,
+			   bool &redistr_A, bool &redistr_B);
+
     // Performs recursive SUMMA
     void rec_summa(Tensor* &A, Tensor* &B, double* &C_buffer, std::list<std::pair<int,int>> contr_list,
 		   std::pair<int,int> prev_cdim1, std::pair<int,int> prev_cdim2);
