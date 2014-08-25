@@ -1,5 +1,5 @@
 #include "contraction.h"
-#define CCHECK 0
+#define CCHECK 1
 #define RRANK 0
 #define DEBUG_TRR 0
 #define DEBUG_TP 0
@@ -1295,7 +1295,7 @@ void Contraction::rec_summa(Tensor* &A, Tensor* &B, double* &C_buffer,
 
 	
 	transpose_and_dgemm_preserve(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer);
-	if(CCHECK) CRCT_check_blocks(A->tile_address, A->num_actual_tiles, B->tile_address, B->num_actual_tiles);
+	//if(CCHECK) CRCT_check_blocks(A->tile_address, A->num_actual_tiles, B->tile_address, B->num_actual_tiles);
 	return;
 	    
 	}
@@ -1718,8 +1718,30 @@ void Contraction::transpose_and_dgemm_preserve(int num_blocks_A, int num_blocks_
 void Contraction::transpose_and_dgemm(int num_blocks_A, int num_blocks_B, double* &blocks_A, double* &blocks_B, int* &block_addr_A, int* &block_addr_B, double* &C_buffer)
 {
      
+
+    
     if(num_blocks_B == 0 || num_blocks_A == 0) return;
     // Contract each block in sub-tensor A with each block in sub-tensor B
+
+    	if(CCHECK) {
+		CRCT_check_blocks(block_addr_A, num_blocks_A, block_addr_B, num_blocks_B);
+
+		/*cout << "A blocks: ";
+		for(int i=0; i<num_blocks_A; i++)
+		{
+			int* addr = block_addr_A + i*A->dims;
+			print_tile_addr(A->dims, addr);
+		}
+		cout << endl << "B blocks: ";
+		for(int i=0; i<num_blocks_B; i++)
+		{
+			int* addr = block_addr_B + i*B->dims;
+			print_tile_addr(B->dims, addr);
+		}
+		cout << endl;*/
+	}
+
+
 
     // Transpose blocks of B here because the outer for-loop requires the tranposed blocks of B
     // multiple times

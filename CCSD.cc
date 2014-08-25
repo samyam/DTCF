@@ -2610,6 +2610,7 @@ int main(int argc, char* argv[])
     Tensor* _a34092 = new Tensor("cc", idmap__a34092, size__a34092, vgrid__a34092, grid);
     _a34092->initialize();
 
+
     int* size__a34095 = new int[4];
     size__a34095[0] = Va;
     size__a34095[1] = Vb;
@@ -2627,6 +2628,7 @@ int main(int argc, char* argv[])
     vgrid__a34095[3] = atoi(argv[3]);
     Tensor* _a34095 = new Tensor("cccc", idmap__a34095, size__a34095, vgrid__a34095, grid);
     _a34095->initialize();
+
 
     int* size__a34096 = new int[4];
     size__a34096[0] = Va;
@@ -5153,6 +5155,7 @@ int main(int argc, char* argv[])
     vgrid_rbb_vvoo[3] = atoi(argv[3]);
     Tensor* rbb_vvoo = new Tensor("cccc", idmap_rbb_vvoo, size_rbb_vvoo, vgrid_rbb_vvoo, grid);
     rbb_vvoo->initialize();
+
 
     int* size_ta_vo = new int[2];
     size_ta_vo[0] = Va;
