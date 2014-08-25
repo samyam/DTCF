@@ -1,14 +1,18 @@
 #include "contraction.h"
 #define CCHECK 0
 #define RRANK 0
+#define DEBUG_TRR 0
+#define DEBUG_TP 0
 #define DEBUG_T 0
+#define DEBUG_T1 0
+#define DEBUG_TR 0
 #define DISPLAY_TIME 0
 #define COST_EVAL 0
 using namespace std;
 
 Contraction::Contraction(Grid* &g)
 {
-	grid = g;
+    grid = g;
 	rank = grid->rank;
 	num_procs = grid->nprocs;
 
@@ -24,7 +28,7 @@ Contraction::Contraction(Grid* &g)
 
 Contraction::Contraction(Tensor* &a, Tensor* &b, Tensor* &c, Grid* &g)
 {
-	grid = g;
+    grid = g;
 	rank = grid->rank;
 	num_procs = grid->nprocs;
 
@@ -221,8 +225,16 @@ void Contraction::generate_permutation_map(Tensor* &A, Tensor* &B, Tensor* &C, v
         }
     }
 
+    if(DEBUG_T1 && rank == RRANK){
+	if(nk_a != nk_b) {
+	    A->printInfo();
+	    B->printInfo();
+	    cout<<"nk_a is "<<nk_a<<" and nk_b is "<<nk_b<<endl<<endl;
+	}
+    }
     //makes sure the size of the contracting indices are equal in A and B
     assert(nk_a == nk_b);
+    
     n_k = nk_a;
 
     for (std::vector<pair<int,int>>::iterator it = contr_list.begin(); it != contr_list.end(); it++)
@@ -1261,6 +1273,12 @@ void Contraction::rec_summa(Tensor* &A, Tensor* &B, double* &C_buffer,
 			    pair<int,int> prev_cdim1, pair<int,int> prev_cdim2)
 {
 
+    //if(rank==RRANK && DEBUG_T) {
+    //	A->printInfo();
+    //	B->printInfo();
+    //}
+
+
     if(contr_list.empty())
     {
 	if(DEBUG_T && rank == RRANK) grid->print_proc_addr(RRANK);
@@ -1292,19 +1310,27 @@ void Contraction::rec_summa(Tensor* &A, Tensor* &B, double* &C_buffer,
     int cdim_A = p.first;
     int cdim_B = p.second;
 
+    /*if(rank == RRANK && DEBUG_T){
+	    cout<<"Matching Contraction indices A "<<cdim_A
+		<<" and B"<<cdim_B<<endl;
+		}*/
+
+
     // Find the upper bound for contraction index k
     int k_bound = A->vgrid[cdim_A];
-    /*cout<<"current contr index is "<<cdim_A
-      <<" and previous contr indx is "<<prev_cdim2.first<<endl;
-      cout<<"current SG map is  "<<A->SG_index_map[cdim_A]
-      <<" and previous SG map is "<<A->SG_index_map[prev_cdim2.first]<<endl;*/
-    
+
+    /*if(rank == RRANK && DEBUG_T){
+	cout<<"Previous cdim in symmetry group 1 is "<<prev_cdim1.first<<endl;
+	cout<<"Previous cdim in symmetry group 2 is "<<prev_cdim2.first<<endl;
+	}*/
+
     if(prev_cdim1.first != -1  
        &&  A->SG_index_map[cdim_A] == A->SG_index_map_permanent[prev_cdim1.first])
     {
         //cout<<"sym 1"<<endl;
         k_bound = prev_cdim1.second+1;
     }
+
     if(prev_cdim2.first != -1  
        &&  A->SG_index_map[cdim_A] == A->SG_index_map_permanent[prev_cdim2.first])
     {
@@ -1325,7 +1351,7 @@ void Contraction::rec_summa(Tensor* &A, Tensor* &B, double* &C_buffer,
         int *block_addr_A, *block_addr_B;
         instigation_time -= MPI_Wtime();
         int num_collected_A = instigate_collection(A, cdim_A, k, blocks_A, block_addr_A);
-        //if(rank==1)    printGetTiles(blocks_A, block_addr_A, A->block_size, num_collected_A, A->dims);
+        //if(DEBUG_T && rank==RRANK)    printGetTiles(blocks_A, block_addr_A, A->block_size, num_collected_A, A->dims);
 
         timer4 -=MPI_Wtime();
         int num_collected_B = instigate_collection(B, cdim_B, k, blocks_B, block_addr_B);
@@ -1409,12 +1435,23 @@ void Contraction::rec_summa(Tensor* &A, Tensor* &B, double* &C_buffer,
 
 
         //---------------------------------------Base Case Do the local dgemm ---------------------------------------//
+	//if(DEBUG_T && rank==RRANK){
+	//   cout<<"k is "<<k<<endl;
+	//}
 	
 
         // Compute
         if(contr_list.empty())
         {
+	    if(DEBUG_T && rank==rank){
+		cout<<"Rank "<<rank<<". Entering transpose and DGEMM"<<endl;
+	    }
+		
             transpose_and_dgemm(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer);
+	    if(DEBUG_T && rank==rank){
+		cout<<"Rank "<<rank<<". Exiting transpose and DGEMM"<<endl;
+	    }
+
         }
 
         //---------------------------------------------------------------------------------------------------------//
@@ -1433,7 +1470,7 @@ void Contraction::rec_summa(Tensor* &A, Tensor* &B, double* &C_buffer,
             if((A->SG_index_map[cdim_A] == A->SG_index_map[prev_cdim1.first] 
                         || prev_cdim1.first == -1) &&  A->SG_index_map[cdim_A] ==0)
             {
-                //if (rank ==0) cout<<"creating sym pair 1 with k "<<k<<endl;
+                //if (DEBUG_T && rank ==0) cout<<"creating sym pair 1 with k "<<k<<endl;
                 p1 = make_pair(cdim_A, k);
             }
             else
@@ -1442,9 +1479,9 @@ void Contraction::rec_summa(Tensor* &A, Tensor* &B, double* &C_buffer,
             }
 
             if((A->SG_index_map[cdim_A] == A->SG_index_map[prev_cdim2.first]
-                        || prev_cdim1.first == -1) &&  A->SG_index_map[cdim_A] ==1)
+                        || prev_cdim1.first == -1) &&  A->SG_index_map[cdim_A] == 1)
             {
-                //if(rank == 0)cout<<"creating sym pair 2 with k "<<k<<endl;
+                //if(DEBUG_T && rank == 0) cout<<"creating sym pair 2 with k "<<k<<endl;
                 p2 = make_pair(cdim_A, k);
             }
             else
@@ -1452,6 +1489,7 @@ void Contraction::rec_summa(Tensor* &A, Tensor* &B, double* &C_buffer,
                 p2 = prev_cdim2;
             }
 
+	    
             // Recursuvely call rec_summa for next contracting dimension
             rec_summa(sub_A, sub_B, C_buffer, contr_list, p1, p2);
 
@@ -1494,8 +1532,9 @@ void Contraction::transpose_and_dgemm_preserve(int num_blocks_A, int num_blocks_
     // Transpose blocks of B here because the outer for-loop requires the tranposed blocks of B
     // multiple times
     double* tr_blocks_buf_B =new double[num_blocks_B * B->block_size]; 
-
-
+    int tg = 0;
+    if(DEBUG_T && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
+		
 
     //-------------------------------------B-transpose---------------------------------------------//
 
@@ -1538,6 +1577,7 @@ void Contraction::transpose_and_dgemm_preserve(int num_blocks_A, int num_blocks_
         delete[] sym_composed_B;
 
     }
+    if(DEBUG_T && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
 
 
     map<int, map<int, int> >* big_matrix_map_B;
@@ -1589,6 +1629,7 @@ void Contraction::transpose_and_dgemm_preserve(int num_blocks_A, int num_blocks_
         delete[] sym_composed_A;
 
     }
+    if(DEBUG_T && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
 
     map<int, map<int, int> >* big_matrix_map_A;
     int num_row_dim_A = A->dims - num_cntr_indices;
@@ -1612,8 +1653,7 @@ void Contraction::transpose_and_dgemm_preserve(int num_blocks_A, int num_blocks_
    tr_time += MPI_Wtime();
 
     //if(rank==0) printGetTiles(blocks_A, block_addr_A, A->block_size, num_blocks_A, A->dims);
-   
-    C->untouch_all_address();
+      C->untouch_all_address();
 
     //if(!rank) cout<<"product of blocks of A and B"<<num_blocks_A * num_blocks_B<<endl;
     //if(!rank) cout<<"Num threads = "<<omp_get_num_threads()<<endl<<fflush;
@@ -1642,10 +1682,13 @@ void Contraction::transpose_and_dgemm_preserve(int num_blocks_A, int num_blocks_
 	cout<<"C_buf : "<<C->num_actual_tiles * C->block_size<<endl;
 
 	}
+    if(DEBUG_T && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
+
     comp_time -= MPI_Wtime();    
     kevin_dgemm(num_row_blocks*n_a,  n_b * num_col_blocks, n_k * num_cntr_blocks, blocks_A, blocks_B, C_buffer, 0, 0, 1.0);
     // kevin_dgemm(n_a * num_row_blocks, n_b * num_col_blocks, n_k * num_cntr_blocks, A_buff, B_buff, C_buffer, 0, 0, 1.0);
     comp_time += MPI_Wtime();
+    if(DEBUG_T && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
 
     revert_big_matrix(A, big_matrix_map_A, 
 		      blocks_A, n_a, n_k, 
@@ -1660,6 +1703,7 @@ void Contraction::transpose_and_dgemm_preserve(int num_blocks_A, int num_blocks_
 		      blocks_B, n_b, n_k, 
 		      p_map_B, tr_blocks_buf_B);
     
+    if(DEBUG_T && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
     
     delete[] blocks_B;
     blocks_B = tr_blocks_buf_B;
@@ -1674,7 +1718,7 @@ void Contraction::transpose_and_dgemm_preserve(int num_blocks_A, int num_blocks_
 void Contraction::transpose_and_dgemm(int num_blocks_A, int num_blocks_B, double* &blocks_A, double* &blocks_B, int* &block_addr_A, int* &block_addr_B, double* &C_buffer)
 {
      
-
+    if(num_blocks_B == 0 || num_blocks_A == 0) return;
     // Contract each block in sub-tensor A with each block in sub-tensor B
 
     // Transpose blocks of B here because the outer for-loop requires the tranposed blocks of B
@@ -1683,6 +1727,8 @@ void Contraction::transpose_and_dgemm(int num_blocks_A, int num_blocks_B, double
 
     int *perm_address_A = new int[A->dims*num_blocks_A]; 
     int *perm_address_B = new int[B->dims*num_blocks_B]; 
+    int tg = 0;
+    if(DEBUG_T && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
 
 
     //-------------------------------------B-transpose---------------------------------------------//
@@ -1726,14 +1772,16 @@ void Contraction::transpose_and_dgemm(int num_blocks_A, int num_blocks_B, double
         delete[] sym_composed_B;
 
     }
+    if(DEBUG_T && rank==rank)	cout<<"Rank "<<rank<<".  Num Blocks B"<<num_blocks_B<<endl;
+    if(DEBUG_T && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
 
 
     map<int, map<int, int> >* big_matrix_map_B;
     int num_row_dim_B = B->dims - num_cntr_indices;
-    if(rank == RRANK && DEBUG_T) {
-	cout<<"Num blocks B received is "<<num_blocks_B<<endl;
+    /*if(rank == RRANK && DEBUG_T) {
+	cout<<endl<<"Num blocks B received is "<<num_blocks_B<<endl;
 	print_tile_addrs(B->dims, block_addr_B, num_blocks_B);
-    }
+	}*/
     create_big_matrix(B, tr_blocks_buf_B, perm_address_B,
 		      p_map_B, num_blocks_B ,n_b, n_k, 
 		      num_row_dim_B, big_matrix_map_B, blocks_B);
@@ -1745,6 +1793,8 @@ void Contraction::transpose_and_dgemm(int num_blocks_A, int num_blocks_B, double
     double* tr_blocks_buf_A =new double[num_blocks_A * A->block_size]; 
     tr_time -= MPI_Wtime();
 
+
+    if(DEBUG_T && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
 
     for(int j=0; j<num_blocks_A; j++)
     {
@@ -1780,12 +1830,22 @@ void Contraction::transpose_and_dgemm(int num_blocks_A, int num_blocks_B, double
 
     }
 
+    if(DEBUG_T && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
+
     map<int, map<int, int> >* big_matrix_map_A;
     int num_row_dim_A = A->dims - num_cntr_indices;
+    /*if(rank == RRANK && DEBUG_T) {
+	cout<<endl<<"Num blocks A received is "<<num_blocks_A<<endl;
+	print_tile_addrs(A->dims, block_addr_A, num_blocks_A);
+	}*/
+
     create_big_matrix(A, tr_blocks_buf_A, perm_address_A,
 		      p_map_A, num_blocks_A, n_a, n_k, 
 		      num_row_dim_A, big_matrix_map_A, blocks_A);
-  
+    
+
+    if(DEBUG_T && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
+    
    tr_time += MPI_Wtime();
 
     //if(rank==0) printGetTiles(blocks_A, block_addr_A, A->block_size, num_blocks_A, A->dims);
@@ -1803,9 +1863,16 @@ void Contraction::transpose_and_dgemm(int num_blocks_A, int num_blocks_B, double
 //    if(rank == 0) cout<<"Num col blocks B is "<<num_col_blocks<<endl;
     // dgemm
     comp_time -= MPI_Wtime();
-    kevin_dgemm(num_row_blocks*n_a,  n_b * num_col_blocks, n_k * num_cntr_blocks, blocks_A, blocks_B, C_buffer, 0, 0, 1.0);
+    if(num_blocks_A>0 && num_blocks_B>0){
+	kevin_dgemm(num_row_blocks*n_a,  n_b * num_col_blocks, n_k * num_cntr_blocks, blocks_A, blocks_B, C_buffer, 0, 0, 1.0);
+    }
     //    kevin_dgemm(n_a*num_blocks_A, n_b*num_blocks_B, n_k, blocks_A, blocks_B, C_buffer, 0, 0, 1.0);
     comp_time += MPI_Wtime();
+    if(DEBUG_T && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
+    if(rank == RRANK && DEBUG_T) {
+	cout<<"Returning "<<endl;
+    }
+
     
     delete[] blocks_A;
     delete[] blocks_B;
@@ -1821,7 +1888,7 @@ void Contraction::kevin_dgemm(int n_a, int n_b, int n_k, double* &A_buf, double*
 //#pragma omp critical
     local_num_dgemm++;
     
-    if(rank == RRANK && DEBUG_T) cout<<endl<<local_num_dgemm<<"th Dgemm with na : "<<n_a<<" n_b : "<<n_b<<" and n_k : "<<n_k<<"."<<endl;
+    //if(rank == RRANK && DEBUG_T) cout<<endl<<local_num_dgemm<<"th Dgemm with na : "<<n_a<<" n_b : "<<n_b<<" and n_k : "<<n_k<<"."<<endl;
 
     dgemm_time -= MPI_Wtime();
     local_contraction(n_a, n_b, n_k, A_buf, B_buf, C_buf, at, bt, alpha);
@@ -2284,7 +2351,7 @@ void Contraction::rotate(Tensor* &T_input, Tensor*& T_output, vector<pair<int,in
 void Contraction::contract(string contr_str_A, string contr_str_B, string contr_str_C)
 {
     int checkpoint =0;
-    if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl; 
+    if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
     total_time = 0;
     total_time -= MPI_Wtime();
     timer1 = 0.0;
@@ -2305,7 +2372,7 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
 
     //if(rank==RRANK && DEBUG_T) cout << "A[" << contr_str_A << "]  x  B[" << contr_str_B << "]  =  C[" << contr_str_C << "]" << endl;
 
-    if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl; 
+    if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 
     //dgemm parameters initialize
     n_a = n_b = n_k = 1;
@@ -2316,20 +2383,20 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
     dims_B = parse_contr_str(contr_str_B, B->contr_dim_str);
     dims_C = parse_contr_str(contr_str_C, C->contr_dim_str);
 
-    if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl;     
+    if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl;     
 
     // Gives the mapping of external indices in the input to external indices in the output. 
     // This mapping is used to find tile address of the output tensor
     fill_input_to_output_map(A->contr_dim_str, dims_A, C->contr_dim_str, dims_C, A_to_C_map, EXT_A);
     fill_input_to_output_map(B->contr_dim_str, dims_B, C->contr_dim_str, dims_C, B_to_C_map, EXT_B);
 
-    if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl; 
+    if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
     // Identify contracting indices in A and B
     vector<pair<int,int>> contr_list = vector<pair<int,int>>();
     vector<pair<int,int>> DDO_list = vector<pair<int,int>>();
     vector<pair<int,int>> DDA_list = vector<pair<int,int>>();
     
-    if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl; 
+    if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 
     
     //if(rank==0 && COST_EVAL)
@@ -2360,7 +2427,7 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
         }
     }
     
-    if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl; 
+    if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
     int need_reduction = 0;
     num_cntr_indices = contr_list.size();
 
@@ -2379,7 +2446,7 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
     bool redistr_A, redistr_B;
     realign_new_idmap(new_idmap_A, new_idmap_B, contr_list, redistr_A, redistr_B);
 
-    if(rank==0 && DEBUG_T) 
+    if(rank==0 && DEBUG_TR) 
     {
         cout << " Before Redistribution: " ;
         print_tile_addr(A->dims, A->index_dimension_map);
@@ -2390,7 +2457,7 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
         print_tile_addr(A->dims, new_idmap_A);
         print_tile_addr(B->dims, new_idmap_B);
         cout << endl << fflush;
-    }
+	}
 
     // Perform redistribution if required
     if(redistr_A)
@@ -2404,7 +2471,7 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
     }
     redist_time += MPI_Wtime();
 
-    if(rank==0 && DEBUG_T) 
+    if(rank==0 && DEBUG_TR) 
     {
         cout << " After Redistribution: " ;
         print_tile_addr(A->dims, A->index_dimension_map);
@@ -2416,14 +2483,14 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
     // Assert contraction validity
     assert_contr_validity(A, B);
 
-    if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl; 
+    if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 
     //Generate RSUMMA(DDO-Distributed Distributed Orthogonal) and 
     //Reduction(DDA-Distributed Distributed Aligned)V contraction lists
     int* reduction_dims = new int[grid_dims];
     memset(reduction_dims, 0, grid_dims*sizeof(int));
 
-    if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl; 
+    if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 
     for (std::vector<pair<int,int>>::iterator cntr_it=contr_list.begin(); cntr_it != contr_list.end(); ++cntr_it)
     {
@@ -2448,9 +2515,9 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
 	}
     }
     
-    if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl; 
+    if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 
-    if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl; 
+    if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 
 // Identify contracting indices in A and B
     list<int> rotate_dims;
@@ -2476,7 +2543,7 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
         }
     }
 
-     if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl; 
+     if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
      
   // Transpose blocks of C as required for this contraction
     double tr_C_time = -MPI_Wtime();
@@ -2486,7 +2553,7 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
     //stores the permuted tile_address
     int* permuted_address = new int[C->num_actual_tiles * C->dims];
 
-    if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl; 
+    if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
     for(int i=0; i < C->num_actual_tiles; i++)
     {
         transpose_block =  C->tensor_tiles + i*C->block_size;
@@ -2504,8 +2571,8 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
     }
     tr_C_time += MPI_Wtime();
   
-    if(DEBUG_T && rank == RRANK) cout<<"Rotate dims size is "<<rotate_dims.size()<<"."<<endl;
-       if(rank == RRANK && DEBUG_T) 
+    if(DEBUG_TRR && rank == RRANK) cout<<"Rotate dims size is "<<rotate_dims.size()<<"."<<endl;
+       if(rank == RRANK && DEBUG_TP) 
        {
 	   cout<<"Permutation Map of A"<<endl;
 	   print_tile_addr(A->dims,p_map_A);
@@ -2516,7 +2583,7 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
 
        }
 
-       if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl; 
+       if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
     //--------------------------------------------------------------------------------//
     if(rotate_dims.size())
      {
@@ -2525,7 +2592,7 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
 	 int* address_B = new int[B->num_actual_tiles * B->dims];
 	 memcpy(data_B, B->tensor_tiles, B->num_actual_tiles * B->block_size *sizeof(double));
 	 memcpy(address_B, B->tile_address, B->num_actual_tiles * B->dims *sizeof(int));
-	 if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl; 
+	 if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 
 	 timer5 = MPI_Wtime() -MPI_Wtime();
 	 rotate(A, C, DDO_list, 
@@ -2536,15 +2603,11 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
      else
      {
 
-	
-
-
-
-	 if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl; 
+	 if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 	 //cmbines individial tiles of C into a 2D matrix called big_matrix_C
 	 std::map<int, std::map<int, int> >* big_matrix_map_C;
 	 double* big_matrix_C;
-	 int num_row_dim_C = C->dims - (A->dims - num_cntr_indices);
+	 int num_row_dim_C = C->dims - (B->dims - num_cntr_indices);
 	 
 	 if(rank ==0)
 	 {
@@ -2555,9 +2618,9 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
 	 } 
 
 
-	 if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl; 
+	 if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 	 bm_time -= MPI_Wtime();
-	 if(DEBUG_T && C->get_rank() == RRANK) cout<<endl<<"Printing C"<<endl<<fflush;
+	 //if(DEBUG_T && C->get_rank() == RRANK) cout<<endl<<"Printing C"<<endl<<fflush;
 	 create_big_matrix(C, C->tensor_tiles, permuted_address,
 			   p_map_C, C->num_actual_tiles ,n_a, n_b, 
 			   num_row_dim_C, big_matrix_map_C, big_matrix_C);
@@ -2570,7 +2633,12 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
 	 pair<int,int> p1(-1,-1);
 	 pair<int,int> p2(-1,-1);
 	 
-	 if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl; 
+	 if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
+	 if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Entering RSUMMA " <<endl; 
+	 //if(rank==RRANK && DEBUG_T) {
+	 //cout<<"Entering Rec_SUMMA"<<endl<<endl;
+	     //}
+	 
 	 timer5 =- MPI_Wtime();
 	 rec_summa(A, B, big_matrix_C, DDO_list, p1, p2);
 	 timer5 += MPI_Wtime();
@@ -2585,7 +2653,7 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
      
 	 //------------------------Reduction and Rotation Done ------------------------//
 	
-	 if(DEBUG_T && rank == RRANK) cout<<"Printing C"<<endl<<fflush;
+	 //if(DEBUG_T && rank == RRANK) cout<<"Printing C"<<endl<<fflush;
 	 bm_time -= MPI_Wtime();
 	 //changes the 2D representation to individial tiles
 	 revert_big_matrix(C, big_matrix_map_C, 
@@ -2595,7 +2663,7 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
  
      }
     //---------------------------------------------------------------------------------//
-    if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl; 
+    if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 
  // Transpose back blocks of C to their original form
     tr_C_time -= MPI_Wtime();
@@ -2609,7 +2677,7 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
     }
     delete[] block_to_transpose;
 
-    if(rank==RRANK && DEBUG_T) cout << "Checkpoint " <<(checkpoint++)<< endl;        
+    if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl;        
     tr_C_time += MPI_Wtime();
    
     redist_time -=MPI_Wtime();
@@ -2647,9 +2715,10 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
 	print_time_flops();
     }
     // Reset the contraction map of input tensors
-    //commenting for debugging uncomment later
-    memset(A->cntr_map, 0, dims_A);
-    memset(B->cntr_map, 0, dims_B);
+    //commenting for debugging uncomment later    
+    //if(rank == 0) cout<<"Resetting cntr_map"<<dims_A<<endl;
+    memset(A->cntr_map, 0, sizeof(double) * dims_A);
+    memset(B->cntr_map, 0, sizeof(double)* dims_B);
 }
 
 void Contraction::display_times(){

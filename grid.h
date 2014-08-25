@@ -63,6 +63,9 @@ class Grid
         // Constructor
         Grid(int num_dims, int* phy_grid);
 
+	//prints grid information
+	void printInfo();
+
         // Create a mapping from allocated grid dimensions to the exposed grid dimensions
         void create_gdmap();
 

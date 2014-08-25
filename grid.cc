@@ -326,3 +326,19 @@ string Grid::get_proc_addr_str(int r)
 }
 
 
+void Grid::printInfo(){
+    cout<<"NUmber of Processors is "<<nprocs<<endl;
+    cout<<"Grid Dimensions is "<<grid_dims<<endl;
+    cout<<"Processor rank is "<<rank<<endl;
+    cout<<"Grid size is [ ";
+    for(int i =0; i<grid_dims; i++)
+	cout<<pgrid[i]<<", ";
+    cout<<"]"<<endl;
+    
+    cout<<"Proc address is [ ";
+    for(int i =0; i<grid_dims; i++)
+	cout<<proc_addr[i]<<", ";
+    cout<<"]"<<endl<<endl;
+    
+
+}

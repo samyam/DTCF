@@ -3,7 +3,8 @@
 #include "tensor.h"
 #include "contraction.h"
 #include "redistribute.h"
-#define DEBUG_T 0
+#define DEBUG_T 1
+#define RRANK 0
 using namespace std;
 
 int main(int argc, char* argv[])
@@ -26,6 +27,7 @@ int main(int argc, char* argv[])
     pgrid_4[3] = atoi(argv[2]);
 
     Grid* grid = new Grid(4, pgrid_4);
+    Grid* grid1 = new Grid(4, pgrid_4);
 
     int* size__a10043 = new int[4];
     size__a10043[0] = Vb;
@@ -44,7 +46,8 @@ int main(int argc, char* argv[])
     vgrid__a10043[3] = atoi(argv[3]);
     Tensor* _a10043 = new Tensor("ccaa", idmap__a10043, size__a10043, vgrid__a10043, grid);
     _a10043->initialize();
-    cout<<"Initialized first tensor"<<endl;
+    if(rank == RRANK)
+	cout<<"Initialized first tensor"<<endl;
     int* size__a10086 = new int[4];
     size__a10086[0] = Ob;
     size__a10086[1] = Vb;
@@ -5163,6 +5166,7 @@ int main(int argc, char* argv[])
     Tensor* ta_vo = new Tensor("cc", idmap_ta_vo, size_ta_vo, vgrid_ta_vo, grid);
     ta_vo->initialize();
 
+
     int* size_taa_vvoo = new int[4];
     size_taa_vvoo[0] = Va;
     size_taa_vvoo[1] = Va;
@@ -5844,29 +5848,36 @@ int main(int argc, char* argv[])
     double time = -MPI_Wtime();
     double max_time = 0;
 
+    
     if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 0: " << endl;
     Contraction* C0 = new Contraction(vaa_vovv, ta_vo, _a24849, grid);
     C0->contract( "p1a,h2a,p3a,p2a", "p3a,h2a", "p1a,p2a");
-
+    if(rank==0 && DEBUG_T) ta_vo->printInfo();
+    
     if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 1: " << endl;
     Contraction* C1 = new Contraction(vab_oovv, tb_vo, _a5246, grid);
     C1->contract( "h2a,h1b,p2a,p1b", "p1b,h2b", "h2a,h1b,p2a,h2b");
+  
 
     if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 2: " << endl;
     Contraction* C2 = new Contraction(vbb_oovv, tbb_vvoo, _a14811, grid);
     C2->contract( "h1b,h3b,p1b,p3b", "p1b,p3b,h2b,h3b", "h1b,h2b");
-
+  
+      
     if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 3: " << endl;
     Contraction* C3 = new Contraction(vab_vovo, ta_vo, _a30368, grid);
     C3->contract( "p1a,h1b,p2a,h2b", "p2a,h1a", "p1a,h1b,h2b,h1a");
+  
 
     if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 4: " << endl;
     Contraction* C4 = new Contraction(vab_ovvv, tab_vvoo, _a34826, grid);
     C4->contract( "h2a,p2b,p2a,p1b", "p2a,p1b,h1a,h2b", "h2a,p2b,h1a,h2b");
+  
 
     if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 5: " << endl;
     Contraction* C5 = new Contraction(vab_vovv, tb_vo, _a9395, grid);
     C5->contract( "p1a,h1b,p2a,p1b", "p1b,h1b", "p1a,p2a");
+  
 
     if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 6: " << endl;
     Contraction* C6 = new Contraction(vaa_oovv, tab_vvoo, _a3071, grid);
@@ -6139,11 +6150,14 @@ int main(int argc, char* argv[])
     if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 73: " << endl;
     Contraction* C73 = new Contraction(vab_oovv, tab_vvoo, _a4861, grid);
     C73->contract( "h2a,h1b,p2a,p1b", "p1a,p1b,h2a,h1b", "p1a,p2a");
-
+    
+    if(rank==0 && DEBUG_T) tab_vvoo->printInfo();
     if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 74: " << endl;
     Contraction* C74 = new Contraction(tab_vvoo, _a34896, _a34897, grid);
     C74->contract( "p2a,p2b,h1a,h2b", "p1a,p2a", "p2b,p1a,h1a,h2b");
-
+    //if(rank==0 && DEBUG_T) taa_vvoo->printInfo();
+    //if(rank==0 && DEBUG_T) vaa_oovv->printInfo();
+    
     if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 75: " << endl;
     Contraction* C75 = new Contraction(vab_oovv, tab_vvoo, _a4920, grid);
     C75->contract( "h2a,h1b,p2a,p1b", "p2a,p1b,h1a,h2b", "h2a,h1b,h1a,h2b");
@@ -6151,11 +6165,14 @@ int main(int argc, char* argv[])
     if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 76: " << endl;
     Contraction* C76 = new Contraction(ta_vo, _a4920, _a26518, grid);
     C76->contract( "p1a,h2a", "h2a,h1b,h1a,h2b", "p1a,h1b,h1a,h2b");
-
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 77: " << endl;
+    
+      if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 77: " << endl;
     Contraction* C77 = new Contraction(tab_vvoo, _a28178, _a29111, grid);
     C77->contract( "p1a,p3b,h1a,h2b", "h1b,p3b", "p1a,h1b,h1a,h2b");
-
+    if(rank==0 && DEBUG_T) tab_vvoo->printInfo();
+    
+    //if(rank==0 && DEBUG_T) grid->printInfo();
+    //if(rank==0 && DEBUG_T) grid1->printInfo();
     if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 78: " << endl;
     Contraction* C78 = new Contraction(vaa_oovv, taa_vvoo, _a14870, grid);
     C78->contract( "h2a,h3a,p2a,p3a", "p2a,p3a,h1a,h2a", "h3a,h1a");
@@ -6575,6 +6592,6 @@ int main(int argc, char* argv[])
     time += MPI_Wtime();
     MPI_Reduce(&time, &max_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
     if(rank==0) cout<<endl<<endl<<"Total CAST CCSD Time = " << max_time << " seconds" << endl;
-
+       
     MPI_Finalize();
 }

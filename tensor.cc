@@ -12,7 +12,7 @@ Tensor::Tensor(
 		Grid* &grid
 		)
 {
-	g = grid;
+    g = grid;
 	grid_dims = grid->grid_dims;
 
 	tensor_str = tnsr_str;
@@ -912,6 +912,7 @@ Tensor* Tensor::generate_tensor_with_new_tiles(double* &data_blocks,
 	int* new_tensor_size = new int[dims];
 	memcpy(new_tensor_size, tensor_size, dims * sizeof(int));
 	
+
 	Tensor *X = new Tensor(tensor_str, index_dimension_map, new_tensor_size, new_vgrid, g);
 
 	memcpy(X->cntr_map, cntr_map, dims*sizeof(int));

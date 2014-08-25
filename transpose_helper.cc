@@ -26,6 +26,8 @@ void create_big_matrix(Tensor* &T, double* &tensor_tiles, int* &permuted_address
     //This packing allows calling of dgemm on similarly created matrix A and matrix B
     //The goal is to run a single parallel huge dgemm instead of running multiple dgemms
     int dims_T = T->get_dims();
+    
+    
 
     //create a permuted tensor grid for C based on the permutation map.
     //this allows easily accessing ranks of different tiles of C based on tile
@@ -46,6 +48,12 @@ void create_big_matrix(Tensor* &T, double* &tensor_tiles, int* &permuted_address
 
     //where i and j are from A and m and n are from B gets permuted to C[i,j,m,n]
     int* temp_T_addr = new int[dims_T];
+
+    if(DEBUG_T) {
+	cout<<"Rank : "<<T->get_rank()<<" ";
+	print_tile_addrs(dims_T, permuted_address, num_tiles);
+	cout<<"Rank : "<<T->get_rank()<<" Num Row Dim "<<num_row_dim<<endl;
+    }
 
     //for each tile in C create a map to the placement in the large matrix
     for(int i=0; i < num_tiles; i++)
@@ -76,8 +84,6 @@ void create_big_matrix(Tensor* &T, double* &tensor_tiles, int* &permuted_address
 	}
 	int T_column_rank = T_grid->get_block_rank(temp_T_addr);
 	
-	
-
 	//insert the row and column address in the big_matrix_map
 	if( big_matrix_map->find(T_row_rank) == big_matrix_map->end())
 	{
@@ -97,7 +103,7 @@ void create_big_matrix(Tensor* &T, double* &tensor_tiles, int* &permuted_address
 
     big_matrix = new double[num_tiles * T->get_block_size()];
     if(DEBUG_T && T->get_rank() == 0) cout<<"size created "<<num_tiles * T->get_block_size()<<endl;
-   int row_count =0;
+    int row_count =0;
     int column_count =0;
 
     int total_rows = big_matrix_map->size() * row_per_block;
