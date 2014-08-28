@@ -11,7 +11,7 @@
 #include "helper.h"
 #include "grid.h"
 
-class GridRedib
+class GridRedistribute
 {
     private:
 	int size;
@@ -85,10 +85,10 @@ class GridRedib
     public:
 
 	// Constructor
-	GridRedib(Tensor* tensor, int* new_index_map, Grid* new_g);
+	GridRedistribute(Tensor* tensor, int* new_index_map, Grid* new_g);
 
     // Destructor 
-	~GridRedib();
+	~GridRedistribute();
 
 	// Redistribute the tensor in the processor grid as per a new dimension mapping
 	void redistribute();

@@ -31,6 +31,7 @@ class Tensor
 	friend class TensorRedistributor;
 	friend class Contraction;
 	friend class cost;
+	friend class GridRedistribute;
 
 	Grid* g;
 	int rank;	        // MPI rank

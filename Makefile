@@ -42,7 +42,7 @@ MAIN = CCSD
 LINK = $(CC)
 
 EXE = CCSD.x
-OBJS = tensor.o contraction.o redistribute.o helper.o transpose_helper.o localcontract.o block_grid.o grid.o correct.o $(MAIN).o 
+OBJS = tensor.o redistribute.o grid_redib.o contraction.o helper.o transpose_helper.o localcontract.o block_grid.o grid.o correct.o $(MAIN).o 
 
 
 all: $(EXE)
