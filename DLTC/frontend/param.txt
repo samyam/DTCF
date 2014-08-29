@@ -1,0 +1,6 @@
+#define NIDX 15
+#define NOCC 8
+#define NVRT 8
+enum IndexName{h1,h10,h11,h2,h6,h7,h8,h9,p3,p4,p5,p6,p7,p8,p9};
+#define NMULT 30
+#define NSUMM 14
