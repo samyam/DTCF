@@ -1,6 +1,7 @@
 #include "tensor.h"
 #define RRANK 0
 #define DEBUG_TENSOR 0
+namespace RRR{
 using namespace std;
 
 // Constructor
@@ -1121,5 +1122,5 @@ void print_double_Array(int inner_max, int outer_max, int** bouncers)
 		cout<<"]\n";
 	}
 }
-
+}
 

@@ -1,5 +1,6 @@
 #include "redistribute.h"
 #include "tensor.h"
+namespace RRR{
 using namespace std;
 
 
@@ -1380,4 +1381,4 @@ void TensorRedistributor::deserialize(int distr_tensor_dim, int distr_grid_dim)
 	T->fill_index_table();
 }
 
-
+}

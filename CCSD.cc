@@ -5,7 +5,7 @@
 #include "redistribute.h"
 #define DEBUG_T 1
 #define RRANK 0
-using namespace std;
+using namespace RRR;
 
 int main(int argc, char* argv[])
 {

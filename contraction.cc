@@ -8,6 +8,7 @@
 #define DEBUG_TR 0
 #define DISPLAY_TIME 0
 #define COST_EVAL 0
+namespace RRR{
 using namespace std;
 
 Contraction::Contraction(Grid* &g)
@@ -2822,4 +2823,4 @@ void Contraction::print_time_flops()
 
     }
 }
-
+}

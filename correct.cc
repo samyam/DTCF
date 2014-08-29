@@ -1,6 +1,7 @@
 #include "contraction.h"
 #include "grid.h"
 
+namespace RRR{
 using namespace std;
 
 
@@ -254,3 +255,4 @@ void Contraction::CRCT_final_validation()
 
 }
 
+}

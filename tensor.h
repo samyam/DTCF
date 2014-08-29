@@ -20,7 +20,7 @@
 #define SYM_GROUP_1 1
 #define NON_SYM 3
 #define CONTRACTED 4
-
+namespace RRR{
 using namespace std;
 class Tensor
 {
@@ -188,7 +188,13 @@ class Tensor
 
 	// Destructor
 	~Tensor();
+	
+	//////////////////////////Interface is Global Arrays///////////////////////////
+	
+	void load_from_GA(int handle);
 
+	void accumulate_to_GA(int handle);
+	///////////////////////////////////////////////////////////////////////////////
 	
 	// Compute the number of maximum possible tiles in the tensor at this processor
 	int compute_num_max_tiles(int* &idmap, int* &phy_grid);
@@ -349,8 +355,10 @@ class Tensor
 
 	// Check if the address satisfies tensor symmetry criterion
 	bool satisfies_sym(int* &addr);
-
-
+	
+	
+	
+	
 	// Getter functions
 
 	int get_block_size()                    { return block_size;}
@@ -366,5 +374,5 @@ class Tensor
 	int* get_tile_addresses()               { return tile_address;}
 	int get_rank()                          { return rank;}
 };
-
+}
 #endif

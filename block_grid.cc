@@ -1,4 +1,5 @@
 #include "block_grid.h"
+namespace RRR{
 using namespace std;
 
 // Constructor
@@ -101,4 +102,4 @@ string Block_Grid::get_block_addr_str(int r)
     return block_addr_str.str();
 }
 
-
+}

@@ -10,7 +10,7 @@
 #include "tensor.h"
 #include "helper.h"
 #include "grid.h"
-
+namespace RRR{
 class TensorRedistributor
 {
     private:
@@ -93,5 +93,5 @@ class TensorRedistributor
 	void redistribute();
 
 };
-
+}
 #endif

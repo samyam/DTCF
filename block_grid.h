@@ -8,7 +8,7 @@
 #include "mpi.h"
 #include "helper.h"
 
-
+namespace RRR{
 using namespace std;
 
 class Block_Grid
@@ -68,4 +68,5 @@ class Block_Grid
         // Returns the string of the block's multi-dimensional address, given its rank
         string get_block_addr_str(int r);
 };
+}
 #endif

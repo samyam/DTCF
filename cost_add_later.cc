@@ -3,6 +3,7 @@
 #include <ctime>
 #include <sys/time.h>
 
+namespace RRR{
 using namespace std;
 
 
@@ -454,3 +455,4 @@ bool cost::check_space(Tensor* &A, int dimsC, int griddims, Grid* &G)
 
 
 
+}

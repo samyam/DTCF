@@ -4,7 +4,8 @@
 #define DEBUG_T 0
 #define RRANK 0
 
-using namespace std;
+namespace RRR{
+    using namespace std;
 /*creates a 2D matrix from a list of multidimensional tensor tiles
 this function works in the following way. It takes each block and 
 places its data in the appropriate position in the 2D matrix. Each 
@@ -402,4 +403,5 @@ void revert_big_matrix(Tensor* &T, map<int, map<int, int> >* &big_matrix_map,
 	row_count += row_per_block;
     }
 
+}
 }

@@ -15,7 +15,7 @@
 #include "omp.h"
 
 #define DEBUG 0
-
+namespace RRR{
 using namespace std;
 /*creates a 2D matrix from a list of multidimensional tensor tiles
 this function works in the following way. It takes each block and 
@@ -41,5 +41,5 @@ extern void create_big_matrix_nl(Tensor* &T, double* &tensor_tiles, int* &permut
 extern void revert_big_matrix(Tensor* &T, map<int, map<int, int> >* &big_matrix_map, 
 			      double* &big_matrix, int row_per_block, int col_per_block, 
 			      int* &p_map_T, double* &tensor_tiles);
-
+}
 #endif

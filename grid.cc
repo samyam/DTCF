@@ -1,6 +1,7 @@
 #include "grid.h"
 #define RRANK 0
 #define DEBUG_GRID 0
+namespace RRR{
 using namespace std;
 
 // Constructor
@@ -341,4 +342,5 @@ void Grid::printInfo(){
     cout<<"]"<<endl<<endl;
     
 
+}
 }

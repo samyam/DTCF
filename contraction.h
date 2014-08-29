@@ -21,7 +21,7 @@
 #define EXT_A 1
 #define EXT_B 2
 #define CONTR_AB 0
-
+namespace RRR{
 // Ideally extend this class and make different contractions from it
 class Contraction 
 {
@@ -257,4 +257,5 @@ public:
 
 
 };
+}
 #endif

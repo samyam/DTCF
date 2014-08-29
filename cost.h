@@ -1,7 +1,7 @@
 #include "tensor.h"
 #include <ctime>
 #include <sys/time.h>
-
+namespace RRR{
 using namespace std;
 
 
@@ -52,3 +52,4 @@ public:
     bool check_space(Tensor* &A, int dimsC, int griddims, Grid* &G);
 
 };
+}

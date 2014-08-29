@@ -11,7 +11,7 @@
 #ifdef __bgq__
 #include <mpix.h>
 #endif
-
+namespace RRR{
 using namespace std;
 
 class Grid
@@ -93,4 +93,5 @@ class Grid
         // Returns the string of the processor's multi-dimensional address, given its rank
         string get_proc_addr_str(int r);
 };
+}
 #endif
