@@ -13,15 +13,18 @@
 #include <algorithm>
 #include <map>
 #include <climits>
+#include "dltc_tensor.h"
 #include "helper.h"
 #include "grid.h"
-
+#include <vector>
 #define SYM_GROUP_0 0
 #define SYM_GROUP_1 1
 #define NON_SYM 3
 #define CONTRACTED 4
-namespace RRR{
+namespace RRR {
+
 using namespace std;
+
 class Tensor
 {
 
@@ -39,6 +42,8 @@ class Tensor
 
 	// Dimension of the tensor and the physical grid
 	int dims, grid_dims;
+	
+
 
 	// Tensor string
 	std::string tensor_str;
@@ -191,9 +196,9 @@ class Tensor
 	
 	//////////////////////////Interface is Global Arrays///////////////////////////
 	
-	void load_from_GA(int handle);
+	void initialize_from_ga_tensor(DLTC::Tensor &t);
 
-	void accumulate_to_GA(int handle);
+	void accumulate_to_ga_tensor(DLTC::Tensor &t);
 	///////////////////////////////////////////////////////////////////////////////
 	
 	// Compute the number of maximum possible tiles in the tensor at this processor

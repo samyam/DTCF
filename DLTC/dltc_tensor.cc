@@ -217,15 +217,19 @@ void Tensor::getTile(double*& buf, int bufSize, const vector<int>& idv, bool& in
   int lo[dim_];
   int hi[dim_];
   int ld[dim_];
+
   for (int i = 0; i < dim_; i++) {
     lo[i] = idv[i] * wbs_[i];
-    hi[i] = (idv[i] + 1) * wbs_[i] - 1;
+    hi[i] = (idv[i] + 1) * wbs_[i] - 1;    
   }
+
+
   for (int i = 1; i < dim_; i++) {
     ld[i - 1] = wbs_[i];
   }
 
-//#if CACHING
+
+#if CACHING
   if (Cache.contains(id_, tileIndex)) {
     if (dim_ == 2) nhit2++;
     else nhit4++;
@@ -234,28 +238,32 @@ void Tensor::getTile(double*& buf, int bufSize, const vector<int>& idv, bool& in
     inCache = true;
   }
   else {
-    Profiler::inc(id_, tileIndex, dim_);
-    ngaget[id_] += 1;
+
+      //Profiler::inc(id_, tileIndex, dim_);
+      ngaget[id_] += 1;
     NGA_Get(handle_, lo, hi, buf, ld);
     inCache = Cache.add(id_, tileIndex, buf, bufSize);
     traffic += bufSize;
   }
-//#else
-//  Profiler::inc(id_, tileIndex, dim_);
-//  ngaget[id_] += 1;
-//  NGA_Get(handle_, lo, hi, buf, ld);
-//#endif
+#else
+
+    //Profiler::inc(id_, tileIndex, dim_);
+    //ngaget[id_] += 1;
+
+  NGA_Get(handle_, lo, hi, buf, ld);
+  #endif
 
 #endif
+
 
 #if TIMER
-  MyTimer::stop(GET);
+      //MyTimer::stop(GET);
 #endif
 
-  gettime += MPI_Wtime();
-  nget[id_] += 1;
-  tget[id_] += gettime;
-  tget_ += gettime;
+  //gettime += MPI_Wtime();
+  //nget[id_] += 1;
+  //tget[id_] += gettime;
+  //tget_ += gettime;
 }
 
 void Tensor::getTile2(double*& buf, int bufSize, const vector<int>& idvm, bool& fromCache) {

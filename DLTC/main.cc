@@ -8,10 +8,8 @@
 #include "task.h"
 #include "profiler.h"
 #include "cache.h"
+#define TIMER 1
 
-
-int nget2, nhit2;
-int nget4, nhit4;
 
 #if CHECK
 #include "checker.h"
@@ -35,6 +33,9 @@ vector<Tensor> T;
 int numTensors;
 int numMuls;
 int numSums;
+
+int nget2, nhit2;
+int nget4, nhit4;
 vector<int> nget;
 vector<int> ngaget;
 vector<double> tget;
@@ -44,7 +45,7 @@ vector<double> Atget;
 vector<double> Btget;
 
 
-int O, V, spO, spV, wbO, wbV;
+//int O, V, spO, spV, wbO, wbV;
 int me, nprocs, nthrds;
 LRUCache Cache;
 
@@ -207,7 +208,7 @@ void printTimer() {
 
   }
 }
-
+/*
 int main(int argc, char **argv) {
 
   nget2 = 0;
@@ -333,5 +334,5 @@ int main(int argc, char **argv) {
 #endif
 
   MPI_Finalize();
-}
+}*/
 

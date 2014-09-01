@@ -1,5 +1,5 @@
-#ifndef _TENSOR_H_
-#define _TENSOR_H_
+#ifndef _DTENSOR_H_
+#define _DTENSOR_H_
 
 #include <cassert>
 #include <mpi.h>
@@ -15,7 +15,10 @@
 #endif
 
 extern int me, nprocs;
-namespace DLTC{
+
+namespace DLTC
+{
+
 class Tensor {
   private:
     vector<IndexName> ids_;
