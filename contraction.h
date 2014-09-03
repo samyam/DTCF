@@ -17,6 +17,7 @@
 #include "block_grid.h"
 #include "transpose_helper.h"
 #include "cost.h"
+#include "grid_redib.h"
 
 #define EXT_A 1
 #define EXT_B 2

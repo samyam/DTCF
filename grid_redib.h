@@ -1,5 +1,5 @@
-#ifndef _TENSOR_REDIST_H_
-#define _TENSOR_REDIST_H_
+#ifndef _GRID_REDIST_H_
+#define _GRID_REDIST_H_
 
 #include <mpi.h>
 #include <stdio.h>
@@ -10,7 +10,10 @@
 #include "tensor.h"
 #include "helper.h"
 #include "grid.h"
+
 namespace RRR{
+using namespace std;
+
 class GridRedistribute
 {
     private:
@@ -72,16 +75,12 @@ class GridRedistribute
 
 	// Find the processors that have the blocks that are supposed to be held at this processor
 	// and post receives for them
-	void redistribute_recv(std::list<recv_data> &recv_list);
-
-	// Serialize a dimension
-	// Performs an allgather along this dimension
-	void serialize(int distr_tensor_dim, int distr_grid_dim);
-
-	// Deserialize a dimension (distribute it)
-	// Deletes unnecessary blocks along this dimension
-	void deserialize(int distr_tensor_dim, int distr_grid_dim);
-
+	void redistribute_recv(std::list<recv_data> &recv_list, int* &repl_dims, int repcount);
+	
+	int get_replicated_dims(int* &idmap, int* &repl_dims);
+	
+	
+	void replicate(int rep_dim);
     public:
 
 	// Constructor

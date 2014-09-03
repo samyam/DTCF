@@ -2421,17 +2421,32 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
     
     if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 
+    bool changed;
+    cost* eval = new eval(A, B, C, grid);
     
-    //if(rank==0 && COST_EVAL)
-    //{
-    //	cost* eval = new cost(A,B,C, dims_A, dims_B, dims_C, grid, grid_dims);
-    //	int* new_idmap_A = new int[dims_A];
-    //	int* new_idmap_B = new int[dims_B];
-    //	int* new_idmap_C = new int[dims_C];
-    //	eval->best_Cost(new_idmap_A,new_idmap_B,new_idmap_C);
-    //	
-    //}
+    int* idmapA;
+    int* idmapB;
+    int* idmapC;
+    int* ndimG;
+    int* npgrid;	
+    if(rank==rank && DEBUG_T) cout<<"Calling Cost function"<<endl;	
+    changed=eval->bestCost(idmapA,idmapB,idmapC,ndimG,npgrid);
 
+    if(changed)
+    {
+	int gdim=ndimG[0];
+	if(rank==rank && DEBUG_T) cout<<"Creating new Grid"<<endl;	
+	Grid* new_grid = new Grid(gdim, npgrid);
+	if(rank==rank && DEBUG_T) cout<<"Redistributing A"<<endl;
+	GridRedistribute* Aredib = new GridRedistribute(A,idmapA,new_grid);
+	Aredib->redistribute();	
+    	if(rank==rank && DEBUG_T) cout<<"Redistributing A"<<endl;
+	GridRedistribute* Bredib = new GridRedistribute(B,idmapB,new_grid);
+	Bredib->redistribute();	
+	if(rank==rank && DEBUG_T) cout<<"Redistributing A"<<endl;
+	GridRedistribute* Credib = new GridRedistribute(C,idmapC,new_grid);
+	Credib->redistribute();	
+     }	
 
     int cntr_id = 1;
     for(int i=0; i<dims_A; i++)

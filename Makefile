@@ -57,7 +57,7 @@ LINK = $(CC)
 EXE = tests/ga_interface/gaintface.x
 OBJS_DLTC = DLTC/dltc_tensor.o DLTC/compute.o DLTC/transp-kernel-omp.o DLTC/exec.o DLTC/ccd-t2.o DLTC/ccsd-t1.o DLTC/ccsd-t2.o DLTC/task.o DLTC/expr.o DLTC/loops.o DLTC/profiler.o DLTC/cache.o DLTC/transp.o DLTC/main.o
 
-OBJS_RRR = tensor.o tensor_ga_api.o redistribute.o grid_redib.o contraction.o helper.o transpose_helper.o localcontract.o block_grid.o grid.o correct.o 
+OBJS_RRR = tensor.o tensor_ga_api.o redistribute.o grid_redib.o cost.o contraction.o helper.o transpose_helper.o localcontract.o block_grid.o grid.o correct.o 
 
 
 
