@@ -2422,7 +2422,7 @@ void Contraction::contract(string contr_str_A, string contr_str_B, string contr_
     if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 
     bool changed;
-    cost* eval = new eval(A, B, C, grid);
+    cost* eval = new cost(A, B, C, grid);
     
     int* idmapA;
     int* idmapB;
