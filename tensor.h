@@ -196,9 +196,9 @@ class Tensor
 	
 	//////////////////////////Interface is Global Arrays///////////////////////////
 	
-	void initialize_from_ga_tensor(DLTC::Tensor &t);
+	//void initialize_from_ga_tensor(DLTC::Tensor &t);
 
-	void accumulate_to_ga_tensor(DLTC::Tensor &t);
+	//void accumulate_to_ga_tensor(DLTC::Tensor &t);
 	///////////////////////////////////////////////////////////////////////////////
 	
 	// Compute the number of maximum possible tiles in the tensor at this processor

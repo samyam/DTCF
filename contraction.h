@@ -237,6 +237,9 @@ public:
     // Destructor
     ~Contraction();
 
+    //Changes the grid if a redistribution is required for contraction
+    void change_grid(Grid* &g);
+
     // Processors send to instigator and instigator collects the data
     int instigate_collection(Tensor* &X, int contr_dim, int contr_idx, double* &blocks, int* &clocks_addrs);
 

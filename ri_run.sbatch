@@ -33,7 +33,7 @@ then
 else
 	n=$1
 fi
-EXE=tests/ga_interface/gaintface.x 
-#CCSD srun -N $1 -n $n ./$EXE $2 $3 $4 $5 $6 $7 $8 $9 $10
-srun -N 16 -n 16 ./$EXE 16 4 4 2 2 2 2 #$2 $3 $4 $5 $6 $7 $8 $9 $10
+EXE=CCSD.x #tests/ga_interface/gaintface.x 
+srun -N $1 -n $n ./$EXE $2 $3 $4 $5 $6 $7 $8 $9 $10
+#srun -N 16 -n 16 ./$EXE 16 4 4 2 2 2 2 #$2 $3 $4 $5 $6 $7 $8 $9 $10
 #make

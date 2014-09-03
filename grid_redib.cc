@@ -112,7 +112,7 @@ void GridRedistribute::redistribute()
 
 	int* repl_dims;
 	int repcount = get_replicated_dims(new_idx_map,repl_dims);
-	cout<<repcount<<endl;
+	//cout<<repcount<<endl;
 	
         // Post send to the processor that is supposed to hold the blocks currently at this processor
         redistribute_send();
@@ -323,7 +323,7 @@ void GridRedistribute::redistribute_send()
                         double* blocks;
                         int* block_addrs;
                         int num_blocks = get_blocks_for_proc(i, new_proc_rank, sent, blocks, block_addrs);
- 			cout<<"aaaaa"<<i<<endl;
+ 			//cout<<"aaaaa"<<i<<endl;
                         if(num_blocks > 0)
                         {
                                 // receiver is the same processor
@@ -351,7 +351,7 @@ void GridRedistribute::redistribute_send()
                                         MPI_Request req1, req2;
                                         MPI_Isend(blocks, num_blocks * T->block_size, MPI_DOUBLE, new_proc_rank[i], 3, MPI_COMM_WORLD, &req1);
                                         MPI_Isend(block_addrs, num_blocks * dims, MPI_INT, new_proc_rank[i], 4, MPI_COMM_WORLD, &req2);
-					cout<<"Sending from "<<T->rank<<" to "<< new_proc_rank[i]<<endl;
+					//cout<<"Sending from "<<T->rank<<" to "<< new_proc_rank[i]<<endl;
                                         rlz_blks_ptrs.push_back(blocks);
                                         rlz_addr_ptrs.push_back(block_addrs);
                                         req_arr[req_count++] = req1;
@@ -400,7 +400,7 @@ void GridRedistribute::redistribute_recv(list<recv_data> &recv_list, int* &repl_
 
        
 bool flag=true;
-cout<<"repcount"<<repcount<<endl;
+//cout<<"repcount"<<repcount<<endl;
 
 
 if(repcount>0)
@@ -411,7 +411,7 @@ if(repcount>0)
 	{
 	if(proc_add[repl_dims[i]]!=0) flag=false;
 	}
-		cout<<flag<<endl;
+		//cout<<flag<<endl;
 }
         // Find how many blocks will be received from which processor
         int* map;
@@ -447,7 +447,7 @@ if(repcount>0)
 
                                 MPI_Irecv(rd.blocks, num_blocks * T->block_size, MPI_DOUBLE, i, 3, MPI_COMM_WORLD, &req1);  
                                 MPI_Irecv(rd.block_addrs, num_blocks * dims, MPI_INT, i, 4, MPI_COMM_WORLD, &req2); 
-				cout<<"Recieving from "<<i <<" to "<<T->rank<<endl;
+				//cout<<"Recieving from "<<i <<" to "<<T->rank<<endl;
                                 recv_list.push_back(rd);
 				req_arr[req_count++] = req1;
                                 req_arr[req_count++] = req2;
@@ -477,7 +477,7 @@ print_tile_addr(grid_dims+1, new_proc_add);
 
         // Create a new MPI_Communicator in the serialization dimension
         int num_procs = new_pgrid[rep_dim];
-	//cout<<"repdimcount"<<num_procs<<endl;
+	////cout<<"repdimcount"<<num_procs<<endl;
         int* dim_group_ranks = new int[num_procs];
        
 	
@@ -487,7 +487,7 @@ print_tile_addr(grid_dims+1, new_proc_add);
                 dim_group_ranks[i] = new_grid->get_proc_rank(new_proc_add);
         }
 	
-	//cout<<"Before group create"<< dim_group_ranks[0]<<"<<Leader---follower>>"<<dim_group_ranks[1]<<endl;
+	////cout<<"Before group create"<< dim_group_ranks[0]<<"<<Leader---follower>>"<<dim_group_ranks[1]<<endl;
 	
 MPI_Group orig_group, new_group; 
 MPI_Comm new_comm; 
@@ -503,13 +503,13 @@ MPI_Comm_create(MPI_COMM_WORLD, new_group, &new_comm);
      //   int dim_size = dim_comm.Get_size();
         //assert(dim_rank == T->proc_addr[ser_grid_dim]);
       //  assert(dim_size == num_procs);
-	//cout<<"Assertion done"<<endl;
+	////cout<<"Assertion done"<<endl;
 
        int count = T->num_actual_tiles;
 
         MPI_Bcast(&count, 1, MPI_INT,dim_group_ranks[0],new_comm);
 
-      //  cout<<count<<"at rank"<<T->rank<<endl;
+      //  //cout<<count<<"at rank"<<T->rank<<endl;
 
 if(count>0){
 if(T->num_actual_tiles==0)

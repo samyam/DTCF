@@ -76,9 +76,6 @@ int main(int argc, char* argv[])
     A->initialize();
 
     if(rank == 0) cout<<"Tensor A initialized"<<endl;
-
-
-	
 	
 	MPI_Barrier(MPI_COMM_WORLD);	
 	double time =0;
@@ -89,7 +86,7 @@ int main(int argc, char* argv[])
 
 	    time=-MPI_Wtime();
 	    GridRedistribute* redib = new GridRedistribute(A,idmaps,grid);
-	redib->redistribute();
+	    redib->redistribute();
 	    time+=MPI_Wtime();
 
 	    MPI_Barrier(MPI_COMM_WORLD);
