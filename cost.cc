@@ -113,9 +113,11 @@ int ccnt=0, ecnt=0;
             			}
         		}
     		}
-
-for(int i=0;i<4;i++) {if(i!=contA[0] && i!=contA[1]) extA[ecnt]=i; ecnt++;}
+////////////////////////FIXXXXXXXXXXXXX////////////////////
+for(int i=0;i<4;i++) {if(i!=contA[0] && i!=contA[1]) {extA[ecnt]=i; ecnt++;}}
 ecnt=0;
+
+		
 	if((A->tensor_str.at(extA[0]) == 'c' || A->tensor_str.at(extA[0]) == 'd') && (A->tensor_str.at(extA[1]) == 'c' || A->tensor_str.at(extA[1]) == 'd'))
 	{
 		idmapA[extA[0]]=0; idmapA[extA[1]]=1; idmapA[contA[0]]=2; idmapA[contA[1]]=2;
@@ -123,27 +125,27 @@ ecnt=0;
 		idmapC[0]=0; idmapC[1]=1;
 	}
 
-	else if((A->tensor_str.at(extA[0]) == 'a' && A->tensor_str.at(contA[0]) == 'A') || (A->tensor_str.at(extA[0]) == 'b' && A->tensor_str.at(contA[0]) == 'B'))
+	else if((A->tensor_str.at(extA[0]) == 'a' && A->tensor_str.at(contA[0]) == 'a') || (A->tensor_str.at(extA[0]) == 'b' && A->tensor_str.at(contA[0]) == 'b'))
 	{
  		idmapA[extA[0]]=0; idmapA[contA[0]]=1; idmapA[contA[1]]=2; idmapA[extA[1]]=2;
 		idmapB[contB[0]]=0; idmapB[contB[1]]=1;
 		idmapC[0]=0; idmapC[1]=1;
 	}
 
-	else if((A->tensor_str.at(extA[0]) == 'a' && A->tensor_str.at(contA[1]) == 'A') || (A->tensor_str.at(extA[0]) == 'b' && A->tensor_str.at(contA[1]) == 'B'))
+	else if((A->tensor_str.at(extA[0]) == 'a' && A->tensor_str.at(contA[1]) == 'a') || (A->tensor_str.at(extA[0]) == 'b' && A->tensor_str.at(contA[1]) == 'b'))
 	{
 		idmapA[extA[0]]=0; idmapA[contA[1]]=1; idmapA[contA[0]]=2; idmapA[extA[1]]=2;
 		idmapB[contB[0]]=1; idmapB[contB[1]]=0;
 		idmapC[0]=0; idmapC[1]=1;
 	}
 
-	else if((A->tensor_str.at(extA[1]) == 'a' && A->tensor_str.at(contA[0]) == 'A') || (A->tensor_str.at(extA[1]) == 'b' && A->tensor_str.at(contA[0]) == 'B'))
+	else if((A->tensor_str.at(extA[1]) == 'a' && A->tensor_str.at(contA[0]) == 'a') || (A->tensor_str.at(extA[1]) == 'b' && A->tensor_str.at(contA[0]) == 'b'))
 	{
  		idmapA[extA[1]]=0; idmapA[contA[0]]=1; idmapA[contA[1]]=2; idmapA[extA[0]]=2;
 		idmapB[contB[0]]=0; idmapB[contB[1]]=1;
 		idmapC[0]=0; idmapC[1]=1;
 	}
-	else if((A->tensor_str.at(extA[1]) == 'a' && A->tensor_str.at(contA[1]) == 'A') || (A->tensor_str.at(extA[1]) == 'b' && A->tensor_str.at(contA[1]) == 'B'))
+	else if((A->tensor_str.at(extA[1]) == 'a' && A->tensor_str.at(contA[1]) == 'a') || (A->tensor_str.at(extA[1]) == 'b' && A->tensor_str.at(contA[1]) == 'b'))
 	{
 		idmapA[extA[1]]=0; idmapA[contA[1]]=1; idmapA[contA[0]]=2; idmapA[extA[0]]=2;
 		idmapB[contB[0]]=1; idmapB[contB[1]]=0;
@@ -181,7 +183,7 @@ int ccnt=0, ecnt=0;
         		}
     		}
 
-for(int i=0;i<4;i++) {if(i!=contB[0] && i!=contB[1]) extB[ecnt]=i; ecnt++;}
+for(int i=0;i<4;i++) {if(i!=contB[0] && i!=contB[1]) {extB[ecnt]=i; ecnt++;}}
 
 if((B->tensor_str.at(extB[0]) == 'c' || B->tensor_str.at(extB[0]) == 'd') && (B->tensor_str.at(extB[1]) == 'c' || B->tensor_str.at(extB[1]) == 'd'))
 	{
@@ -190,27 +192,27 @@ if((B->tensor_str.at(extB[0]) == 'c' || B->tensor_str.at(extB[0]) == 'd') && (B-
 		idmapC[0]=0; idmapC[1]=1;
 	}
 
-	else if((B->tensor_str.at(extB[0]) == 'a' && B->tensor_str.at(contB[0]) == 'A') || (B->tensor_str.at(extB[0]) == 'b' && B->tensor_str.at(contB[0]) == 'B'))
+	else if((B->tensor_str.at(extB[0]) == 'a' && B->tensor_str.at(contB[0]) == 'a') || (B->tensor_str.at(extB[0]) == 'b' && B->tensor_str.at(contB[0]) == 'b'))
 	{
  		idmapB[extB[0]]=0; idmapB[contB[0]]=1; idmapB[contB[1]]=2; idmapB[extB[1]]=2;
 		idmapA[contA[0]]=0; idmapA[contA[1]]=1;
 		idmapC[0]=0; idmapC[1]=1;
 	}
 
-	else if((B->tensor_str.at(extB[0]) == 'a' && B->tensor_str.at(contB[1]) == 'A') || (B->tensor_str.at(extB[0]) == 'b' && B->tensor_str.at(contB[1]) == 'B'))
+	else if((B->tensor_str.at(extB[0]) == 'a' && B->tensor_str.at(contB[1]) == 'a') || (B->tensor_str.at(extB[0]) == 'b' && B->tensor_str.at(contB[1]) == 'b'))
 	{
 		idmapB[extB[0]]=0; idmapB[contB[1]]=1; idmapB[contB[0]]=2; idmapB[extB[1]]=2;
 		idmapA[contA[0]]=1; idmapA[contA[1]]=0;
 		idmapC[0]=0; idmapC[1]=1;
 	}
 
-	else if((B->tensor_str.at(extB[1]) == 'a' && B->tensor_str.at(contB[0]) == 'A') || (B->tensor_str.at(extB[1]) == 'b' && B->tensor_str.at(contB[0]) == 'B'))
+	else if((B->tensor_str.at(extB[1]) == 'a' && B->tensor_str.at(contB[0]) == 'a') || (B->tensor_str.at(extB[1]) == 'b' && B->tensor_str.at(contB[0]) == 'b'))
 	{
  		idmapB[extB[1]]=0; idmapB[contB[0]]=1; idmapB[contB[1]]=2; idmapB[extB[0]]=2;
 		idmapA[contA[0]]=0; idmapA[contA[1]]=1;
 		idmapC[0]=0; idmapC[1]=1;
 	}
-	else if((B->tensor_str.at(extB[1]) == 'a' && B->tensor_str.at(contB[1]) == 'A') || (B->tensor_str.at(extB[1]) == 'b' && B->tensor_str.at(contB[1]) == 'B'))
+	else if((B->tensor_str.at(extB[1]) == 'a' && B->tensor_str.at(contB[1]) == 'a') || (B->tensor_str.at(extB[1]) == 'b' && B->tensor_str.at(contB[1]) == 'b'))
 	{
 		idmapB[extB[1]]=0; idmapB[contB[1]]=1; idmapB[contB[0]]=2; idmapB[extB[0]]=2;
 		idmapA[contA[0]]=1; idmapA[contA[1]]=0;
@@ -326,9 +328,9 @@ int ccnt=0, ecnt=0;
         		}
     		}
 
-for(int i=0;i<4;i++) {if(i!=contA[0] && i!=contA[1]) extA[ecnt]=i; ecnt++;}
+for(int i=0;i<4;i++) {if(i!=contA[0] && i!=contA[1]){ extA[ecnt]=i; ecnt++;}}
 ecnt=0;
-for(int i=0;i<4;i++) {if(i!=contB[0] && i!=contB[1]) extB[ecnt]=i; ecnt++;}
+for(int i=0;i<4;i++) {if(i!=contB[0] && i!=contB[1]){ extB[ecnt]=i; ecnt++;}}
 
 int lar=1;
 if(curGrid[3] > curGrid[1]) lar=3;
@@ -337,47 +339,47 @@ int size_A=1, size_B=1;
 for(int i=0;i<4;i++){ size_A*=A->tensor_size[i];	size_B*=B->tensor_size[i];}
 
 if(size_A > size_B)
-{	cout<<"1"<<endl;
+{	
 	
 	if(A->tensor_size[extA[0]] >= A->tensor_size[extA[1]])
-	{cout<<"2"<<endl;
+	{
 		curidmapA[extA[0]]=lar;
 		if(A->tensor_str.at(extA[0]) == 'c' || A->tensor_str.at(extA[0]) == 'd' || A->tensor_str.at(extA[0]) == A->tensor_str.at(extA[1]))
-			{ cout<<"3"<<endl;
+			{ 
 			if(A->tensor_str.at(extA[1]) == 'c' || A->tensor_str.at(extA[1]) == 'd')
-				{cout<<"4"<<endl;
+				{
 				curidmapA[extA[1]]=lar-1; curidmapA[contA[0]]=4-lar; curidmapA[contA[1]] = 4-lar-1;
 			  	curidmapB[extB[0]]=4-lar; curidmapB[extB[1]]=4-lar-1; curidmapB[contB[0]]=lar; curidmapB[contB[1]]=lar-1;
 				curidmapC[0]=lar; curidmapC[1]=lar-1; curidmapC[2]=4-lar; curidmapC[3]=4-lar-1; 
 				}
-			else if((A->tensor_str.at(extA[1]) == 'a' && A->tensor_str.at(contA[0]) == 'A') || (A->tensor_str.at(extA[1]) == 'b' && A->tensor_str.at(contA[0]) == 'B'))
-				{cout<<"1"<<endl;
+			else if((A->tensor_str.at(extA[1]) == 'a' && A->tensor_str.at(contA[0]) == 'a') || (A->tensor_str.at(extA[1]) == 'b' && A->tensor_str.at(contA[0]) == 'b'))
+				{
 				curidmapA[extA[1]]=4-lar; curidmapA[contA[0]]=4-lar-1; curidmapA[contA[1]] =lar-1;
 				  curidmapB[extB[0]]=4-lar-1; curidmapB[extB[1]]=lar-1; curidmapB[contB[0]]=4-lar; curidmapB[contB[1]]=lar;
 				curidmapC[0]=lar; curidmapC[1]=4-lar; curidmapC[2]=4-lar-1; curidmapC[3]=lar-1; 
 				}
-			else if((A->tensor_str.at(extA[1]) == 'a' && A->tensor_str.at(contA[1]) == 'A') || (A->tensor_str.at(extA[1]) == 'b' && A->tensor_str.at(contA[1]) == 'B'))
-				{cout<<"1"<<endl;
+			else if((A->tensor_str.at(extA[1]) == 'a' && A->tensor_str.at(contA[1]) == 'a') || (A->tensor_str.at(extA[1]) == 'b' && A->tensor_str.at(contA[1]) == 'b'))
+				{
 				curidmapA[extA[1]]=4-lar; curidmapA[contA[1]]=4-lar-1; curidmapA[contA[0]] =lar-1;
 				  curidmapB[extB[0]]=4-lar-1; curidmapB[extB[1]]=lar-1; curidmapB[contB[0]]=4-lar; curidmapB[contB[1]]=lar;
 				curidmapC[0]=lar; curidmapC[1]=4-lar; curidmapC[2]=4-lar-1; curidmapC[3]=lar-1; 
 				}
 			}
-		else if((A->tensor_str.at(extA[0]) == 'a' && A->tensor_str.at(contA[0]) == 'A') || (A->tensor_str.at(extA[0]) == 'b' && A->tensor_str.at(contA[0]) == 'B'))
-			{ cout<<"1"<<endl;
+		else if((A->tensor_str.at(extA[0]) == 'a' && A->tensor_str.at(contA[0]) == 'a') || (A->tensor_str.at(extA[0]) == 'b' && A->tensor_str.at(contA[0]) == 'b'))
+			{
 				curidmapA[contA[0]]=lar-1; curidmapA[contA[1]]=4-lar; curidmapA[extA[1]]=4-lar-1;
 			  curidmapB[extB[0]]=4-lar; curidmapB[extB[1]]=lar-1; curidmapB[contB[0]]=4-lar-1; curidmapB[contB[1]]=lar;
 				curidmapC[0]=lar; curidmapC[1]=4-lar-1; curidmapC[2]=4-lar; curidmapC[3]=lar-1; 
 			}
-		else if((A->tensor_str.at(extA[0]) == 'a' && A->tensor_str.at(contA[1]) == 'A') || (A->tensor_str.at(extA[0]) == 'b' && A->tensor_str.at(contA[1]) == 'B')) 
-			{ cout<<"1"<<endl;
+		else if((A->tensor_str.at(extA[0]) == 'a' && A->tensor_str.at(contA[1]) == 'a') || (A->tensor_str.at(extA[0]) == 'b' && A->tensor_str.at(contA[1]) == 'b')) 
+			{
 			curidmapA[contA[1]]=lar-1; curidmapA[contA[0]]=4-lar; curidmapA[extA[1]]=4-lar-1;
 			  curidmapB[extB[0]]=4-lar; curidmapB[extB[1]]=lar-1; curidmapB[contB[0]]=4-lar-1; curidmapB[contB[1]]=lar;
 				curidmapC[0]=lar; curidmapC[1]=4-lar-1; curidmapC[2]=4-lar; curidmapC[3]=lar-1; 
 			}
 	}
 	else
-	{cout<<"11"<<endl;
+	{
 		curidmapA[extA[1]]=lar;
 		if(A->tensor_str.at(extA[1]) == 'c' || A->tensor_str.at(extA[1]) == 'd' || A->tensor_str.at(extA[0]) == A->tensor_str.at(extA[1]))
 			{ 
@@ -386,23 +388,23 @@ if(size_A > size_B)
 			  	curidmapB[extB[0]]=4-lar; curidmapB[extB[1]]=4-lar-1; curidmapB[contB[0]]=lar; curidmapB[contB[1]]=lar-1;
 				curidmapC[0]=lar-1; curidmapC[1]=lar; curidmapC[2]=4-lar; curidmapC[3]=4-lar-1; 
 				}
-			else if((A->tensor_str.at(extA[0]) == 'a' && A->tensor_str.at(contA[0]) == 'A') || (A->tensor_str.at(extA[0]) == 'b' && A->tensor_str.at(contA[0]) == 'B'))
+			else if((A->tensor_str.at(extA[0]) == 'a' && A->tensor_str.at(contA[0]) == 'a') || (A->tensor_str.at(extA[0]) == 'b' && A->tensor_str.at(contA[0]) == 'b'))
 				{curidmapA[extA[0]]=4-lar; curidmapA[contA[0]]=4-lar-1; curidmapA[contA[1]] =lar-1;
 				  curidmapB[extB[0]]=4-lar-1; curidmapB[extB[1]]=lar-1; curidmapB[contB[0]]=4-lar; curidmapB[contB[1]]=lar;
 				curidmapC[0]=4-lar; curidmapC[1]=lar; curidmapC[2]=4-lar-1; curidmapC[3]=lar-1; 
 				}
-			else if((A->tensor_str.at(extA[0]) == 'a' && A->tensor_str.at(contA[1]) == 'A') || (A->tensor_str.at(extA[0]) == 'b' && A->tensor_str.at(contA[1]) == 'B'))
+			else if((A->tensor_str.at(extA[0]) == 'a' && A->tensor_str.at(contA[1]) == 'a') || (A->tensor_str.at(extA[0]) == 'b' && A->tensor_str.at(contA[1]) == 'b'))
 				{curidmapA[extA[0]]=4-lar; curidmapA[contA[1]]=4-lar-1; curidmapA[contA[0]] =lar-1;
 				  curidmapB[extB[0]]=4-lar-1; curidmapB[extB[1]]=lar-1; curidmapB[contB[0]]=4-lar; curidmapB[contB[1]]=lar;
 				curidmapC[0]=4-lar; curidmapC[1]=lar; curidmapC[2]=4-lar-1; curidmapC[3]=lar-1; 
 				}
 			}
-		else if((A->tensor_str.at(extA[1]) == 'a' && A->tensor_str.at(contA[0]) == 'A') || (A->tensor_str.at(extA[1]) == 'b' && A->tensor_str.at(contA[0]) == 'B'))
+		else if((A->tensor_str.at(extA[1]) == 'a' && A->tensor_str.at(contA[0]) == 'a') || (A->tensor_str.at(extA[1]) == 'b' && A->tensor_str.at(contA[0]) == 'b'))
 			{ curidmapA[contA[0]]=lar-1; curidmapA[contA[1]]=4-lar; curidmapA[extA[0]]=4-lar-1;
 			  curidmapB[extB[0]]=4-lar; curidmapB[extB[1]]=lar-1; curidmapB[contB[0]]=4-lar-1; curidmapB[contB[1]]=lar;
 				curidmapC[0]=4-lar-1; curidmapC[1]=lar; curidmapC[2]=4-lar; curidmapC[3]=lar-1; 
 			}
-		else if((A->tensor_str.at(extA[1]) == 'a' && A->tensor_str.at(contA[1]) == 'A') || (A->tensor_str.at(extA[1]) == 'b' && A->tensor_str.at(contA[1]) == 'B')) 
+		else if((A->tensor_str.at(extA[1]) == 'a' && A->tensor_str.at(contA[1]) == 'a') || (A->tensor_str.at(extA[1]) == 'b' && A->tensor_str.at(contA[1]) == 'b')) 
 			{ curidmapA[contA[1]]=lar-1; curidmapA[contA[0]]=4-lar; curidmapA[extA[0]]=4-lar-1;
 			  curidmapB[extB[0]]=4-lar; curidmapB[extB[1]]=lar-1; curidmapB[contB[0]]=4-lar-1; curidmapB[contB[1]]=lar;
 				curidmapC[0]=4-lar-1; curidmapC[1]=lar; curidmapC[2]=4-lar; curidmapC[3]=lar-1; 
@@ -412,43 +414,43 @@ if(size_A > size_B)
 else
 {
 	if(B->tensor_size[extB[0]] >= B->tensor_size[extB[1]])
-	{cout<<"133"<<endl;
+	{
 		curidmapB[extB[0]]=lar;
 		if(B->tensor_str.at(extB[0]) == 'c' || B->tensor_str.at(extB[0]) == 'd' || B->tensor_str.at(extB[0]) == B->tensor_str.at(extB[1]))
-			{ cout<<"1313"<<endl;
+			{ 
 			if(B->tensor_str.at(extB[1]) == 'c' || B->tensor_str.at(extB[1]) == 'd')
 				{curidmapB[extB[1]]=lar-1; curidmapB[contB[0]]=4-lar; curidmapB[contB[1]] = 4-lar-1;
 			  	curidmapA[extA[0]]=4-lar; curidmapA[extA[1]]=4-lar-1; curidmapA[contA[0]]=lar; curidmapA[contA[1]]=lar-1;
 				curidmapC[0]=4-lar; curidmapC[1]=4-lar-1; curidmapC[2]=lar; curidmapC[3]=lar-1; 
 			}
-			else if((B->tensor_str.at(extB[1]) == 'a' && B->tensor_str.at(contB[0]) == 'A') || (B->tensor_str.at(extB[1]) == 'b' && B->tensor_str.at(contB[0]) == 'B'))
-				{cout<<"1233"<<endl;
+			else if((B->tensor_str.at(extB[1]) == 'a' && B->tensor_str.at(contB[0]) == 'a') || (B->tensor_str.at(extB[1]) == 'b' && B->tensor_str.at(contB[0]) == 'b'))
+				{
 				curidmapB[extB[1]]=4-lar; curidmapB[contB[0]]=4-lar-1; curidmapB[contB[1]] =lar-1;
 				  curidmapA[extA[0]]=4-lar-1; curidmapA[extA[1]]=lar-1; curidmapA[contA[0]]=4-lar; curidmapA[contA[1]]=lar;
 				curidmapC[0]=4-lar-1; curidmapC[1]=lar-1; curidmapC[2]=lar; curidmapC[3]=4-lar; 
 				}
-			else if((B->tensor_str.at(extB[1]) == 'a' && B->tensor_str.at(contB[1]) == 'A') || (B->tensor_str.at(extB[1]) == 'b' && B->tensor_str.at(contB[1]) == 'B'))
-				{cout<<"1333"<<endl;
+			else if((B->tensor_str.at(extB[1]) == 'a' && B->tensor_str.at(contB[1]) == 'a') || (B->tensor_str.at(extB[1]) == 'b' && B->tensor_str.at(contB[1]) == 'b'))
+				{
 				curidmapB[extB[1]]=4-lar; curidmapB[contB[1]]=4-lar-1; curidmapB[contB[0]] =lar-1;
 				  curidmapA[extA[0]]=4-lar-1; curidmapA[extA[1]]=lar-1; curidmapA[contA[0]]=4-lar; curidmapA[contA[1]]=lar;
 				curidmapC[0]=4-lar-1; curidmapC[1]=lar-1; curidmapC[2]=lar; curidmapC[3]=4-lar; 
 				}
 			}
-		else if((B->tensor_str.at(extB[0]) == 'a' && B->tensor_str.at(contB[0]) == 'A') || (B->tensor_str.at(extB[0]) == 'b' && B->tensor_str.at(contB[0]) == 'B'))
-			{ cout<<"1343"<<endl;
+		else if((B->tensor_str.at(extB[0]) == 'a' && B->tensor_str.at(contB[0]) == 'a') || (B->tensor_str.at(extB[0]) == 'b' && B->tensor_str.at(contB[0]) == 'b'))
+			{
 			curidmapB[contB[0]]=lar-1; curidmapB[contB[1]]=4-lar; curidmapB[extB[1]]=4-lar-1;
 			  curidmapA[extA[0]]=4-lar; curidmapA[extA[1]]=lar-1; curidmapA[contA[0]]=4-lar-1; curidmapA[contA[1]]=lar;
 				curidmapC[0]=4-lar; curidmapC[1]=lar-1; curidmapC[2]=lar; curidmapC[3]=4-lar-1; 
 			}
-		else if((B->tensor_str.at(extB[0]) == 'a' && B->tensor_str.at(contB[1]) == 'A') || (B->tensor_str.at(extB[0]) == 'b' && B->tensor_str.at(contB[1]) == 'B'))
-			{ cout<<"1353"<<endl;
+		else if((B->tensor_str.at(extB[0]) == 'a' && B->tensor_str.at(contB[1]) == 'a') || (B->tensor_str.at(extB[0]) == 'b' && B->tensor_str.at(contB[1]) == 'b'))
+			{
 			curidmapB[contB[1]]=lar-1; curidmapB[contB[0]]=4-lar; curidmapB[extB[1]]=4-lar-1;
 			  curidmapA[extA[0]]=4-lar; curidmapA[extA[1]]=lar-1; curidmapA[contA[0]]=4-lar-1; curidmapA[contA[1]]=lar;
 				curidmapC[0]=4-lar; curidmapC[1]=lar-1; curidmapC[2]=lar; curidmapC[3]=4-lar-1; 
 			}
 	}
 	else
-	{cout<<"155"<<endl;
+	{
 		curidmapB[extB[1]]=lar;
 		if(B->tensor_str.at(extB[1]) == 'c' || B->tensor_str.at(extB[1]) == 'd' || B->tensor_str.at(extB[0]) == B->tensor_str.at(extB[1]))
 			{ 
@@ -457,23 +459,23 @@ else
 			  	curidmapA[extA[0]]=4-lar; curidmapA[extA[1]]=4-lar-1; curidmapA[contA[0]]=lar; curidmapA[contA[1]]=lar-1;
 				curidmapC[0]=4-lar; curidmapC[1]=4-lar-1; curidmapC[2]=lar-1; curidmapC[3]=lar; 
 				}
-			else if((B->tensor_str.at(extB[0]) == 'a' && B->tensor_str.at(contB[0]) == 'A') || (B->tensor_str.at(extB[0]) == 'b' && B->tensor_str.at(contB[0]) == 'B'))
+			else if((B->tensor_str.at(extB[0]) == 'a' && B->tensor_str.at(contB[0]) == 'a') || (B->tensor_str.at(extB[0]) == 'b' && B->tensor_str.at(contB[0]) == 'b'))
 				{curidmapB[extB[0]]=4-lar; curidmapB[contB[0]]=4-lar-1; curidmapB[contB[1]] =lar-1;
 				  curidmapA[extA[0]]=4-lar-1; curidmapA[extA[1]]=lar-1; curidmapA[contA[0]]=4-lar; curidmapA[contA[1]]=lar;
 				curidmapC[0]=4-lar-1; curidmapC[1]=lar-1; curidmapC[2]=4-lar; curidmapC[3]=lar; 
 				}
-			else if((B->tensor_str.at(extB[0]) == 'a' && B->tensor_str.at(contB[1]) == 'A') || (B->tensor_str.at(extB[0]) == 'b' && B->tensor_str.at(contB[1]) == 'B'))
+			else if((B->tensor_str.at(extB[0]) == 'a' && B->tensor_str.at(contB[1]) == 'a') || (B->tensor_str.at(extB[0]) == 'b' && B->tensor_str.at(contB[1]) == 'b'))
 				{curidmapB[extB[0]]=4-lar; curidmapB[contB[1]]=4-lar-1; curidmapB[contB[0]] =lar-1;
 				  curidmapA[extA[0]]=4-lar-1; curidmapA[extA[1]]=lar-1; curidmapA[contA[0]]=4-lar; curidmapA[contA[1]]=lar;
 				curidmapC[0]=4-lar-1; curidmapC[1]=lar-1; curidmapC[2]=4-lar; curidmapC[3]=lar; 
 				}
 			}
-		else if((B->tensor_str.at(extB[1]) == 'a' && B->tensor_str.at(contB[0]) == 'A') || (B->tensor_str.at(extB[1]) == 'b' && B->tensor_str.at(contB[0]) == 'B'))
+		else if((B->tensor_str.at(extB[1]) == 'a' && B->tensor_str.at(contB[0]) == 'a') || (B->tensor_str.at(extB[1]) == 'b' && B->tensor_str.at(contB[0]) == 'b'))
 			{ curidmapB[contB[0]]=lar-1; curidmapB[contB[1]]=4-lar; curidmapB[extB[0]]=4-lar-1;
 			  curidmapA[extA[0]]=4-lar; curidmapA[extA[1]]=lar-1; curidmapA[contA[0]]=4-lar-1; curidmapA[contA[1]]=lar;
 				curidmapC[0]=4-lar; curidmapC[1]=lar-1; curidmapC[2]=4-lar-1; curidmapC[3]=lar; 
 			}
-		else if((B->tensor_str.at(extB[1]) == 'a' && B->tensor_str.at(contB[1]) == 'A') || (B->tensor_str.at(extB[1]) == 'b' && B->tensor_str.at(contB[1]) == 'B')) 
+		else if((B->tensor_str.at(extB[1]) == 'a' && B->tensor_str.at(contB[1]) == 'a') || (B->tensor_str.at(extB[1]) == 'b' && B->tensor_str.at(contB[1]) == 'b')) 
 			{ curidmapB[contB[1]]=lar-1; curidmapB[contB[0]]=4-lar; curidmapB[extB[0]]=4-lar-1;
 			  curidmapA[extA[0]]=4-lar; curidmapA[extA[1]]=lar-1; curidmapA[contA[0]]=4-lar-1; curidmapA[contA[1]]=lar;
 				curidmapC[0]=4-lar; curidmapC[1]=lar-1; curidmapC[2]=4-lar-1; curidmapC[3]=lar; 
@@ -562,9 +564,9 @@ void cost::best_Cost_GGrid_4Db(int* &curGrid, int* &curidmapA, int* &curidmapB, 
         		}
     		}
 
-	for(int i=0;i<4;i++) {if(i!=contA[0]) extA[ecnt]=i; ecnt++;}
+	for(int i=0;i<4;i++) {if(i!=contA[0]) {extA[ecnt]=i; ecnt++;}}
 	ecnt=0;
-	for(int i=0;i<4;i++) {if(i!=contB[0]) extB[ecnt]=i; ecnt++;}
+	for(int i=0;i<4;i++) {if(i!=contB[0]){ extB[ecnt]=i; ecnt++;}}
 
 	int lar=1;
 	if(curGrid[3] > curGrid[1]) lar=3;
@@ -724,9 +726,9 @@ void cost::best_Cost_GGrid_4Dc(int* &curGrid, int* &curidmapA, int* &curidmapB, 
         		}
     		}
 
-	for(int i=0;i<4;i++) {if(i!=contA[0]) extA[ecnt]=i; ecnt++;}
+	for(int i=0;i<4;i++) {if(i!=contA[0]){ extA[ecnt]=i; ecnt++;}}
 	ecnt=0;
-	for(int i=0;i<4;i++) {if(i!=contB[0]) extB[ecnt]=i; ecnt++;}
+	for(int i=0;i<4;i++) {if(i!=contB[0]) {extB[ecnt]=i; ecnt++;}}
 
 	int lar=1;
 	if(curGrid[3] > curGrid[1]) lar=3;
@@ -737,10 +739,10 @@ void cost::best_Cost_GGrid_4Dc(int* &curGrid, int* &curidmapA, int* &curidmapB, 
 	bool symA1f=false,symA2f=false,symB1f=false,symB2f=false;
 	
 	
-	if(A->tensor_str.at(extA[0]) == 'a' || A->tensor_str.at(contA[0]) == 'A' || A->tensor_str.at(contA[1]) == 'A' || A->tensor_str.at(contA[2]) == 'A') symA1f=true;
-	if(A->tensor_str.at(extA[0]) == 'b' || A->tensor_str.at(contA[0]) == 'B' || A->tensor_str.at(contA[1]) == 'B' || A->tensor_str.at(contA[2]) == 'B') symA2f=true;
-	if(B->tensor_str.at(extA[0]) == 'a' || B->tensor_str.at(contA[0]) == 'A' || B->tensor_str.at(contA[1]) == 'A' || B->tensor_str.at(contA[2]) == 'A') symB1f=true;
-	if(B->tensor_str.at(extA[0]) == 'b' || B->tensor_str.at(contA[0]) == 'B' || B->tensor_str.at(contA[1]) == 'B' || B->tensor_str.at(contA[2]) == 'B') symB2f=true;
+	if(A->tensor_str.at(extA[0]) == 'a' || A->tensor_str.at(contA[0]) == 'a' || A->tensor_str.at(contA[1]) == 'a' || A->tensor_str.at(contA[2]) == 'a') symA1f=true;
+	if(A->tensor_str.at(extA[0]) == 'b' || A->tensor_str.at(contA[0]) == 'b' || A->tensor_str.at(contA[1]) == 'b' || A->tensor_str.at(contA[2]) == 'b') symA2f=true;
+	if(B->tensor_str.at(extA[0]) == 'a' || B->tensor_str.at(contA[0]) == 'a' || B->tensor_str.at(contA[1]) == 'a' || B->tensor_str.at(contA[2]) == 'a') symB1f=true;
+	if(B->tensor_str.at(extA[0]) == 'b' || B->tensor_str.at(contA[0]) == 'b' || B->tensor_str.at(contA[1]) == 'b' || B->tensor_str.at(contA[2]) == 'b') symB2f=true;
 	
 	
 	if(size_A >= size_B)
@@ -752,31 +754,31 @@ void cost::best_Cost_GGrid_4Dc(int* &curGrid, int* &curidmapA, int* &curidmapB, 
 		}
 		else if(symA1f && A->tensor_str.at(extA[0]) == 'a')
 		{
-			if(A->tensor_str.at(contA[0])=='A'){ curidmapA[contA[0]]=lar-1; curidmapA[contA[1]]=4-lar; curidmapA[contA[2]]=4-lar-1; }
-			else if(A->tensor_str.at(contA[1])=='A'){ curidmapA[contA[1]]=lar-1; curidmapA[contA[0]]=4-lar; curidmapA[contA[2]]=4-lar-1; }
-			else if(A->tensor_str.at(contA[2])=='A'){ curidmapA[contA[2]]=lar-1; curidmapA[contA[0]]=4-lar; curidmapA[contA[0]]=4-lar-1; }
+			if(A->tensor_str.at(contA[0])=='a'){ curidmapA[contA[0]]=lar-1; curidmapA[contA[1]]=4-lar; curidmapA[contA[2]]=4-lar-1; }
+			else if(A->tensor_str.at(contA[1])=='a'){ curidmapA[contA[1]]=lar-1; curidmapA[contA[0]]=4-lar; curidmapA[contA[2]]=4-lar-1; }
+			else if(A->tensor_str.at(contA[2])=='a'){ curidmapA[contA[2]]=lar-1; curidmapA[contA[0]]=4-lar; curidmapA[contA[0]]=4-lar-1; }
 		}
 		else if(symA2f && A->tensor_str.at(extA[0]) == 'b')
 		{
-			if(A->tensor_str.at(contA[0])=='B'){ curidmapA[contA[0]]=lar-1; curidmapA[contA[1]]=4-lar; curidmapA[contA[2]]=4-lar-1; }
-			else if(A->tensor_str.at(contA[1])=='B'){ curidmapA[contA[1]]=lar-1; curidmapA[contA[0]]=4-lar; curidmapA[contA[2]]=4-lar-1; }
-			else if(A->tensor_str.at(contA[2])=='B'){ curidmapA[contA[2]]=lar-1; curidmapA[contA[0]]=4-lar; curidmapA[contA[0]]=4-lar-1; }
+			if(A->tensor_str.at(contA[0])=='b'){ curidmapA[contA[0]]=lar-1; curidmapA[contA[1]]=4-lar; curidmapA[contA[2]]=4-lar-1; }
+			else if(A->tensor_str.at(contA[1])=='b'){ curidmapA[contA[1]]=lar-1; curidmapA[contA[0]]=4-lar; curidmapA[contA[2]]=4-lar-1; }
+			else if(A->tensor_str.at(contA[2])=='b'){ curidmapA[contA[2]]=lar-1; curidmapA[contA[0]]=4-lar; curidmapA[contA[0]]=4-lar-1; }
 		}
-		else if(symA1f && A->tensor_str.at(contA[0]) == 'A')
+		else if(symA1f && A->tensor_str.at(contA[0]) == 'a')
 		{
-			if(A->tensor_str.at(contA[1]) == 'A'){curidmapA[contA[0]]=4-lar; curidmapA[contA[1]]=4-lar-1; curidmapA[contA[2]]=lar-1;}
-			else if(A->tensor_str.at(contA[2]) == 'A'){curidmapA[contA[0]]=4-lar; curidmapA[contA[2]]=4-lar-1; curidmapA[contA[1]]=lar-1;}
+			if(A->tensor_str.at(contA[1]) == 'a'){curidmapA[contA[0]]=4-lar; curidmapA[contA[1]]=4-lar-1; curidmapA[contA[2]]=lar-1;}
+			else if(A->tensor_str.at(contA[2]) == 'a'){curidmapA[contA[0]]=4-lar; curidmapA[contA[2]]=4-lar-1; curidmapA[contA[1]]=lar-1;}
 		}
-		else if(symA2f && A->tensor_str.at(contA[0]) == 'B')
+		else if(symA2f && A->tensor_str.at(contA[0]) == 'b')
 		{
-			if(A->tensor_str.at(contA[1]) == 'B'){curidmapA[contA[0]]=4-lar; curidmapA[contA[1]]=4-lar-1; curidmapA[contA[2]]=lar-1;}
-			else if(A->tensor_str.at(contA[2]) == 'B'){curidmapA[contA[0]]=4-lar; curidmapA[contA[2]]=4-lar-1; curidmapA[contA[1]]=lar-1;}
+			if(A->tensor_str.at(contA[1]) == 'b'){curidmapA[contA[0]]=4-lar; curidmapA[contA[1]]=4-lar-1; curidmapA[contA[2]]=lar-1;}
+			else if(A->tensor_str.at(contA[2]) == 'b'){curidmapA[contA[0]]=4-lar; curidmapA[contA[2]]=4-lar-1; curidmapA[contA[1]]=lar-1;}
 		}
-		else if(symA1f && A->tensor_str.at(contA[1]) == 'A')
+		else if(symA1f && A->tensor_str.at(contA[1]) == 'a')
 		{
 			curidmapA[contA[1]]=4-lar; curidmapA[contA[2]]=4-lar-1; curidmapA[contA[0]]=lar-1;
 		}
-		else if(symA2f && 	A->tensor_str.at(contA[1]) == 'B')
+		else if(symA2f && 	A->tensor_str.at(contA[1]) == 'b')
 		{
 			curidmapA[contA[1]]=4-lar; curidmapA[contA[2]]=4-lar-1; curidmapA[contA[0]]=lar-1;
 		}
@@ -789,35 +791,35 @@ void cost::best_Cost_GGrid_4Dc(int* &curGrid, int* &curidmapA, int* &curidmapB, 
 		else if(symB1f && B->tensor_str.at(extB[0]) == 'a')
 		{
 			curidmapB[extB[0]]=4-lar; 
-			if(B->tensor_str.at(contB[0]) == 'A'){ curidmapB[contB[0]]=4-lar-1; curidmapB[contB[1]]=lar; curidmapB[contB[2]]=lar-1; curidmapC[0]=lar; curidmapC[1]=4-lar;}
-			else if(B->tensor_str.at(contB[1]) == 'A'){ curidmapB[contB[1]]=4-lar-1; curidmapB[contB[0]]=lar; curidmapB[contB[2]]=lar-1; curidmapC[0]=lar; curidmapC[1]=4-lar;}
-			else if(B->tensor_str.at(contB[2]) == 'A'){ curidmapB[contB[2]]=4-lar-1; curidmapB[contB[1]]=lar; curidmapB[contB[0]]=lar-1; curidmapC[0]=lar; curidmapC[1]=4-lar;}
+			if(B->tensor_str.at(contB[0]) == 'a'){ curidmapB[contB[0]]=4-lar-1; curidmapB[contB[1]]=lar; curidmapB[contB[2]]=lar-1; curidmapC[0]=lar; curidmapC[1]=4-lar;}
+			else if(B->tensor_str.at(contB[1]) == 'a'){ curidmapB[contB[1]]=4-lar-1; curidmapB[contB[0]]=lar; curidmapB[contB[2]]=lar-1; curidmapC[0]=lar; curidmapC[1]=4-lar;}
+			else if(B->tensor_str.at(contB[2]) == 'a'){ curidmapB[contB[2]]=4-lar-1; curidmapB[contB[1]]=lar; curidmapB[contB[0]]=lar-1; curidmapC[0]=lar; curidmapC[1]=4-lar;}
 		}	
 		else if	(symB2f && B->tensor_str.at(extB[0]) == 'b')
 		{
 			curidmapB[extB[0]]=4-lar; 
-			if(B->tensor_str.at(contB[0]) == 'B'){ curidmapB[contB[0]]=4-lar-1; curidmapB[contB[1]]=lar; curidmapB[contB[2]]=lar-1; curidmapC[0]=lar; curidmapC[1]=4-lar;}
-			else if(B->tensor_str.at(contB[1]) == 'B'){ curidmapB[contB[1]]=4-lar-1; curidmapB[contB[0]]=lar; curidmapB[contB[2]]=lar-1; curidmapC[0]=lar; curidmapC[1]=4-lar;}
-			else if(B->tensor_str.at(contB[2]) == 'B'){ curidmapB[contB[2]]=4-lar-1; curidmapB[contB[1]]=lar; curidmapB[contB[0]]=lar-1; curidmapC[0]=lar; curidmapC[1]=4-lar;}
+			if(B->tensor_str.at(contB[0]) == 'b'){ curidmapB[contB[0]]=4-lar-1; curidmapB[contB[1]]=lar; curidmapB[contB[2]]=lar-1; curidmapC[0]=lar; curidmapC[1]=4-lar;}
+			else if(B->tensor_str.at(contB[1]) == 'b'){ curidmapB[contB[1]]=4-lar-1; curidmapB[contB[0]]=lar; curidmapB[contB[2]]=lar-1; curidmapC[0]=lar; curidmapC[1]=4-lar;}
+			else if(B->tensor_str.at(contB[2]) == 'b'){ curidmapB[contB[2]]=4-lar-1; curidmapB[contB[1]]=lar; curidmapB[contB[0]]=lar-1; curidmapC[0]=lar; curidmapC[1]=4-lar;}
 		}
-		else if	(symB1f && B->tensor_str.at(contB[0]) == 'A')
+		else if	(symB1f && B->tensor_str.at(contB[0]) == 'a')
 		{
 			curidmapB[extB[0]]=lar-1; 
-			if(B->tensor_str.at(contB[1]) == 'A'){ curidmapB[contB[0]]=4-lar; curidmapB[contB[1]]=4-lar-1; curidmapB[contB[2]]=lar-1; curidmapC[0]=lar; curidmapC[1]=lar-1;}
-			else if(B->tensor_str.at(contB[2]) == 'A'){ curidmapB[contB[1]]=lar-1; curidmapB[contB[0]]=4-lar; curidmapB[contB[2]]=4-lar-1; curidmapC[0]=lar; curidmapC[1]=lar-1;}
+			if(B->tensor_str.at(contB[1]) == 'a'){ curidmapB[contB[0]]=4-lar; curidmapB[contB[1]]=4-lar-1; curidmapB[contB[2]]=lar-1; curidmapC[0]=lar; curidmapC[1]=lar-1;}
+			else if(B->tensor_str.at(contB[2]) == 'a'){ curidmapB[contB[1]]=lar-1; curidmapB[contB[0]]=4-lar; curidmapB[contB[2]]=4-lar-1; curidmapC[0]=lar; curidmapC[1]=lar-1;}
 		}	
-		else if	(symB1f && B->tensor_str.at(contB[1]) == 'A')
+		else if	(symB1f && B->tensor_str.at(contB[1]) == 'a')
 		{
 			curidmapB[extB[0]]=lar-1; 
 			 curidmapB[contB[0]]=lar; curidmapB[contB[1]]=4-lar; curidmapB[contB[2]]=4-lar-1; curidmapC[0]=lar; curidmapC[1]=lar-1;
 		}
-		else if	(symB2f && B->tensor_str.at(contB[0]) == 'B')
+		else if	(symB2f && B->tensor_str.at(contB[0]) == 'b')
 		{
 			curidmapB[extB[0]]=lar-1; 
-			if(B->tensor_str.at(contB[1]) == 'B'){ curidmapB[contB[0]]=4-lar; curidmapB[contB[1]]=4-lar-1; curidmapB[contB[2]]=lar-1; curidmapC[0]=lar; curidmapC[1]=lar-1;}
-			else if(B->tensor_str.at(contB[2]) == 'B'){ curidmapB[contB[1]]=lar-1; curidmapB[contB[0]]=4-lar; curidmapB[contB[2]]=4-lar-1; curidmapC[0]=lar; curidmapC[1]=lar-1;}
+			if(B->tensor_str.at(contB[1]) == 'b'){ curidmapB[contB[0]]=4-lar; curidmapB[contB[1]]=4-lar-1; curidmapB[contB[2]]=lar-1; curidmapC[0]=lar; curidmapC[1]=lar-1;}
+			else if(B->tensor_str.at(contB[2]) == 'b'){ curidmapB[contB[1]]=lar-1; curidmapB[contB[0]]=4-lar; curidmapB[contB[2]]=4-lar-1; curidmapC[0]=lar; curidmapC[1]=lar-1;}
 		}	
-		else if	(symB2f && B->tensor_str.at(contB[1]) == 'B')
+		else if	(symB2f && B->tensor_str.at(contB[1]) == 'b')
 		{
 			curidmapB[extB[0]]=lar-1; 
 			 curidmapB[contB[0]]=lar; curidmapB[contB[1]]=4-lar; curidmapB[contB[2]]=4-lar-1; curidmapC[0]=lar; curidmapC[1]=lar-1;
@@ -832,31 +834,31 @@ void cost::best_Cost_GGrid_4Dc(int* &curGrid, int* &curidmapA, int* &curidmapB, 
 		}
 		else if(symB1f && B->tensor_str.at(extB[0]) == 'a')
 		{
-			if(B->tensor_str.at(contB[0])=='A'){ curidmapB[contB[0]]=lar-1; curidmapB[contB[1]]=4-lar; curidmapB[contB[2]]=4-lar-1; }
-			else if(B->tensor_str.at(contB[1])=='A'){ curidmapB[contB[1]]=lar-1; curidmapB[contB[0]]=4-lar; curidmapB[contB[2]]=4-lar-1; }
-			else if(B->tensor_str.at(contB[2])=='A'){ curidmapB[contB[2]]=lar-1; curidmapB[contB[0]]=4-lar; curidmapB[contB[0]]=4-lar-1; }
+			if(B->tensor_str.at(contB[0])=='a'){ curidmapB[contB[0]]=lar-1; curidmapB[contB[1]]=4-lar; curidmapB[contB[2]]=4-lar-1; }
+			else if(B->tensor_str.at(contB[1])=='a'){ curidmapB[contB[1]]=lar-1; curidmapB[contB[0]]=4-lar; curidmapB[contB[2]]=4-lar-1; }
+			else if(B->tensor_str.at(contB[2])=='a'){ curidmapB[contB[2]]=lar-1; curidmapB[contB[0]]=4-lar; curidmapB[contB[0]]=4-lar-1; }
 		}
 		else if(symB2f && B->tensor_str.at(extB[0]) == 'b')
 		{
-			if(B->tensor_str.at(contB[0])=='B'){ curidmapB[contB[0]]=lar-1; curidmapB[contB[1]]=4-lar; curidmapB[contB[2]]=4-lar-1; }
-			else if(B->tensor_str.at(contB[1])=='B'){ curidmapB[contB[1]]=lar-1; curidmapB[contB[0]]=4-lar; curidmapB[contB[2]]=4-lar-1; }
-			else if(B->tensor_str.at(contB[2])=='B'){ curidmapB[contB[2]]=lar-1; curidmapB[contB[0]]=4-lar; curidmapB[contB[0]]=4-lar-1; }
+			if(B->tensor_str.at(contB[0])=='b'){ curidmapB[contB[0]]=lar-1; curidmapB[contB[1]]=4-lar; curidmapB[contB[2]]=4-lar-1; }
+			else if(B->tensor_str.at(contB[1])=='b'){ curidmapB[contB[1]]=lar-1; curidmapB[contB[0]]=4-lar; curidmapB[contB[2]]=4-lar-1; }
+			else if(B->tensor_str.at(contB[2])=='b'){ curidmapB[contB[2]]=lar-1; curidmapB[contB[0]]=4-lar; curidmapB[contB[0]]=4-lar-1; }
 		}
-		else if(symB1f && B->tensor_str.at(contB[0]) == 'A')
+		else if(symB1f && B->tensor_str.at(contB[0]) == 'a')
 		{
-			if(B->tensor_str.at(contB[1]) == 'A'){curidmapB[contB[0]]=4-lar; curidmapB[contB[1]]=4-lar-1; curidmapB[contB[2]]=lar-1;}
-			else if(B->tensor_str.at(contB[2]) == 'A'){curidmapB[contB[0]]=4-lar; curidmapB[contB[2]]=4-lar-1; curidmapB[contB[1]]=lar-1;}
+			if(B->tensor_str.at(contB[1]) == 'a'){curidmapB[contB[0]]=4-lar; curidmapB[contB[1]]=4-lar-1; curidmapB[contB[2]]=lar-1;}
+			else if(B->tensor_str.at(contB[2]) == 'a'){curidmapB[contB[0]]=4-lar; curidmapB[contB[2]]=4-lar-1; curidmapB[contB[1]]=lar-1;}
 		}
-		else if(symB2f && B->tensor_str.at(contB[0]) == 'B')
+		else if(symB2f && B->tensor_str.at(contB[0]) == 'b')
 		{
-			if(B->tensor_str.at(contB[1]) == 'B'){curidmapB[contB[0]]=4-lar; curidmapB[contB[1]]=4-lar-1; curidmapB[contB[2]]=lar-1;}
-			else if(B->tensor_str.at(contB[2]) == 'B'){curidmapB[contB[0]]=4-lar; curidmapB[contB[2]]=4-lar-1; curidmapB[contB[1]]=lar-1;}
+			if(B->tensor_str.at(contB[1]) == 'b'){curidmapB[contB[0]]=4-lar; curidmapB[contB[1]]=4-lar-1; curidmapB[contB[2]]=lar-1;}
+			else if(B->tensor_str.at(contB[2]) == 'b'){curidmapB[contB[0]]=4-lar; curidmapB[contB[2]]=4-lar-1; curidmapB[contB[1]]=lar-1;}
 		}
-		else if(symB1f && B->tensor_str.at(contB[1]) == 'A')
+		else if(symB1f && B->tensor_str.at(contB[1]) == 'a')
 		{
 			curidmapB[contB[1]]=4-lar; curidmapB[contB[2]]=4-lar-1; curidmapB[contB[0]]=lar-1;
 		}
-		else if(symB2f && 	B->tensor_str.at(contB[1]) == 'B')
+		else if(symB2f && 	B->tensor_str.at(contB[1]) == 'b')
 		{
 			curidmapB[contB[1]]=4-lar; curidmapB[contB[2]]=4-lar-1; curidmapB[contB[0]]=lar-1;
 		}
@@ -869,35 +871,35 @@ void cost::best_Cost_GGrid_4Dc(int* &curGrid, int* &curidmapA, int* &curidmapB, 
 		else if(symA1f && A->tensor_str.at(extA[0]) == 'a')
 		{
 			curidmapA[extA[0]]=4-lar; 
-			if(A->tensor_str.at(contA[0]) == 'A'){ curidmapA[contA[0]]=4-lar-1; curidmapA[contA[1]]=lar; curidmapA[contA[2]]=lar-1; curidmapC[0]=lar; curidmapC[1]=4-lar;}
-			else if(A->tensor_str.at(contA[1]) == 'A'){ curidmapA[contA[1]]=4-lar-1; curidmapA[contA[0]]=lar; curidmapA[contA[2]]=lar-1; curidmapC[0]=lar; curidmapC[1]=4-lar;}
-			else if(A->tensor_str.at(contA[2]) == 'A'){ curidmapA[contA[2]]=4-lar-1; curidmapA[contA[1]]=lar; curidmapA[contA[0]]=lar-1; curidmapC[0]=lar; curidmapC[1]=4-lar;}
+			if(A->tensor_str.at(contA[0]) == 'a'){ curidmapA[contA[0]]=4-lar-1; curidmapA[contA[1]]=lar; curidmapA[contA[2]]=lar-1; curidmapC[0]=lar; curidmapC[1]=4-lar;}
+			else if(A->tensor_str.at(contA[1]) == 'a'){ curidmapA[contA[1]]=4-lar-1; curidmapA[contA[0]]=lar; curidmapA[contA[2]]=lar-1; curidmapC[0]=lar; curidmapC[1]=4-lar;}
+			else if(A->tensor_str.at(contA[2]) == 'a'){ curidmapA[contA[2]]=4-lar-1; curidmapA[contA[1]]=lar; curidmapA[contA[0]]=lar-1; curidmapC[0]=lar; curidmapC[1]=4-lar;}
 		}	
 		else if	(symA2f && A->tensor_str.at(extA[0]) == 'b')
 		{
 			curidmapA[extA[0]]=4-lar; 
-			if(A->tensor_str.at(contA[0]) == 'B'){ curidmapA[contA[0]]=4-lar-1; curidmapA[contA[1]]=lar; curidmapA[contA[2]]=lar-1; curidmapC[0]=lar; curidmapC[1]=4-lar;}
-			else if(A->tensor_str.at(contA[1]) == 'B'){ curidmapA[contA[1]]=4-lar-1; curidmapA[contA[0]]=lar; curidmapA[contA[2]]=lar-1; curidmapC[0]=lar; curidmapC[1]=4-lar;}
-			else if(A->tensor_str.at(contA[2]) == 'B'){ curidmapA[contA[2]]=4-lar-1; curidmapA[contA[1]]=lar; curidmapA[contA[0]]=lar-1; curidmapC[0]=lar; curidmapC[1]=4-lar;}
+			if(A->tensor_str.at(contA[0]) == 'b'){ curidmapA[contA[0]]=4-lar-1; curidmapA[contA[1]]=lar; curidmapA[contA[2]]=lar-1; curidmapC[0]=lar; curidmapC[1]=4-lar;}
+			else if(A->tensor_str.at(contA[1]) == 'b'){ curidmapA[contA[1]]=4-lar-1; curidmapA[contA[0]]=lar; curidmapA[contA[2]]=lar-1; curidmapC[0]=lar; curidmapC[1]=4-lar;}
+			else if(A->tensor_str.at(contA[2]) == 'b'){ curidmapA[contA[2]]=4-lar-1; curidmapA[contA[1]]=lar; curidmapA[contA[0]]=lar-1; curidmapC[0]=lar; curidmapC[1]=4-lar;}
 		}
-		else if	(symA1f && A->tensor_str.at(contA[0]) == 'A')
+		else if	(symA1f && A->tensor_str.at(contA[0]) == 'a')
 		{
 			curidmapA[extA[0]]=lar-1; 
-			if(A->tensor_str.at(contA[1]) == 'A'){ curidmapA[contA[0]]=4-lar; curidmapA[contA[1]]=4-lar-1; curidmapA[contA[2]]=lar-1; curidmapC[0]=lar; curidmapC[1]=lar-1;}
-			else if(A->tensor_str.at(contA[2]) == 'A'){ curidmapA[contA[1]]=lar-1; curidmapA[contA[0]]=4-lar; curidmapA[contA[2]]=4-lar-1; curidmapC[0]=lar; curidmapC[1]=lar-1;}
+			if(A->tensor_str.at(contA[1]) == 'a'){ curidmapA[contA[0]]=4-lar; curidmapA[contA[1]]=4-lar-1; curidmapA[contA[2]]=lar-1; curidmapC[0]=lar; curidmapC[1]=lar-1;}
+			else if(A->tensor_str.at(contA[2]) == 'a'){ curidmapA[contA[1]]=lar-1; curidmapA[contA[0]]=4-lar; curidmapA[contA[2]]=4-lar-1; curidmapC[0]=lar; curidmapC[1]=lar-1;}
 		}	
-		else if	(symA1f && A->tensor_str.at(contA[1]) == 'A')
+		else if	(symA1f && A->tensor_str.at(contA[1]) == 'a')
 		{
 			curidmapA[extA[0]]=lar-1; 
 			 curidmapA[contA[0]]=lar; curidmapA[contA[1]]=4-lar; curidmapA[contA[2]]=4-lar-1; curidmapC[0]=lar; curidmapC[1]=lar-1;
 		}
-		else if	(symA2f && A->tensor_str.at(contA[0]) == 'B')
+		else if	(symA2f && A->tensor_str.at(contA[0]) == 'b')
 		{
 			curidmapA[extA[0]]=lar-1; 
-			if(A->tensor_str.at(contA[1]) == 'B'){ curidmapA[contA[0]]=4-lar; curidmapA[contA[1]]=4-lar-1; curidmapA[contA[2]]=lar-1; curidmapC[0]=lar; curidmapC[1]=lar-1;}
-			else if(A->tensor_str.at(contA[2]) == 'B'){ curidmapA[contA[1]]=lar-1; curidmapA[contA[0]]=4-lar; curidmapA[contA[2]]=4-lar-1; curidmapC[0]=lar; curidmapC[1]=lar-1;}
+			if(A->tensor_str.at(contA[1]) == 'b'){ curidmapA[contA[0]]=4-lar; curidmapA[contA[1]]=4-lar-1; curidmapA[contA[2]]=lar-1; curidmapC[0]=lar; curidmapC[1]=lar-1;}
+			else if(A->tensor_str.at(contA[2]) == 'b'){ curidmapA[contA[1]]=lar-1; curidmapA[contA[0]]=4-lar; curidmapA[contA[2]]=4-lar-1; curidmapC[0]=lar; curidmapC[1]=lar-1;}
 		}	
-		else if	(symA2f && A->tensor_str.at(contA[1]) == 'B')
+		else if	(symA2f && A->tensor_str.at(contA[1]) == 'b')
 		{
 			curidmapA[extA[0]]=lar-1; 
 			 curidmapA[contA[0]]=lar; curidmapA[contA[1]]=4-lar; curidmapA[contA[2]]=4-lar-1; curidmapC[0]=lar; curidmapC[1]=lar-1;
@@ -983,9 +985,9 @@ void cost::best_Cost_GGrid_4Dd(int* &curGrid, int* &curidmapA, int* &curidmapB, 
         		}
     		}
 
-	for(int i=0;i<4;i++) {if(i!=contA[0]) extA[ecnt]=i; ecnt++;}
+	for(int i=0;i<4;i++) {if(i!=contA[0]){ extA[ecnt]=i; ecnt++;}}
 	ecnt=0;
-	for(int i=0;i<4;i++) {if(i!=contB[0]) extB[ecnt]=i; ecnt++;}
+	for(int i=0;i<4;i++) {if(i!=contB[0]){ extB[ecnt]=i; ecnt++;}}
 
 	int lar=1;
 	if(curGrid[3] > curGrid[1]) lar=3;
