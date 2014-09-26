@@ -116,9 +116,9 @@ void GridRedistribute::redistribute()
 	
         // Post send to the processor that is supposed to hold the blocks currently at this processor
         redistribute_send();
-
-
-
+	
+	
+	
         // Post receive from the processor that currently holds the blocks that should be at this processor
         list<recv_data> recv_list;
         redistribute_recv(recv_list,repl_dims,repcount);
@@ -370,6 +370,7 @@ void GridRedistribute::redistribute_send()
 // and post receives for them
 void GridRedistribute::redistribute_recv(list<recv_data> &recv_list, int* &repl_dims, int repcount)
 {
+	
         int* local_indices = new int[dims];
         int offset = 0;
         int* addresses = new int[T->num_max_tiles * dims];
@@ -377,6 +378,7 @@ void GridRedistribute::redistribute_recv(list<recv_data> &recv_list, int* &repl_
         // Generate addresses that should reside at this processor w.r.t. the new index map
         //int num_tiles = T->num_actual_tiles;
 	int num_tiles = 0;
+	
         T->get_num_tiles(0, local_indices, offset, new_idx_map, new_proc_addr, addresses, new_pgrid, num_tiles);
         
 	
@@ -400,11 +402,12 @@ void GridRedistribute::redistribute_recv(list<recv_data> &recv_list, int* &repl_
 
        
 bool flag=true;
-//cout<<"repcount"<<repcount<<endl;
+
 
 
 if(repcount>0)
-{
+{	
+
 	int* proc_add=new int[grid_dims+1];
 	new_grid->get_proc_addr(T->rank, proc_add);
 	for(int i=0;i<repcount;i++)
@@ -419,7 +422,7 @@ if(repcount>0)
 
         // Post receives from each processor identified above
         recv_list = list<recv_data>();
-
+	//cout<<"numtiles"<<num_tiles<<"  rank"<<T->rank<<endl;
                
 
         for (int i=0; i < num_procs; i++)
@@ -458,12 +461,13 @@ if(repcount>0)
 
 
         // Free allocated memory
-        delete[] map;
-        delete[] local_indices;
-        delete[] addresses;
+     //   delete[] map;
+       // delete[] local_indices;
+       // delete[] addresses;
       //  delete[] old_proc_addr;
-        delete[] old_proc_ranks;
+      //  delete[] old_proc_ranks;
 }
+
 
 
 
@@ -473,7 +477,7 @@ int* new_proc_add = new int[grid_dims+1];
         new_grid->get_proc_addr(T->rank, new_proc_add);
 
 	new_proc_add[grid_dims]=0;
-print_tile_addr(grid_dims+1, new_proc_add);
+cout<<"Replication dimension is"<<rep_dim;
 
         // Create a new MPI_Communicator in the serialization dimension
         int num_procs = new_pgrid[rep_dim];
