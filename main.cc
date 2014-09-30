@@ -12,7 +12,7 @@
 //
 #define TEST 0
 
-using namespace std;
+using namespace RRR;
 
 int** generate_Addr(int dimension, int max_blocks)
 {
@@ -41,14 +41,14 @@ int main(int argc, char* argv[]) {
 
     //cout<<"Setting pgrid"<<endl;
     int* pgrid = new int[5];
-    pgrid[0] = 4;//atoi(argv[1]);
-    pgrid[1] = 4;//atoi(argv[1]);
-    pgrid[2] = 4;//atoi(argv[2]);
-    pgrid[3] = 4;//atoi(argv[2]);
-    pgrid[4] = 2;//atoi(argv[2]);
+    pgrid[0] = 2;//atoi(argv[1]);
+    pgrid[1] = 8;//atoi(argv[1]);
+    pgrid[2] = 1;//atoi(argv[2]);
+    pgrid[3] = 1;//atoi(argv[2]);
+    pgrid[4] = 1;//atoi(argv[2]);
 
     //cout<<"Initializing grid"<<endl;
-    Grid* grid = new Grid(5, pgrid);
+    Grid* grid = new Grid(4, pgrid);
 
     //cout<<"getting parameters"<<endl;
     //int ctr = atoi(argv[5]);
@@ -67,11 +67,13 @@ int main(int argc, char* argv[]) {
     //    cout << endl << endl;
     //}
 
-   		if(!rank)
-		    cout<<"Calling test program"<<endl;
-		reduction_test(grid);
-		
+    if(!rank)
+	cout<<"Calling test program : Identify Receivers"<<endl;
+
    
+   contraction_1(grid,8,32);
+    
+    
     MPI_Finalize();
     return 0;
 

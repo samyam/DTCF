@@ -31,7 +31,10 @@ private:
     int rank, num_procs; 
     int *my_address;
 
-       
+    //these are debugging buffers to ensure that for every send there is a matching receive. 
+    int* receiver_grid_buffer;
+    int* sender_grid_buffer;
+    
     int num_cntr_indices;
 
     Tensor *A, *B, *C;
@@ -148,6 +151,15 @@ private:
     // Receive data at instigator
     int recv_at_instigator(Tensor* &X, int contr_dim, int contr_idx,  double* &blocks, int* &block_addrs, int send_addr_count, int send_data_count);
 
+public:
+    // Send data to instigator
+    void send_to_instigator_rect( Tensor* &X, int contr_dim, int contr_idx, int &count_addr_sends, int &count_data_sends); 
+
+private:
+
+    // Receive data at instigator
+    int recv_at_instigator_rect(Tensor* &X, int contr_dim, int contr_idx,  double* &blocks, int* &block_addrs, int send_addr_count, int send_data_count);
+
     // Test for completion of bounce send receives of this processor
     void test_comm_completion();
 
@@ -242,6 +254,9 @@ public:
 
     // Processors send to instigator and instigator collects the data
     int instigate_collection(Tensor* &X, int contr_dim, int contr_idx, double* &blocks, int* &clocks_addrs);
+
+    // Processors send to instigator and instigator collects the data in a rectangular grid
+    int instigate_collection_rect(Tensor* &X, int contr_dim, int contr_idx, double* &blocks, int* &clocks_addrs);
 
     // Contraction procedure
     void contract(std::string contr_str_A, std::string contr_str_B, std::string contr_str_C);

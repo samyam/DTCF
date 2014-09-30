@@ -264,6 +264,7 @@ void assert_pgrid_size(int size, int dims, int* &pgrid)
 	{
 		pgrid_size *= pgrid[i];
 	}
+	//cout<<"Size is "<<size<<"pgrid_size is "<<pgrid_size<<endl;
 	assert(size == pgrid_size);
 }
 
@@ -613,3 +614,58 @@ void recursive_transpose(double* &input_buffer,
 
 }
 
+// compute greatest common divisor
+int gcd(int a, int b)
+{
+    if(a == b) return a;
+
+    if(a == 1 || b == 1) return 1;
+     
+    if(a > b) return gcd(a-b,b);
+    
+    return gcd(a,b-a);
+
+}
+
+// compute lowest common multiple
+int lcm(int a, int b)
+{
+    return a*b/gcd(a,b);
+}
+
+
+/*points_per_dim is an array of arrays. The inner dimension
+ * represents the dimension of the processor grid while the outer
+ * dimension represents the processor addresses along that
+ * dimension. The size_per_dim stores the number of processor
+ * along each dimension of points_per_dim. The
+ * create_cross_products fills output which is an array of
+ * processor addresses. The addresses created by this function is
+ * a tuple of dims, given by the cross products of addresses along
+ * each dimension given by points_per_dims.*/ 
+void create_cross_product(int** &points_per_dim, int* &size_per_dim, 
+			  int &dims, int cur_dim, 
+			  int &offset, int* &current_addr,
+			  int** &output){
+
+    //for each receiver address along cur_dim
+    for(int i = 0 ; i< size_per_dim[cur_dim]; i++)
+    {
+
+	current_addr[cur_dim] = points_per_dim[cur_dim][i];
+
+	if(cur_dim == dims-1){
+
+	    output[offset] = new int[dims];
+
+	    memcpy(output[offset], current_addr, dims*sizeof(int));
+
+	    offset ++;
+
+	}else{
+	    
+	    create_cross_product(points_per_dim, size_per_dim, dims, cur_dim+1, offset, current_addr, output);
+	}
+    }
+
+}

@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <map>
 #include <climits>
+#include <set>
 #include "dltc_tensor.h"
 #include "helper.h"
 #include "grid.h"
@@ -109,6 +110,9 @@ class Tensor
 	// maps tensor indices to physical qrid
 	int *index_dimension_map;
 
+	// maps processor grid dimension to tensor indices
+	int *reverse_index_map;
+
 	//maps block address to the location of that block in the tensor
 	std::map<int,int> block_addr_to_blk_num;
 
@@ -204,6 +208,10 @@ class Tensor
 	// Compute the number of maximum possible tiles in the tensor at this processor
 	int compute_num_max_tiles(int* &idmap, int* &phy_grid);
 
+
+	// Compute the number of maximum possible tiles in the tensor at this processor
+	int compute_num_max_tiles_rect(int* &idmap, int* &phy_grid);
+
 	//sets function to the get_value function
 	void set_get_value(double (*value_function)(int* &indices));
 
@@ -213,6 +221,11 @@ class Tensor
 	// Returns the number of tiles with address value indx_id in dimension dim
 	// Stores the tiles in tile_block and addresses in virt_addr
 	int getTiles(int dim, int indx_id, double* &tile_block, int* &virt_addr);
+
+
+	// Returns the number of tiles with address value indx_id in dimension dim
+	// Stores addresses in virt_addr tile location in tile_location
+	int getTileAddresses(int dim, int indx_id, int* &tile_location, int* &virt_addr);
 
 	int getTile(int* tile_address);
 	
@@ -261,11 +274,27 @@ class Tensor
 	//from index to processor dimension
 	int get_bouncers(int index, int** &bouncers);
 
+	//returns number of processor addresses from which data needs to be
+	//bounced, when the processor grid is not square .THe array of addresses
+	//are put in bouncers. my_address holds the invoking nodes address,
+	//index_dimension_map gives the mapping from index to processor
+	//dimension
+	int get_rect_bouncers(int contr_dim, int contr_idx, int** &bouncers);
+
 	// Get the number of blocks held by a processor
 	int get_tensor_size(int cur_dim, int* &cur_indices, int* &processor_addr);
 
 	// Gets receiver addresses based on current contraction dimension and index
 	int get_receivers(int contr_dim, int contr_idx, int** &receivers, int* &matching_indices);
+
+	// Gets matching indices based on current contraction
+	// dimension and index on a rectangular grid
+	int get_matching_indices_rect(int contr_dim, int contr_idx, int* &matching_indices);
+
+	// Gets receiver addresses based on current contraction
+	// dimension and index on a rectangular grid.
+	//for testing purpose, remove it after debugging
+	int get_receivers_rect(int contr_dim, int contr_idx, int** &receivers, int* &matching_indices, int &num_matches);
 
 	//returns block number using block address
 	//int get_block_number(int* &block_address);
@@ -360,12 +389,9 @@ class Tensor
 
 	// Check if the address satisfies tensor symmetry criterion
 	bool satisfies_sym(int* &addr);
-	
-	
-	
-	
-	// Getter functions
 
+	// Getter functions
+	void set_cntr_map(int dim, int value)   { cntr_map[dim] = value;}
 	int get_block_size()                    { return block_size;}
 	int* get_block_range()                  { return block_range;}
 	int  get_dims() 			{ return dims; }

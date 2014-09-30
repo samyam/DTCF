@@ -9,7 +9,7 @@
 #include "tensor.h"
 #include "contraction.h"
 #include "redistribute.h"
-
+using namespace RRR;
 
 #define DEBUG 0
 
@@ -18,6 +18,7 @@
 #else
 #define TEST_EXTERN extern
 #endif
+
 TEST_EXTERN void contr_rotate(Grid* &g, int vgrid_side, int N);
 TEST_EXTERN void rotation_test(Grid* &g, int vgrid_side, int N);
 TEST_EXTERN void two_point_five_D_SUMMA(Grid* &g, int vgrid_side, int N);
@@ -46,4 +47,9 @@ TEST_EXTERN void test_contract_4d_4d();
 TEST_EXTERN void serialize_test();
 
 TEST_EXTERN void multiple_contr_test();
+
+TEST_EXTERN void rect_grid_instigation(Grid* &g);
+
+TEST_EXTERN void rect_identify_receivers(Grid* &g);
+
 #endif

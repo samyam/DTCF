@@ -1,14 +1,15 @@
 #include "contraction.h"
-#define CCHECK 1
-#define RRANK 0
+#define CCHECK 0
+#define RRANK 2
 #define DEBUG_TRR 0
-#define DEBUG_TP 0
+#define DEBUG_TDEBUG_IP 0
 #define DEBUG_TCM 1
-#define DEBUG_T 0
+#define DEBUG_T 1
+#define DEBUG_I 0
 #define DEBUG_T1 0
 #define DEBUG_TR 0
 #define DISPLAY_TIME 0
-#define COST_EVAL 0
+#define COST_EVAL 1
 namespace RRR{
     using namespace std;
 
@@ -17,7 +18,7 @@ namespace RRR{
 	grid = g;
 	rank = grid->rank;
 	num_procs = grid->nprocs;
-    
+	
 	grid_dims = grid->grid_dims;
 	serial = grid_dims;
 	pgrid = new int[grid_dims + 1];
@@ -26,6 +27,11 @@ namespace RRR{
 	memcpy(my_address, grid->proc_addr, grid_dims * sizeof(int));
 	pgrid[grid_dims] = 1;
 	my_address[grid_dims] = 0;
+
+	//debugging
+	receiver_grid_buffer = new int[num_procs*num_procs];
+	sender_grid_buffer = new int[num_procs*num_procs];
+	
     }
 
     Contraction::Contraction(Tensor* &a, Tensor* &b, Tensor* &c, Grid* &g)
@@ -33,6 +39,10 @@ namespace RRR{
 	grid = g;
 	rank = grid->rank;
 	num_procs = grid->nprocs;
+
+	//debugging
+	//receiver_grid_buffer = new int[num_procs*num_procs];
+	//sender_grid_buffer = new int[num_procs*num_procs];
 
 	A = a;
 	B = b;
@@ -65,6 +75,11 @@ namespace RRR{
 	memcpy(my_address, grid->proc_addr, grid_dims * sizeof(int));
 	pgrid[grid_dims] = 1;
 	my_address[grid_dims] = 0;
+
+	//debugging
+	receiver_grid_buffer = new int[num_procs*num_procs];
+	sender_grid_buffer = new int[num_procs*num_procs];
+	
     }
 
     //Changes the grid if a redistribution is required for contraction
@@ -702,12 +717,15 @@ namespace RRR{
 					  int * &block_addrs)
     {
 
+	if (DEBUG_I && rank == rank) cout<<"Rank "<<rank<<" Instigate send with contr_dim "<<contr_dim<<" and contr indx "<<contr_idx<<endl<<fflush;
 	int send_addr_count, send_data_count;
 	timer1 -= MPI_Wtime();
-	send_to_instigator(X, contr_dim, contr_idx, send_addr_count, send_data_count);
+	//cout<<"Send to instigator "<<rank<<endl;
+	send_to_instigator_rect(X, contr_dim, contr_idx, send_addr_count, send_data_count);
 	timer1 += MPI_Wtime();
-
-	return recv_at_instigator(X, contr_dim, contr_idx,  blocks, block_addrs, send_addr_count, send_data_count);
+	//cout<<"Returning from send to instigator "<<rank<<endl;
+	if (DEBUG_I && rank == rank)  cout<<"Rank "<<rank<< " Instigate receive with contr_dim "<<contr_dim<<" and contr indx "<<contr_idx<<endl<<fflush;
+	return recv_at_instigator_rect(X, contr_dim, contr_idx,  blocks, block_addrs, send_addr_count, send_data_count);
     }
 
 
@@ -1358,9 +1376,11 @@ namespace RRR{
 	}
 
 	// Contraction loop
-
-	for(int k = 0; k < k_bound; k++)
+	int k = 0;
+	//for(int k = 0; k < k_bound; k++)
 	{
+	    //if(rank == 0) A->printInfo();
+
 	    // Start measuring communication time
 	    comm_time -= MPI_Wtime();
 
@@ -1368,20 +1388,23 @@ namespace RRR{
 
 	    double *blocks_A, *blocks_B;
 	    int *block_addr_A, *block_addr_B;
+
 	    instigation_time -= MPI_Wtime();
 	    int num_collected_A = instigate_collection(A, cdim_A, k, blocks_A, block_addr_A);
+	    
 	    //if(DEBUG_T && rank==RRANK)    printGetTiles(blocks_A, block_addr_A, A->block_size, num_collected_A, A->dims);
-
-	    timer4 -=MPI_Wtime();
-	    int num_collected_B = instigate_collection(B, cdim_B, k, blocks_B, block_addr_B);
+	    //if(DEBUG_I && rank == RRANK && cdim_B == 2 && k == 1) cout<<endl<<endl<<"Instigation for B"<<endl;
+	       timer4 -=MPI_Wtime();
+	       //int num_collected_B = instigate_collection(B, cdim_B, k, blocks_B, block_addr_B);
+	       int num_collected_B =0;
 	    timer4 +=MPI_Wtime();
 	    instigation_time += MPI_Wtime();
 	    //cout << rank << " num_collected_A= " << num_collected_A<< " num_collected_B = " << num_collected_B << endl;
-
+	    
 	    //if(rank==4)    printGetTiles(blocks_B, block_addr_B, B->block_size, num_collected_B, B->dims);
 	    bool is_instigator_A = (k % pgrid[A->index_dimension_map[cdim_A]] == my_address[A->index_dimension_map[cdim_A]]);
-	    bool is_instigator_B = (k % pgrid[B->index_dimension_map[cdim_B]] == my_address[B->index_dimension_map[cdim_B]]);
-
+	    //bool is_instigator_B = (k % pgrid[B->index_dimension_map[cdim_B]] == my_address[B->index_dimension_map[cdim_B]]);
+	    
 
 	    //------------------------------------------------------------------------------------------------------------//
 
@@ -1418,7 +1441,7 @@ namespace RRR{
 
 	    //------------------------------------------------------------------------------------------------------------//
 
-
+	    /*
 
 	    //--------------------------------------------- Communicate B forward----------------------------------------//
 
@@ -1452,13 +1475,13 @@ namespace RRR{
 	    // Stop measuring communication time
 	    comm_time += MPI_Wtime();
 
-
+	    
 	    //---------------------------------------Base Case Do the local dgemm ---------------------------------------//
 	    //if(DEBUG_T && rank==RRANK){
 	    //   cout<<"k is "<<k<<endl;
 	    //}
-	
-
+	    
+	    */
 	    // Compute
 	    if(contr_list.empty())
 	    {
@@ -1466,7 +1489,7 @@ namespace RRR{
 		    cout<<"Rank "<<rank<<". Entering transpose and DGEMM"<<endl;
 		}
 		
-		transpose_and_dgemm(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer);
+		//transpose_and_dgemm(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer);
 		if(DEBUG_T && rank==rank){
 		    cout<<"Rank "<<rank<<". Exiting transpose and DGEMM"<<endl;
 		}
@@ -1480,7 +1503,7 @@ namespace RRR{
 	    {
 		// Generate sub-tensors from the accumulated data after contracting current contr_dimension
 		Tensor* sub_A = A->generate_tensor(cdim_A, blocks_A, block_addr_A, num_blocks_A);
-		Tensor* sub_B = B->generate_tensor(cdim_B, blocks_B, block_addr_B, num_blocks_B);
+		//Tensor* sub_B = B->generate_tensor(cdim_B, blocks_B, block_addr_B, num_blocks_B);
 
 		// Create pairs of contracting dimensions with current contr_idx and pass them on
 		// for contracting next index. They will be used if the next contracting dimensions
@@ -1510,12 +1533,15 @@ namespace RRR{
 
 	    
 		// Recursuvely call rec_summa for next contracting dimension
-		rec_summa(sub_A, sub_B, C_buffer, contr_list, p1, p2);
+		rec_summa(sub_A, B, C_buffer, contr_list, p1, p2);
+		//rec_summa(sub_A, sub_B, C_buffer, contr_list, p1, p2);
 
 		// Delete the subtensors once their job is done
 		sub_A->~Tensor();
-		sub_B->~Tensor();
-	    }
+		//sub_B->~Tensor();
+
+		}
+	    
 	} 
     }
 
@@ -2392,7 +2418,7 @@ namespace RRR{
     void Contraction::contract(string contr_str_A, string contr_str_B, string contr_str_C)
     {
 	int checkpoint =0;
-	if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
+	if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 	total_time = 0;
 	total_time -= MPI_Wtime();
 	timer1 = 0.0;
@@ -2413,7 +2439,7 @@ namespace RRR{
 
 	//if(rank==RRANK && DEBUG_T) cout << "A[" << contr_str_A << "]  x  B[" << contr_str_B << "]  =  C[" << contr_str_C << "]" << endl;
 
-	if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
+	if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 
 	//dgemm parameters initialize
 	n_a = n_b = n_k = 1;
@@ -2424,16 +2450,16 @@ namespace RRR{
 	dims_B = parse_contr_str(contr_str_B, B->contr_dim_str);
 	dims_C = parse_contr_str(contr_str_C, C->contr_dim_str);
 
-	if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl;     
+	if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl;     
 
 	// Gives the mapping of external indices in the input to external indices in the output. 
 	// This mapping is used to find tile address of the output tensor
 	fill_input_to_output_map(A->contr_dim_str, dims_A, C->contr_dim_str, dims_C, A_to_C_map, EXT_A);
 	fill_input_to_output_map(B->contr_dim_str, dims_B, C->contr_dim_str, dims_C, B_to_C_map, EXT_B);
 
-	if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
+	if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
     
-	if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
+	if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 
 	//Checks if a redistribution is necessary for this contraction
 	bool changed;
@@ -2447,6 +2473,14 @@ namespace RRR{
 	if(rank==RRANK && DEBUG_TCM) cout<<"Calling Cost function"<<endl;	
 	changed=eval->bestCost(idmapA,idmapB,idmapC,ndimG,npgrid);
 
+	if(rank == RRANK && DEBUG_TCM){
+	    print_tile_addr(4,idmapA);
+	    print_tile_addr(4,idmapB);
+	    print_tile_addr(4,idmapC);
+	    print_tile_addr(ndimG[0],npgrid);
+	}
+
+	if(rank==RRANK && DEBUG_TCM) cout<<"Returned from bestCost function"<<endl;	
 	//if redistribution is necessary redistribute A, B and C along with the 
 	//contraction grid
 	if(changed)
@@ -2459,6 +2493,7 @@ namespace RRR{
 	    if(rank==RRANK && DEBUG_TCM) cout<<"Redistributing A"<<endl;
 	    GridRedistribute* Aredib = new GridRedistribute(A,idmapA,new_grid);
 	    Aredib->redistribute();	
+	    if(rank==RRANK && DEBUG_TCM) cout<<"Redistributing A Completed"<<endl;
 	    if(rank==RRANK && DEBUG_TCM) cout<<"Redistributing B"<<endl;
 	    GridRedistribute* Bredib = new GridRedistribute(B,idmapB,new_grid);
 	    Bredib->redistribute();	
@@ -2634,7 +2669,7 @@ namespace RRR{
 	tr_C_time += MPI_Wtime();
   
 	if(DEBUG_TRR && rank == RRANK) cout<<"Rotate dims size is "<<rotate_dims.size()<<"."<<endl;
-	if(rank == RRANK && DEBUG_TP) 
+	if(rank == RRANK && DEBUG_T) 
 	{
 	    cout<<"Permutation Map of A"<<endl;
 	    print_tile_addr(A->dims,p_map_A);
@@ -2703,6 +2738,7 @@ namespace RRR{
 	 
 	    timer5 =- MPI_Wtime();
 	    rec_summa(A, B, big_matrix_C, DDO_list, p1, p2);
+	    return;
 	    timer5 += MPI_Wtime();
 
 	    timer6 =- MPI_Wtime();

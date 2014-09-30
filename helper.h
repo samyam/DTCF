@@ -62,6 +62,26 @@ EXTERN int is_address_equal(int dims, int* addr1, int* addr2);
 // Swaps two integers
 EXTERN void swap(int* a, int* b);
 
+// compute greatest common divisor
+EXTERN int gcd(int a, int b);
+
+// compute lowest common multiple
+EXTERN int lcm(int a, int b);
+
+/*points_per_dim is an array of arrays. The inner dimension
+ * represents the dimension of the processor grid while the outer
+ * dimension represents the processor addresses along that
+ * dimension. The size_per_dim stores the number of processor
+ * along each dimension of points_per_dim. The
+ * create_cross_products fills output which is an array of
+ * processor addresses. The addresses created by this function is
+ * a tuple of dims, given by the cross products of addresses along
+ * each dimension given by points_per_dims*/ 
+EXTERN void create_cross_product(int** &points_per_dim, int* &size_per_dim, 
+				 int &dims, int cur_dim, 
+				 int &offset, int* &current_addr,
+				 int** &output);
+
 EXTERN void printGetTiles(double* data_block, int* tile_address, int blocksize, int num_blocks, int dims);
 
 // Finds block number of a block in the block grid based on its virtual address
