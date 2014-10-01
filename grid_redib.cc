@@ -105,7 +105,7 @@ void GridRedistribute::redistribute()
 {
 
         // Re-compute num_max_tiles for the redistributed tensor
-        T->num_max_tiles = T->compute_num_max_tiles(new_idx_map, new_pgrid);
+        T->num_max_tiles = T->compute_num_max_tiles_rect(new_idx_map, new_pgrid);
 
         
 

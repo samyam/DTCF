@@ -4,10 +4,10 @@
 #define DEBUG_TRR 0
 #define DEBUG_TDEBUG_IP 0
 #define DEBUG_TCM 1
-#define DEBUG_T 1
+#define DEBUG_T 0
 #define DEBUG_I 0
 #define DEBUG_T1 0
-#define DEBUG_TR 0
+#define DEBUG_TR 1
 #define DISPLAY_TIME 0
 #define COST_EVAL 1
 namespace RRR{
@@ -1332,7 +1332,7 @@ namespace RRR{
 
 	
 	    transpose_and_dgemm_preserve(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer);
-	    //if(CCHECK) CRCT_check_blocks(A->tile_address, A->num_actual_tiles, B->tile_address, B->num_actual_tiles);
+	    if(CCHECK) CRCT_check_blocks(A->tile_address, A->num_actual_tiles, B->tile_address, B->num_actual_tiles);
 	    return;
 	    
 	}
@@ -1376,8 +1376,8 @@ namespace RRR{
 	}
 
 	// Contraction loop
-	int k = 0;
-	//for(int k = 0; k < k_bound; k++)
+	//int k = 0;
+	for(int k = 0; k < k_bound; k++)
 	{
 	    //if(rank == 0) A->printInfo();
 
@@ -1394,16 +1394,17 @@ namespace RRR{
 	    
 	    //if(DEBUG_T && rank==RRANK)    printGetTiles(blocks_A, block_addr_A, A->block_size, num_collected_A, A->dims);
 	    //if(DEBUG_I && rank == RRANK && cdim_B == 2 && k == 1) cout<<endl<<endl<<"Instigation for B"<<endl;
-	       timer4 -=MPI_Wtime();
-	       //int num_collected_B = instigate_collection(B, cdim_B, k, blocks_B, block_addr_B);
-	       int num_collected_B =0;
+	    timer4 -=MPI_Wtime();
+	    
+	    int num_collected_B = instigate_collection(B, cdim_B, k, blocks_B, block_addr_B);
+	    //int num_collected_B =0;
 	    timer4 +=MPI_Wtime();
 	    instigation_time += MPI_Wtime();
 	    //cout << rank << " num_collected_A= " << num_collected_A<< " num_collected_B = " << num_collected_B << endl;
 	    
 	    //if(rank==4)    printGetTiles(blocks_B, block_addr_B, B->block_size, num_collected_B, B->dims);
 	    bool is_instigator_A = (k % pgrid[A->index_dimension_map[cdim_A]] == my_address[A->index_dimension_map[cdim_A]]);
-	    //bool is_instigator_B = (k % pgrid[B->index_dimension_map[cdim_B]] == my_address[B->index_dimension_map[cdim_B]]);
+	    bool is_instigator_B = (k % pgrid[B->index_dimension_map[cdim_B]] == my_address[B->index_dimension_map[cdim_B]]);
 	    
 
 	    //------------------------------------------------------------------------------------------------------------//
@@ -1441,7 +1442,7 @@ namespace RRR{
 
 	    //------------------------------------------------------------------------------------------------------------//
 
-	    /*
+	    
 
 	    //--------------------------------------------- Communicate B forward----------------------------------------//
 
@@ -1481,7 +1482,7 @@ namespace RRR{
 	    //   cout<<"k is "<<k<<endl;
 	    //}
 	    
-	    */
+	    
 	    // Compute
 	    if(contr_list.empty())
 	    {
@@ -1489,7 +1490,7 @@ namespace RRR{
 		    cout<<"Rank "<<rank<<". Entering transpose and DGEMM"<<endl;
 		}
 		
-		//transpose_and_dgemm(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer);
+		transpose_and_dgemm(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer);
 		if(DEBUG_T && rank==rank){
 		    cout<<"Rank "<<rank<<". Exiting transpose and DGEMM"<<endl;
 		}
@@ -1503,7 +1504,7 @@ namespace RRR{
 	    {
 		// Generate sub-tensors from the accumulated data after contracting current contr_dimension
 		Tensor* sub_A = A->generate_tensor(cdim_A, blocks_A, block_addr_A, num_blocks_A);
-		//Tensor* sub_B = B->generate_tensor(cdim_B, blocks_B, block_addr_B, num_blocks_B);
+		Tensor* sub_B = B->generate_tensor(cdim_B, blocks_B, block_addr_B, num_blocks_B);
 
 		// Create pairs of contracting dimensions with current contr_idx and pass them on
 		// for contracting next index. They will be used if the next contracting dimensions
@@ -1533,12 +1534,12 @@ namespace RRR{
 
 	    
 		// Recursuvely call rec_summa for next contracting dimension
-		rec_summa(sub_A, B, C_buffer, contr_list, p1, p2);
-		//rec_summa(sub_A, sub_B, C_buffer, contr_list, p1, p2);
+		//rec_summa(sub_A, B, C_buffer, contr_list, p1, p2);
+		rec_summa(sub_A, sub_B, C_buffer, contr_list, p1, p2);
 
 		// Delete the subtensors once their job is done
 		sub_A->~Tensor();
-		//sub_B->~Tensor();
+		sub_B->~Tensor();
 
 		}
 	    
@@ -2419,6 +2420,7 @@ namespace RRR{
     {
 	int checkpoint =0;
 	if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
+
 	total_time = 0;
 	total_time -= MPI_Wtime();
 	timer1 = 0.0;
@@ -2438,6 +2440,7 @@ namespace RRR{
 	tr_time = 0;
 
 	//if(rank==RRANK && DEBUG_T) cout << "A[" << contr_str_A << "]  x  B[" << contr_str_B << "]  =  C[" << contr_str_C << "]" << endl;
+
 
 	if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 
@@ -2464,7 +2467,7 @@ namespace RRR{
 	//Checks if a redistribution is necessary for this contraction
 	bool changed;
 	cost* eval = new cost(A, B, C, grid);
-    
+    	
 	int* idmapA;
 	int* idmapB;
 	int* idmapC;
@@ -2472,20 +2475,20 @@ namespace RRR{
 	int* npgrid;	
 	if(rank==RRANK && DEBUG_TCM) cout<<"Calling Cost function"<<endl;	
 	changed=eval->bestCost(idmapA,idmapB,idmapC,ndimG,npgrid);
-
+	
 	if(rank == RRANK && DEBUG_TCM){
 	    print_tile_addr(4,idmapA);
-	    print_tile_addr(4,idmapB);
-	    print_tile_addr(4,idmapC);
+	    print_tile_addr(2,idmapB);
+	    print_tile_addr(2,idmapC);
 	    print_tile_addr(ndimG[0],npgrid);
 	}
-
+	
 	if(rank==RRANK && DEBUG_TCM) cout<<"Returned from bestCost function"<<endl;	
 	//if redistribution is necessary redistribute A, B and C along with the 
 	//contraction grid
 	if(changed)
 	{
-
+	
 	    int gdim=ndimG[0];
 	    if(rank==RRANK && DEBUG_TCM) cout<<"Creating new Grid"<<endl;	
 	    Grid* new_grid = new Grid(gdim, npgrid);
@@ -2524,7 +2527,7 @@ namespace RRR{
 	    }
 	}
     
-	if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
+	if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 	int need_reduction = 0;
 	num_cntr_indices = contr_list.size();
 
@@ -2536,46 +2539,46 @@ namespace RRR{
 
 	redist_time = -MPI_Wtime();
 	// Check if redistribution is required for input tensors
-	int *new_idmap_A, *new_idmap_B;
-	check_redistr(A, C, new_idmap_A, A->contr_dim_str, C->contr_dim_str);
-	check_redistr(B, C, new_idmap_B, B->contr_dim_str, C->contr_dim_str);
+	//int *new_idmap_A, *new_idmap_B;
+	//check_redistr(A, C, new_idmap_A, A->contr_dim_str, C->contr_dim_str);
+	//check_redistr(B, C, new_idmap_B, B->contr_dim_str, C->contr_dim_str);
+	//
+	//bool redistr_A, redistr_B;
+	//realign_new_idmap(new_idmap_A, new_idmap_B, contr_list, redistr_A, redistr_B);
 
-	bool redistr_A, redistr_B;
-	realign_new_idmap(new_idmap_A, new_idmap_B, contr_list, redistr_A, redistr_B);
-
-	if(rank==0 && DEBUG_TR) 
-	{
-	    cout << " Before Redistribution: " ;
-	    print_tile_addr(A->dims, A->index_dimension_map);
-	    print_tile_addr(B->dims, B->index_dimension_map);
-	    print_tile_addr(C->dims, C->index_dimension_map);
-        
-	    cout << endl << " New maps: ";
-	    print_tile_addr(A->dims, new_idmap_A);
-	    print_tile_addr(B->dims, new_idmap_B);
-	    cout << endl << fflush;
-	}
+	//if(rank==0 && DEBUG_TR) 
+	//{
+	//    cout << " Before Redistribution: " ;
+	//    print_tile_addr(A->dims, A->index_dimension_map);
+	//    print_tile_addr(B->dims, B->index_dimension_map);
+	//    print_tile_addr(C->dims, C->index_dimension_map);
+        //
+	//    cout << endl << " New maps: ";
+	//    print_tile_addr(A->dims, new_idmap_A);
+	//    print_tile_addr(B->dims, new_idmap_B);
+	//    cout << endl << fflush;
+	//}
 
 	// Perform redistribution if required
-	if(redistr_A)
-	{
-	    A->redistribute(new_idmap_A);
-	}
-
-	if(redistr_B)
-	{
-	    B->redistribute(new_idmap_B);
-	}
+	//if(redistr_A)
+	//{
+	//    A->redistribute(new_idmap_A);
+	//}
+	//
+	//if(redistr_B)
+	//{
+	//    B->redistribute(new_idmap_B);
+	//}
 	redist_time += MPI_Wtime();
 
-	if(rank==0 && DEBUG_TR) 
-	{
-	    cout << " After Redistribution: " ;
-	    print_tile_addr(A->dims, A->index_dimension_map);
-	    print_tile_addr(B->dims, B->index_dimension_map);
-	    print_tile_addr(C->dims, C->index_dimension_map);
-	    cout << endl;
-	}
+	//if(rank==0 && DEBUG_TR) 
+	//{
+	//    cout << " After Redistribution: " ;
+	//    print_tile_addr(A->dims, A->index_dimension_map);
+	//    print_tile_addr(B->dims, B->index_dimension_map);
+	//    print_tile_addr(C->dims, C->index_dimension_map);
+	//    cout << endl;
+	//}
     
 	// Assert contraction validity
 	assert_contr_validity(A, B);

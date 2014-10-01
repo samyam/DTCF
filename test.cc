@@ -807,19 +807,19 @@ void contraction_1(Grid* &g, int vgrid_side, int N)
     int* idmap_B = new int[dims_B];
     int* idmap_C = new int[dims_C];
 
-    idmap_A[0] = 0;
-    idmap_A[1] = 1;
-    idmap_A[2] = 2;
-    idmap_A[3] = 3;
+    idmap_A[0] = 2;
+    idmap_A[1] = 3;
+    idmap_A[2] = 0;
+    idmap_A[3] = 1;
 
     idmap_B[0] = 0;//serial;
     idmap_B[1] = 1;//serial;
     idmap_B[2] = 2;
     idmap_B[3] = 3;
 
-    idmap_C[0] = 0;
+    idmap_C[0] = 2;
     idmap_C[1] = 1;
-    idmap_C[2] = 2;
+    idmap_C[2] = 0;
     idmap_C[3] = 3;
 
 

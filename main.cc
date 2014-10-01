@@ -42,9 +42,9 @@ int main(int argc, char* argv[]) {
     //cout<<"Setting pgrid"<<endl;
     int* pgrid = new int[5];
     pgrid[0] = 2;//atoi(argv[1]);
-    pgrid[1] = 8;//atoi(argv[1]);
-    pgrid[2] = 1;//atoi(argv[2]);
-    pgrid[3] = 1;//atoi(argv[2]);
+    pgrid[1] = 2;//atoi(argv[1]);
+    pgrid[2] = 2;//atoi(argv[2]);
+    pgrid[3] = 2;//atoi(argv[2]);
     pgrid[4] = 1;//atoi(argv[2]);
 
     //cout<<"Initializing grid"<<endl;
