@@ -5856,9 +5856,9 @@ int main(int argc, char* argv[])
 
     
      if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 0: " << endl;
-     if(rank==0 && DEBUG_T) vaa_vovv->printInfo();
-     if(rank==0 && DEBUG_T) ta_vo->printInfo();
-     if(rank==0 && DEBUG_T)_a24849->printInfo();
+     //if(rank==0 && DEBUG_T) vaa_vovv->printInfo();
+     //if(rank==0 && DEBUG_T) ta_vo->printInfo();
+     //if(rank==0 && DEBUG_T)_a24849->printInfo();
      MPI_Barrier(MPI_COMM_WORLD);
 
      Contraction* C0 = new Contraction(vaa_vovv, ta_vo, _a24849, grid);

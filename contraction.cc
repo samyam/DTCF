@@ -1,11 +1,11 @@
 #include "contraction.h"
 #define CCHECK 0
-#define RRANK 2
+#define RRANK 0
 #define DEBUG_TRR 0
 #define DEBUG_TDEBUG_IP 0
-#define DEBUG_TCM 1
+#define DEBUG_TCM 0
 #define DEBUG_T 0
-#define DEBUG_I 0
+#define DEBUG_I 1
 #define DEBUG_T1 0
 #define DEBUG_TR 1
 #define DISPLAY_TIME 0
@@ -717,15 +717,23 @@ namespace RRR{
 					  int * &block_addrs)
     {
 
-	if (DEBUG_I && rank == rank) cout<<"Rank "<<rank<<" Instigate send with contr_dim "<<contr_dim<<" and contr indx "<<contr_idx<<endl<<fflush;
+	if (DEBUG_I && rank == RRANK) cout<<"Rank "<<rank<<" Instigate send with contr_dim "<<contr_dim<<" and contr indx "<<contr_idx<<endl<<fflush;
+
 	int send_addr_count, send_data_count;
 	timer1 -= MPI_Wtime();
-	//cout<<"Send to instigator "<<rank<<endl;
+
 	send_to_instigator_rect(X, contr_dim, contr_idx, send_addr_count, send_data_count);
+
 	timer1 += MPI_Wtime();
-	//cout<<"Returning from send to instigator "<<rank<<endl;
-	if (DEBUG_I && rank == rank)  cout<<"Rank "<<rank<< " Instigate receive with contr_dim "<<contr_dim<<" and contr indx "<<contr_idx<<endl<<fflush;
-	return recv_at_instigator_rect(X, contr_dim, contr_idx,  blocks, block_addrs, send_addr_count, send_data_count);
+	
+
+	if (DEBUG_I && rank == RRANK)  cout<<"Rank "<<rank<< " Instigate receive with contr_dim "<<contr_dim<<" and contr indx "<<contr_idx<<endl<<fflush;
+
+	int r = recv_at_instigator_rect(X, contr_dim, contr_idx,  blocks, block_addrs, send_addr_count, send_data_count);
+
+	if (DEBUG_I && rank == RRANK)  cout<<"Rank "<<rank<< " Returned from Instigate receive with contr_dim "<<contr_dim<<" and contr indx "<<contr_idx<<endl<<fflush;
+
+	return r;
     }
 
 
@@ -1331,7 +1339,7 @@ namespace RRR{
 	    int* block_addr_B = B->tile_address;
 
 	
-	    transpose_and_dgemm_preserve(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer);
+	    //transpose_and_dgemm_preserve(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer);
 	    if(CCHECK) CRCT_check_blocks(A->tile_address, A->num_actual_tiles, B->tile_address, B->num_actual_tiles);
 	    return;
 	    
@@ -1375,8 +1383,9 @@ namespace RRR{
 	    k_bound = prev_cdim2.second+1;
 	}
 
+	//A->printInfo();
 	// Contraction loop
-	//int k = 0;
+	
 	for(int k = 0; k < k_bound; k++)
 	{
 	    //if(rank == 0) A->printInfo();
@@ -1391,13 +1400,13 @@ namespace RRR{
 
 	    instigation_time -= MPI_Wtime();
 	    int num_collected_A = instigate_collection(A, cdim_A, k, blocks_A, block_addr_A);
-	    
+	    return ;
 	    //if(DEBUG_T && rank==RRANK)    printGetTiles(blocks_A, block_addr_A, A->block_size, num_collected_A, A->dims);
 	    //if(DEBUG_I && rank == RRANK && cdim_B == 2 && k == 1) cout<<endl<<endl<<"Instigation for B"<<endl;
 	    timer4 -=MPI_Wtime();
 	    
-	    int num_collected_B = instigate_collection(B, cdim_B, k, blocks_B, block_addr_B);
-	    //int num_collected_B =0;
+	    // int num_collected_B = instigate_collection(B, cdim_B, k, blocks_B, block_addr_B);
+	     int num_collected_B =0;
 	    timer4 +=MPI_Wtime();
 	    instigation_time += MPI_Wtime();
 	    //cout << rank << " num_collected_A= " << num_collected_A<< " num_collected_B = " << num_collected_B << endl;
@@ -1443,7 +1452,7 @@ namespace RRR{
 	    //------------------------------------------------------------------------------------------------------------//
 
 	    
-
+	    
 	    //--------------------------------------------- Communicate B forward----------------------------------------//
 
 	    // Forward number of blocks
@@ -1486,12 +1495,12 @@ namespace RRR{
 	    // Compute
 	    if(contr_list.empty())
 	    {
-		if(DEBUG_T && rank==rank){
+		if(DEBUG_T && rank==RRANK){
 		    cout<<"Rank "<<rank<<". Entering transpose and DGEMM"<<endl;
 		}
 		
-		transpose_and_dgemm(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer);
-		if(DEBUG_T && rank==rank){
+		//transpose_and_dgemm(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer);
+		if(DEBUG_T && rank==RRANK){
 		    cout<<"Rank "<<rank<<". Exiting transpose and DGEMM"<<endl;
 		}
 
@@ -1505,7 +1514,8 @@ namespace RRR{
 		// Generate sub-tensors from the accumulated data after contracting current contr_dimension
 		Tensor* sub_A = A->generate_tensor(cdim_A, blocks_A, block_addr_A, num_blocks_A);
 		Tensor* sub_B = B->generate_tensor(cdim_B, blocks_B, block_addr_B, num_blocks_B);
-
+		
+		//if(rank == 0) sub_A->printInfo();
 		// Create pairs of contracting dimensions with current contr_idx and pass them on
 		// for contracting next index. They will be used if the next contracting dimensions
 		// are symmetric with this one.
@@ -2419,7 +2429,8 @@ namespace RRR{
     void Contraction::contract(string contr_str_A, string contr_str_B, string contr_str_C)
     {
 	int checkpoint =0;
-	if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
+	
+	if(rank==RRANK && DEBUG_T) cout<< "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 
 	total_time = 0;
 	total_time -= MPI_Wtime();
@@ -2583,14 +2594,14 @@ namespace RRR{
 	// Assert contraction validity
 	assert_contr_validity(A, B);
 
-	if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
+	if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 
 	//Generate RSUMMA(DDO-Distributed Distributed Orthogonal) and 
 	//Reduction(DDA-Distributed Distributed Aligned)V contraction lists
 	int* reduction_dims = new int[grid_dims];
 	memset(reduction_dims, 0, grid_dims*sizeof(int));
 
-	if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
+	if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 
 	for (std::vector<pair<int,int>>::iterator cntr_it=contr_list.begin(); cntr_it != contr_list.end(); ++cntr_it)
 	{
@@ -2615,9 +2626,9 @@ namespace RRR{
 	    }
 	}
     
-	if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
+	if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 
-	if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
+	if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 
 // Identify contracting indices in A and B
 	list<int> rotate_dims;
@@ -2643,7 +2654,7 @@ namespace RRR{
 	    }
 	}
 
-	if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
+	if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
      
 	// Transpose blocks of C as required for this contraction
 	double tr_C_time = -MPI_Wtime();
@@ -2653,7 +2664,7 @@ namespace RRR{
 	//stores the permuted tile_address
 	int* permuted_address = new int[C->num_actual_tiles * C->dims];
 
-	if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
+	if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 	for(int i=0; i < C->num_actual_tiles; i++)
 	{
 	    transpose_block =  C->tensor_tiles + i*C->block_size;
@@ -2683,7 +2694,7 @@ namespace RRR{
 
 	}
 
-	if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
+	if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 	//--------------------------------------------------------------------------------//
 	if(rotate_dims.size())
 	{
@@ -2703,7 +2714,7 @@ namespace RRR{
 	else
 	{
 
-	    if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
+	    if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 	    //cmbines individial tiles of C into a 2D matrix called big_matrix_C
 	    std::map<int, std::map<int, int> >* big_matrix_map_C;
 	    double* big_matrix_C;
@@ -2718,7 +2729,7 @@ namespace RRR{
 	    } 
 
 
-	    if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
+	    if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 	    bm_time -= MPI_Wtime();
 	    //if(DEBUG_T && C->get_rank() == RRANK) cout<<endl<<"Printing C"<<endl<<fflush;
 	    create_big_matrix(C, C->tensor_tiles, permuted_address,
@@ -2733,13 +2744,17 @@ namespace RRR{
 	    pair<int,int> p1(-1,-1);
 	    pair<int,int> p2(-1,-1);
 	 
-	    if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
-	    if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Entering RSUMMA " <<endl; 
+	    if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
+	    if(rank==RRANK) A->printInfo();
+	    if(rank==RRANK) B->printInfo();
+	    if(rank==RRANK) C->printInfo();
+	    if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Entering RSUMMA " <<endl; 
 	    //if(rank==RRANK && DEBUG_T) {
 	    //cout<<"Entering Rec_SUMMA"<<endl<<endl;
 	    //}
 	 
 	    timer5 =- MPI_Wtime();
+
 	    rec_summa(A, B, big_matrix_C, DDO_list, p1, p2);
 	    return;
 	    timer5 += MPI_Wtime();
@@ -2764,7 +2779,7 @@ namespace RRR{
  
 	}
 	//---------------------------------------------------------------------------------//
-	if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
+	if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
 
 	// Transpose back blocks of C to their original form
 	tr_C_time -= MPI_Wtime();
@@ -2778,7 +2793,7 @@ namespace RRR{
 	}
 	delete[] block_to_transpose;
 
-	if(rank==rank && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl;        
+	if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl;        
 	tr_C_time += MPI_Wtime();
    
 	redist_time -=MPI_Wtime();

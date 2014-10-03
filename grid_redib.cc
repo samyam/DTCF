@@ -179,10 +179,13 @@ void GridRedistribute::redistribute()
         // Update proc address in tensor object
         memcpy(T->proc_addr, new_proc_addr, dims * sizeof(int));
 
+	
+
 	for(int i=0; i<repcount; i++)
 {	
 	replicate(repl_dims[i]);
 }
+	T->g = new_grid;
 
         // Free old index table
         T->free_index_table();
