@@ -1,5 +1,6 @@
 #include "grid_redib.h"
 #include "tensor.h"
+#define DDbug 0
 namespace RRR{
 using namespace std;
 
@@ -62,7 +63,7 @@ GridRedistribute::~GridRedistribute()
         delete[] req_arr;
 }
 
-int GridRedistribute::get_replicated_dims(int* &idmap, int* &repl_dims)
+int GridRedistribute::get_replicated_dims(int* &idmap, int* &repl_dims, int grid_dims)
 {
 	int* temp = new int[grid_dims];
 	memset(temp, 0, grid_dims*sizeof(int));
@@ -103,26 +104,29 @@ int GridRedistribute::get_replicated_dims(int* &idmap, int* &repl_dims)
 // Redistribute the tensor in the processor grid as per a new dimension mapping
 void GridRedistribute::redistribute()
 {
-
+	//if(T->rank==14){cout<<"old grid size = "<<old_grid->grid_dims<<"    new grid size= "<<new_grid->grid_dims; print_tile_addr(old_grid->grid_dims,old_grid->pgrid); 
+//print_tile_addr(new_grid->grid_dims,new_grid->pgrid);}
         // Re-compute num_max_tiles for the redistributed tensor
-        T->num_max_tiles = T->compute_num_max_tiles_rect(new_idx_map, new_pgrid);
+        T->num_max_tiles = T->compute_num_max_tiles(new_idx_map, new_pgrid);
 
         
 
-
+	int* old_repl_dims;
 	int* repl_dims;
-	int repcount = get_replicated_dims(new_idx_map,repl_dims);
+	int repcount = get_replicated_dims(new_idx_map,repl_dims,grid_dims);
+	int oldrepcount= get_replicated_dims(old_idx_map, old_repl_dims,old_grid->grid_dims);
 	//cout<<repcount<<endl;
-	
+	if(DDbug == 1) cout<<"Rank1:"<<T->rank<<endl;	
         // Post send to the processor that is supposed to hold the blocks currently at this processor
-        redistribute_send();
+        redistribute_send(old_repl_dims,oldrepcount);
 	
 	
 	
         // Post receive from the processor that currently holds the blocks that should be at this processor
         list<recv_data> recv_list;
         redistribute_recv(recv_list,repl_dims,repcount);
-
+	
+	//if(DDbug == 1) cout<<"Rank2:"<<T->rank<<endl;
          //Check for completion of Isends
 	
         MPI_Status* st_arr = new MPI_Status[req_count];
@@ -140,7 +144,7 @@ void GridRedistribute::redistribute()
         {
                 delete[] *addr;
 }
-
+if(DDbug == 1) cout<<"Rank3:"<<T->rank<<endl;
         //cout << T->rank << " Finished redistribute communication" << endl << fflush;
 
         // Reallocate memory for blocks and addresses after redistribution
@@ -155,7 +159,7 @@ void GridRedistribute::redistribute()
         delete[] T->tile_address;
         T->tensor_tiles = new double[T->block_size * block_count];
         T->tile_address = new int[T->dims * block_count];
-	
+if(DDbug == 1) cout<<"Rank4:"<<T->rank<<endl;	
         // Once all sends and receives are complete for this processor,
         // Copy the received blocks and addresses in tensor_tiles and tile_addresses.
         // This copying is needed because blocks are received from different processors are
@@ -175,18 +179,15 @@ void GridRedistribute::redistribute()
                 tile_addrs += rd->num_blocks * dims;
                 delete[] rd->block_addrs;
         }
-
+if(DDbug == 1) cout<<"Rank5:"<<T->rank<<endl;
         // Update proc address in tensor object
         memcpy(T->proc_addr, new_proc_addr, dims * sizeof(int));
-
-	
 
 	for(int i=0; i<repcount; i++)
 {	
 	replicate(repl_dims[i]);
 }
-	T->g = new_grid;
-
+	if(DDbug == 1) cout<<"Rank6:"<<T->rank<<endl;
         // Free old index table
         T->free_index_table();
 
@@ -195,8 +196,9 @@ void GridRedistribute::redistribute()
 
         // Recompute index_table
         T->init_index_table();
-
+if(DDbug == 1) cout<<"Rank7:"<<T->rank<<endl;
         T->fill_index_table();
+	
 }
 
 // Extracts the blocks that should be sent to the processor with rank rank[index]
@@ -289,14 +291,14 @@ int GridRedistribute::get_num_recv_blocks(int* &ranks, int num_tiles, int* &map)
 }
 
 // Find the processors that should hold the blocks at this processor and send the data to them
-void GridRedistribute::redistribute_send()
+void GridRedistribute::redistribute_send(int* &repl_dims, int repcount)
 {
         req_count = 0;
         // Allocate memory for new processor address for each block
         int* new_proc_addr = new int[T->num_actual_tiles * (grid_dims+1)];
 	memset(new_proc_addr,0,(T->num_actual_tiles*(grid_dims+1)*sizeof(int)));
         int* new_proc_rank = new int[T->num_actual_tiles];
-
+	//if(T->rank==14) cout<<"T->num_actual_tiles"<<T->num_actual_tiles<<endl;
         // Create sent flags for each block and initialize them to false
         bool* sent = new bool[T->num_actual_tiles];
         for (int i=0; i < T->num_actual_tiles; i++)
@@ -316,7 +318,21 @@ void GridRedistribute::redistribute_send()
                 }
                 new_proc_rank[i] = new_grid->get_proc_rank(new_proc_address);
         }
+	
+	bool flag=true;
+	if(repcount>0)
+	{	
 
+	int* proc_add=new int[old_grid->grid_dims+1];
+	old_grid->get_proc_addr(T->rank, proc_add);
+	for(int i=0;i<repcount;i++)
+	{
+	if(proc_add[repl_dims[i]]!=0) flag=false;
+	}
+		//cout<<flag<<endl;
+	}
+  
+	
         // Post sends to each processor identified above
         //list<MPI_Request> req_list = list<MPI_Request>();
         for (int i=0; i < T->num_actual_tiles; i++)
@@ -337,7 +353,7 @@ void GridRedistribute::redistribute_send()
                                         local_data.num_blocks = num_blocks;
                                 }
                                 // receiver is a different processor
-                                else
+                                else if(flag)
                                 {
 					/*if(T->rank == 3)
                                           {
@@ -354,7 +370,7 @@ void GridRedistribute::redistribute_send()
                                         MPI_Request req1, req2;
                                         MPI_Isend(blocks, num_blocks * T->block_size, MPI_DOUBLE, new_proc_rank[i], 3, MPI_COMM_WORLD, &req1);
                                         MPI_Isend(block_addrs, num_blocks * dims, MPI_INT, new_proc_rank[i], 4, MPI_COMM_WORLD, &req2);
-					//cout<<"Sending from "<<T->rank<<" to "<< new_proc_rank[i]<<endl;
+					//if(T->rank == 14 || new_proc_rank[i]==14) cout<<"Sending from "<<T->rank<<" to "<< new_proc_rank[i]<<endl;
                                         rlz_blks_ptrs.push_back(blocks);
                                         rlz_addr_ptrs.push_back(block_addrs);
                                         req_arr[req_count++] = req1;
@@ -384,7 +400,7 @@ void GridRedistribute::redistribute_recv(list<recv_data> &recv_list, int* &repl_
 	
         T->get_num_tiles(0, local_indices, offset, new_idx_map, new_proc_addr, addresses, new_pgrid, num_tiles);
         
-	
+	//cout<<"New Num tiles = "<<num_tiles;
         // Allocate memory for processor addresses for each block
         //int* old_proc_addr = new int[num_tiles * old_serial];
         int* old_proc_ranks = new int[num_tiles];
@@ -453,7 +469,7 @@ if(repcount>0)
 
                                 MPI_Irecv(rd.blocks, num_blocks * T->block_size, MPI_DOUBLE, i, 3, MPI_COMM_WORLD, &req1);  
                                 MPI_Irecv(rd.block_addrs, num_blocks * dims, MPI_INT, i, 4, MPI_COMM_WORLD, &req2); 
-				//cout<<"Recieving from "<<i <<" to "<<T->rank<<endl;
+				//if(i == 14 || T->rank==14) cout<<"Recieving from "<<i <<" to "<<T->rank<<endl;
                                 recv_list.push_back(rd);
 				req_arr[req_count++] = req1;
                                 req_arr[req_count++] = req2;
@@ -480,7 +496,7 @@ int* new_proc_add = new int[grid_dims+1];
         new_grid->get_proc_addr(T->rank, new_proc_add);
 
 	new_proc_add[grid_dims]=0;
-cout<<"Replication dimension is"<<rep_dim;
+if(DDbug == 1) cout<<"Replication dimension is"<<rep_dim;
 
         // Create a new MPI_Communicator in the serialization dimension
         int num_procs = new_pgrid[rep_dim];
