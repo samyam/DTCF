@@ -71,13 +71,13 @@ class GridRedistribute
 	int get_num_recv_blocks(int* &ranks, int num_tiles, int* &map);
 
 	// Find the processors that should hold the blocks at this processor and send the data to them
-	void redistribute_send();
+	void redistribute_send(int* &repl_dims, int repcount);
 
 	// Find the processors that have the blocks that are supposed to be held at this processor
 	// and post receives for them
 	void redistribute_recv(std::list<recv_data> &recv_list, int* &repl_dims, int repcount);
 	
-	int get_replicated_dims(int* &idmap, int* &repl_dims);
+	int get_replicated_dims(int* &idmap, int* &repl_dims, int grid_dims);
 	
 	
 	void replicate(int rep_dim);

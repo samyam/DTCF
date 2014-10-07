@@ -1,7 +1,11 @@
 #include "grid_redib.h"
 #include "tensor.h"
-#define DEBUG_CHECK_POINT 1
+
+#define DEBUG_CHECK_POINT 0
 #define RRANK 14
+
+#define DDbug 0
+
 namespace RRR{
     using namespace std;
 
@@ -64,8 +68,9 @@ namespace RRR{
         delete[] req_arr;
     }
 
-    int GridRedistribute::get_replicated_dims(int* &idmap, int* &repl_dims)
-    {
+int GridRedistribute::get_replicated_dims(int* &idmap, int* &repl_dims, int grid_dims)
+{
+
 	int* temp = new int[grid_dims];
 	memset(temp, 0, grid_dims*sizeof(int));
 	
@@ -103,25 +108,27 @@ namespace RRR{
 
 
 // Redistribute the tensor in the processor grid as per a new dimension mapping
-    void GridRedistribute::redistribute()
-    {
+void GridRedistribute::redistribute()
+{
 
-	
-	int rank = T->rank;
-	int checkpoint = 0;
-	if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Redistribute Checkpoint " <<(checkpoint++)<< endl; 
+    int rank = T->rank;
+    int checkpoint = 0;
+	//if(T->rank==14){cout<<"old grid size = "<<old_grid->grid_dims<<"    new grid size= "<<new_grid->grid_dims; print_tile_addr(old_grid->grid_dims,old_grid->pgrid); 
+//print_tile_addr(new_grid->grid_dims,new_grid->pgrid);}
+
         // Re-compute num_max_tiles for the redistributed tensor
-        T->num_max_tiles = T->compute_num_max_tiles_rect(new_idx_map, new_pgrid);
+        T->num_max_tiles = T->compute_num_max_tiles(new_idx_map, new_pgrid);
 
         
 
-
+	int* old_repl_dims;
 	int* repl_dims;
-	int repcount = get_replicated_dims(new_idx_map,repl_dims);
+	int repcount = get_replicated_dims(new_idx_map,repl_dims,grid_dims);
+	int oldrepcount= get_replicated_dims(old_idx_map, old_repl_dims,old_grid->grid_dims);
 	//cout<<repcount<<endl;
-	
+	if(DDbug == 1) cout<<"Rank1:"<<T->rank<<endl;	
         // Post send to the processor that is supposed to hold the blocks currently at this processor
-        redistribute_send();
+        redistribute_send(old_repl_dims,oldrepcount);
 	
 	if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Redistribute Checkpoint " <<(checkpoint++)<< endl; 
 	
@@ -129,9 +136,10 @@ namespace RRR{
         // Post receive from the processor that currently holds the blocks that should be at this processor
         list<recv_data> recv_list;
         redistribute_recv(recv_list,repl_dims,repcount);
-	if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Redistribute Checkpoint " <<(checkpoint++)<< endl; 
+	
+	//if(DDbug == 1) cout<<"Rank2:"<<T->rank<<endl;
+         //Check for completion of Isends
 
-	//Check for completion of Isends
 	
         MPI_Status* st_arr = new MPI_Status[req_count];
         MPI_Waitall(req_count, req_arr, st_arr);
@@ -150,9 +158,9 @@ namespace RRR{
         for(list<int*>::iterator addr = rlz_addr_ptrs.begin();
 	    addr != rlz_addr_ptrs.end(); addr++)
         {
-	    delete[] *addr;
-	}
-	if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Redistribute Checkpoint " <<(checkpoint++)<< endl; 
+                delete[] *addr;
+}
+if(DDbug == 1) cout<<"Rank3:"<<T->rank<<endl;
 
         //cout << T->rank << " Finished redistribute communication" << endl << fflush;
 
@@ -170,8 +178,8 @@ namespace RRR{
         delete[] T->tile_address;
         T->tensor_tiles = new double[T->block_size * block_count];
         T->tile_address = new int[T->dims * block_count];
-	if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Redistribute Checkpoint " <<(checkpoint++)<< endl; 
-	
+if(DDbug == 1) cout<<"Rank4:"<<T->rank<<endl;	
+
         // Once all sends and receives are complete for this processor,
         // Copy the received blocks and addresses in tensor_tiles and tile_addresses.
         // This copying is needed because blocks are received from different processors are
@@ -191,23 +199,15 @@ namespace RRR{
 	    tile_addrs += rd->num_blocks * dims;
 	    delete[] rd->block_addrs;
         }
-
-	if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Redistribute Checkpoint " <<(checkpoint++)<< endl; 
-
+if(DDbug == 1) cout<<"Rank5:"<<T->rank<<endl;
         // Update proc address in tensor object
         memcpy(T->proc_addr, new_proc_addr, dims * sizeof(int));
-	
-
 
 	for(int i=0; i<repcount; i++)
-	{	
-	    replicate(repl_dims[i]);
-	}
-	if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Redistribute Checkpoint " <<(checkpoint++)<< endl; 
-	T->g = new_grid;
-
-
-	if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Redistribute Checkpoint " <<(checkpoint++)<< endl; 
+{	
+	replicate(repl_dims[i]);
+}
+	if(DDbug == 1) cout<<"Rank6:"<<T->rank<<endl;
 
         // Free old index table
         T->free_index_table();
@@ -221,12 +221,11 @@ namespace RRR{
 
         // Recompute index_table
         T->init_index_table();
-	if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Redistribute Checkpoint " <<(checkpoint++)<< endl; 
+if(DDbug == 1) cout<<"Rank7:"<<T->rank<<endl;
+        T->fill_index_table();
+	
+}
 
-	if(rank == RRANK ) {print_tile_addr(new_grid->grid_dims,T->pgrid);}
-        T->fill_index_table_tmp();
-	if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Redistribute Checkpoint " <<(checkpoint++)<< endl; 
-    }
 
 // Extracts the blocks that should be sent to the processor with rank rank[index]
 // Returns number of blocks
@@ -318,14 +317,15 @@ namespace RRR{
     }
 
 // Find the processors that should hold the blocks at this processor and send the data to them
-    void GridRedistribute::redistribute_send()
-    {
+void GridRedistribute::redistribute_send(int* &repl_dims, int repcount)
+{
+
         req_count = 0;
         // Allocate memory for new processor address for each block
         int* new_proc_addr = new int[T->num_actual_tiles * (grid_dims+1)];
 	memset(new_proc_addr,0,(T->num_actual_tiles*(grid_dims+1)*sizeof(int)));
         int* new_proc_rank = new int[T->num_actual_tiles];
-
+	//if(T->rank==14) cout<<"T->num_actual_tiles"<<T->num_actual_tiles<<endl;
         // Create sent flags for each block and initialize them to false
         bool* sent = new bool[T->num_actual_tiles];
         for (int i=0; i < T->num_actual_tiles; i++)
@@ -345,54 +345,67 @@ namespace RRR{
 	    }
 	    new_proc_rank[i] = new_grid->get_proc_rank(new_proc_address);
         }
+	
+	bool flag=true;
+	if(repcount>0)
+	{	
 
+	int* proc_add=new int[old_grid->grid_dims+1];
+	old_grid->get_proc_addr(T->rank, proc_add);
+	for(int i=0;i<repcount;i++)
+	{
+	if(proc_add[repl_dims[i]]!=0) flag=false;
+	}
+		//cout<<flag<<endl;
+	}
+  
+	
         // Post sends to each processor identified above
         //list<MPI_Request> req_list = list<MPI_Request>();
         for (int i=0; i < T->num_actual_tiles; i++)
         {
-	    if(sent[i] == false)
-	    {
-		double* blocks;
-		int* block_addrs;
-		int num_blocks = get_blocks_for_proc(i, new_proc_rank, sent, blocks, block_addrs);
-		//cout<<"aaaaa"<<i<<endl;
-		if(num_blocks > 0)
-		{
-		    // receiver is the same processor
-		    if(T->rank == new_proc_rank[i])
-		    {
-			local_data.blocks = blocks;
-			local_data.block_addrs = block_addrs;
-			local_data.num_blocks = num_blocks;
-		    }
-		    // receiver is a different processor
-		    else
-		    {
-			/*if(T->rank == 3)
-			  {
-			  cout << get_proc_addr_str(dims, old_pgrid, T->rank) << " send to   " << get_proc_addr_str(dims, new_pgrid, new_proc_rank[i]) << "  #blocks = " << num_blocks << endl;
-			  cout << "Addresses sent: ";
-			  for(int j=0; j<num_blocks; j++)
-			  {
-			  int* addr = block_addrs + j*dims;
-			  print_tile_addr(dims, addr); 
-			  }
-			  cout << endl << endl;
-			  }*/
+                if(sent[i] == false)
+                {
+                        double* blocks;
+                        int* block_addrs;
+                        int num_blocks = get_blocks_for_proc(i, new_proc_rank, sent, blocks, block_addrs);
+ 			//cout<<"aaaaa"<<i<<endl;
+                        if(num_blocks > 0)
+                        {
+                                // receiver is the same processor
+                                if(T->rank == new_proc_rank[i])
+                                {
+                                        local_data.blocks = blocks;
+                                        local_data.block_addrs = block_addrs;
+                                        local_data.num_blocks = num_blocks;
+                                }
+                                // receiver is a different processor
+                                else if(flag)
+                                {
+					/*if(T->rank == 3)
+                                          {
+                                          cout << get_proc_addr_str(dims, old_pgrid, T->rank) << " send to   " << get_proc_addr_str(dims, new_pgrid, new_proc_rank[i]) << "  #blocks = " << num_blocks << endl;
+                                          cout << "Addresses sent: ";
+                                          for(int j=0; j<num_blocks; j++)
+                                          {
+                                          int* addr = block_addrs + j*dims;
+                                          print_tile_addr(dims, addr); 
+                                          }
+                                          cout << endl << endl;
+                                          }*/
 
-			MPI_Request req1, req2;
-			MPI_Isend(blocks, num_blocks * T->block_size, MPI_DOUBLE, new_proc_rank[i], 3, MPI_COMM_WORLD, &req1);
-			MPI_Isend(block_addrs, num_blocks * dims, MPI_INT, new_proc_rank[i], 4, MPI_COMM_WORLD, &req2);
-			
-			if(new_proc_rank[i] == 14 || new_proc_rank[i] == 15 || T->rank == 14 || T->rank ==15)
-			    cout<<"Sending from "<<T->rank<<" to "<< new_proc_rank[i]<<endl;
-			rlz_blks_ptrs.push_back(blocks);
-			rlz_addr_ptrs.push_back(block_addrs);
-			req_arr[req_count++] = req1;
-			req_arr[req_count++] = req2;
-		    }
-		}
-	    }
+                                        MPI_Request req1, req2;
+                                        MPI_Isend(blocks, num_blocks * T->block_size, MPI_DOUBLE, new_proc_rank[i], 3, MPI_COMM_WORLD, &req1);
+                                        MPI_Isend(block_addrs, num_blocks * dims, MPI_INT, new_proc_rank[i], 4, MPI_COMM_WORLD, &req2);
+					//if(T->rank == 14 || new_proc_rank[i]==14) cout<<"Sending from "<<T->rank<<" to "<< new_proc_rank[i]<<endl;
+                                        rlz_blks_ptrs.push_back(blocks);
+                                        rlz_addr_ptrs.push_back(block_addrs);
+                                        req_arr[req_count++] = req1;
+                                        req_arr[req_count++] = req2;
+                                }
+                        }
+                }
+
         }
 
         delete[] new_proc_addr;
@@ -415,7 +428,7 @@ namespace RRR{
 	
         T->get_num_tiles(0, local_indices, offset, new_idx_map, new_proc_addr, addresses, new_pgrid, num_tiles);
         
-	
+	//cout<<"New Num tiles = "<<num_tiles;
         // Allocate memory for processor addresses for each block
         //int* old_proc_addr = new int[num_tiles * old_serial];
         int* old_proc_ranks = new int[num_tiles];
@@ -475,20 +488,20 @@ namespace RRR{
 		else if(flag)
 		{	
 				
-		    recv_data rd;
-		    rd.num_blocks = num_blocks;
-		    rd.blocks = new double[num_blocks * T->block_size];
-		    rd.block_addrs = new int[num_blocks * dims];
+                                recv_data rd;
+                                rd.num_blocks = num_blocks;
+                                rd.blocks = new double[num_blocks * T->block_size];
+                                rd.block_addrs = new int[num_blocks * dims];
 
-		    MPI_Request req1, req2;
+                                MPI_Request req1, req2;
 
-		    MPI_Irecv(rd.blocks, num_blocks * T->block_size, MPI_DOUBLE, i, 3, MPI_COMM_WORLD, &req1);  
-		    MPI_Irecv(rd.block_addrs, num_blocks * dims, MPI_INT, i, 4, MPI_COMM_WORLD, &req2); 
-		    if(i == 14 || i == 15 || T->rank == 14 || T->rank ==15)
-			cout<<"Recieving from "<<i <<" to "<<T->rank<<endl;
-		    recv_list.push_back(rd);
-		    req_arr[req_count++] = req1;
-		    req_arr[req_count++] = req2;
+                                MPI_Irecv(rd.blocks, num_blocks * T->block_size, MPI_DOUBLE, i, 3, MPI_COMM_WORLD, &req1);  
+                                MPI_Irecv(rd.block_addrs, num_blocks * dims, MPI_INT, i, 4, MPI_COMM_WORLD, &req2); 
+				//if(i == 14 || T->rank==14) cout<<"Recieving from "<<i <<" to "<<T->rank<<endl;
+                                recv_list.push_back(rd);
+				req_arr[req_count++] = req1;
+                                req_arr[req_count++] = req2;
+
 				
 		}
 	    }
@@ -517,7 +530,8 @@ namespace RRR{
 	
 	if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Replicate Redistribute Checkpoint " <<(checkpoint++)<< endl; 
 	new_proc_add[grid_dims]=0;
-// cout<<"Replication dimension is"<<rep_dim;
+if(DDbug == 1) cout<<"Replication dimension is"<<rep_dim;
+
 
         // Create a new MPI_Communicator in the serialization dimension
         int num_procs = new_pgrid[rep_dim];

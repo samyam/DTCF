@@ -4,7 +4,7 @@
 #define DEBUG_TRR 0
 #define DEBUG_TDEBUG_IP 0
 #define DEBUG_TCM 1
-#define DEBUG_T 0
+#define DEBUG_T 1
 #define DEBUG_I 0
 #define DEBUG_T1 0
 #define DEBUG_TR 0
@@ -2514,11 +2514,11 @@ namespace RRR{
 	    if(rank==RRANK && DEBUG_TCM) cout<<"Redistributing B initialized"<<endl;
 	    Bredib->redistribute();	
 	    if(rank==RRANK && DEBUG_TCM) cout<<"Redistributing B Completed"<<endl;
-	   // if(rank==RRANK && DEBUG_TCM) cout<<"Redistributing C"<<endl;
-	   // GridRedistribute* Credib = new GridRedistribute(C,idmapC,new_grid);
-	   // Credib->redistribute();	
+	    if(rank==RRANK && DEBUG_TCM) cout<<"Redistributing C"<<endl;
+	    GridRedistribute* Credib = new GridRedistribute(C,idmapC,new_grid);
+	    Credib->redistribute();	
 	}	
-	/*
+	
 	// Identify contracting indices in A and B
 	vector<pair<int,int>> contr_list = vector<pair<int,int>>();
 	vector<pair<int,int>> DDO_list = vector<pair<int,int>>();
@@ -2640,7 +2640,7 @@ namespace RRR{
 /*Finds the DC dimensions for the external indices. Two indices
  * are DC if they are external indices and they both map to the
  * same physical dimension*/
-/*	for(int i=0; i<dims_A; i++)
+	for(int i=0; i<dims_A; i++)
 	{
 	    for(int j=0; j<dims_B; j++)
 	    {
@@ -2729,7 +2729,7 @@ namespace RRR{
 		  C->print_all_tile_addr();
 		  cout<<"Permuted tile addresses"<<endl;
 		  int_tile_addrs(C->dims, permuted_address, C->num_actual_tiles);*/
-/*	    } 
+	    } 
 
 
 	    if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
@@ -2748,9 +2748,9 @@ namespace RRR{
 	    pair<int,int> p2(-1,-1);
 	 
 	    if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
-	    if(rank==RRANK) A->printInfo();
-	    if(rank==RRANK) B->printInfo();
-	    if(rank==RRANK) C->printInfo();
+	    //if(rank==RRANK) A->printInfo();
+	    //if(rank==RRANK) B->printInfo();
+	    //if(rank==RRANK) C->printInfo();
 	    if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Entering RSUMMA " <<endl; 
 	    //if(rank==RRANK && DEBUG_T) {
 	    //cout<<"Entering Rec_SUMMA"<<endl<<endl;
@@ -2758,8 +2758,8 @@ namespace RRR{
 	 
 	    timer5 =- MPI_Wtime();
 
-	    //rec_summa(A, B, big_matrix_C, DDO_list, p1, p2);
-	    return;
+	    rec_summa(A, B, big_matrix_C, DDO_list, p1, p2);
+
 	    timer5 += MPI_Wtime();
 
 	    timer6 =- MPI_Wtime();
@@ -2838,7 +2838,7 @@ namespace RRR{
 	//if(rank == 0) cout<<"Resetting cntr_map"<<dims_A<<endl;
 	memset(A->cntr_map, 0, sizeof(double) * dims_A);
 	memset(B->cntr_map, 0, sizeof(double)* dims_B);
-*/
+
     }
 
     void Contraction::display_times(){
