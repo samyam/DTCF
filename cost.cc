@@ -867,9 +867,9 @@ void cost::best_Cost_GGrid_4Dc(int* &curGrid, int* &curidmapA, int* &curidmapB, 
         		}
     		}
 
-	for(int i=0;i<4;i++) {if(i!=contA[0]){ extA[ecnt]=i; ecnt++;}}
+	for(int i=0;i<4;i++) {if(i!=contA[0] && i!=contA[1] && i!=contA[2]){ extA[ecnt]=i; ecnt++;}}
 	ecnt=0;
-	for(int i=0;i<4;i++) {if(i!=contB[0]) {extB[ecnt]=i; ecnt++;}}
+	for(int i=0;i<4;i++) {if(i!=contB[0]  && i!=contB[1] && i!=contB[2]) {extB[ecnt]=i; ecnt++;}}
 
 	int lar=1;
 	if(curGrid[3] > curGrid[1]) lar=3;
