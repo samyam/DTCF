@@ -126,6 +126,9 @@ class Tensor
 	// fills up the index table
 	void fill_index_table();
 
+	// fills up the index table
+	void fill_index_table_tmp();
+
 	// Return a value based on the index passed
 	double default_get_value(int* &indices);
 

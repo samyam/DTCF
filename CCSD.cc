@@ -4413,7 +4413,7 @@ int main(int argc, char* argv[])
     vgrid__a52398[3] = atoi(argv[3]);
     Tensor* _a52398 = new Tensor("ccaa", idmap__a52398, size__a52398, vgrid__a52398, grid);
     _a52398->initialize();
-
+*/
     int* size__a5246 = new int[4];
     size__a5246[0] = Oa;
     size__a5246[1] = Ob;
@@ -4431,7 +4431,7 @@ int main(int argc, char* argv[])
     vgrid__a5246[3] = atoi(argv[3]);
     Tensor* _a5246 = new Tensor("cccc", idmap__a5246, size__a5246, vgrid__a5246, grid);
     _a5246->initialize();
-
+/*
     int* size__a52784 = new int[2];
     size__a52784[0] = Oa;
     size__a52784[1] = Oa;
@@ -5208,7 +5208,7 @@ int main(int argc, char* argv[])
     vgrid_tab_vvoo[3] = atoi(argv[3]);
     Tensor* tab_vvoo = new Tensor("cccc", idmap_tab_vvoo, size_tab_vvoo, vgrid_tab_vvoo, grid);
     tab_vvoo->initialize();
-
+*/
     int* size_tb_vo = new int[2];
     size_tb_vo[0] = Vb;
     size_tb_vo[1] = Ob;
@@ -5220,7 +5220,7 @@ int main(int argc, char* argv[])
     vgrid_tb_vo[1] = atoi(argv[3]);
     Tensor* tb_vo = new Tensor("cc", idmap_tb_vo, size_tb_vo, vgrid_tb_vo, grid);
     tb_vo->initialize();
-
+/*
     int* size_tbb_vvoo = new int[4];
     size_tbb_vvoo[0] = Vb;
     size_tbb_vvoo[1] = Vb;
@@ -5454,7 +5454,7 @@ int main(int argc, char* argv[])
     vgrid_vab_oovo[3] = atoi(argv[3]);
     Tensor* vab_oovo = new Tensor("cccc", idmap_vab_oovo, size_vab_oovo, vgrid_vab_oovo, grid);
     vab_oovo->initialize();
-
+*/
     int* size_vab_oovv = new int[4];
     size_vab_oovv[0] = Oa;
     size_vab_oovv[1] = Ob;
@@ -5472,7 +5472,7 @@ int main(int argc, char* argv[])
     vgrid_vab_oovv[3] = atoi(argv[3]);
     Tensor* vab_oovv = new Tensor("cccc", idmap_vab_oovv, size_vab_oovv, vgrid_vab_oovv, grid);
     vab_oovv->initialize();
-
+/*
     int* size_vab_ovoo = new int[4];
     size_vab_ovoo[0] = Oa;
     size_vab_ovoo[1] = Vb;
@@ -5859,18 +5859,25 @@ int main(int argc, char* argv[])
      //if(rank==0 && DEBUG_T) vaa_vovv->printInfo();
      //if(rank==0 && DEBUG_T) ta_vo->printInfo();
      //if(rank==0 && DEBUG_T)_a24849->printInfo();
-     MPI_Barrier(MPI_COMM_WORLD);
 
+
+
+     if(rank == 0) print_tile_addr(grid->grid_dims,grid->pgrid);
      Contraction* C0 = new Contraction(vaa_vovv, ta_vo, _a24849, grid);
-     C0->contract( "p1a,h2a,p3a,p2a", "p3a,h2a", "p1a,p2a");
+     //C0->contract( "p1a,h2a,p3a,p2a", "p3a,h2a", "p1a,p2a");
+     if(rank == 0) print_tile_addr(grid->grid_dims,grid->pgrid);
+     
+
+
+    Grid* gg = new Grid(grid->grid_dims,grid->pgrid);
     
     
-    /*if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 1: " << endl;
-    Contraction* C1 = new Contraction(vab_oovv, tb_vo, _a5246, grid);
+    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 1: " << endl;
+    Contraction* C1 = new Contraction(vab_oovv, tb_vo, _a5246, gg);
     C1->contract( "h2a,h1b,p2a,p1b", "p1b,h2b", "h2a,h1b,p2a,h2b");
   
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 2: " << endl;
+    /*if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 2: " << endl;
     Contraction* C2 = new Contraction(vbb_oovv, tbb_vvoo, _a14811, grid);
     C2->contract( "h1b,h3b,p1b,p3b", "p1b,p3b,h2b,h3b", "h1b,h2b");
   

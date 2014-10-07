@@ -3,10 +3,11 @@
 #define DEBUG_I 0
 #define DEBUG_T 0
 #define DEBUG_TT 0
-#define DEBUG_CHECK_POINT 1
+#define DEBUG_CHECK_POINT 0
+#define DEBUG_PRINT_TABLE 0
 #define RRANK 0
 namespace RRR{
-using namespace std;
+    using namespace std;
 //returns number of processor addresses from which data needs to be
 //bounced.The array of addresses are put in bouncers. my_address holds
 //the invoking nodes address, index_dimension_map gives the mapping
@@ -325,10 +326,11 @@ using namespace std;
 	    
 	}
 	
-	int t = MPI_Reduce(receiver_grid, receiver_grid_buffer, 16*16, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+
 	
-	if(rank == 0)
+	if(DEBUG_PRINT_TABLE && rank == 0)
 	{
+	    int t = MPI_Reduce(receiver_grid, receiver_grid_buffer, 16*16, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 	    cout<<endl;
 	    for(int i =-1; i< 16; i++){
 		cout<<i<<" :"<<setw(10);
@@ -649,12 +651,13 @@ using namespace std;
 	if(contr_idx % pgrid[pindex] != my_address[pindex])
 	{
 
-	    int* sender_grid = new int[num_procs*num_procs];
-	    memset(sender_grid, 0, sizeof(int) * num_procs*num_procs);
-	    MPI_Reduce(sender_grid, sender_grid_buffer, num_procs * num_procs, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 	    
-	    if(rank == 0)
+	    if(DEBUG_PRINT_TABLE && rank == 0)
 	    {
+		int* sender_grid = new int[num_procs*num_procs];
+		memset(sender_grid, 0, sizeof(int) * num_procs*num_procs);
+		MPI_Reduce(sender_grid, sender_grid_buffer, num_procs * num_procs, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+
 		cout<<endl;
 		for(int i =-1; i< 16; i++){
 		    cout<<i<<" :"<<setw(10);
@@ -667,9 +670,8 @@ using namespace std;
 		    cout<<endl;
 	    
 		}
-	    }
+		
 
-	    if(rank == 0){
 		for(int r = 0; r<num_procs; r++)
 		{
 		    for(int s = 0; s<num_procs; s++)
@@ -686,15 +688,15 @@ using namespace std;
 			else
 			{
 			    cout<<sender_grid_buffer[r*num_procs + s]<<" == "<<receiver_grid_buffer[s*num_procs +r]<<endl;
-			}
-		    
-		    
+			}		    		    
 		    
 		    } 
 		
 		} 
 		//cout<<"Passed for Contr Dim "<<contr_dim<<" and contr indx "<<contr_idx<<endl;
+
 	    }
+
 
 	    
 	    // Wait for address sends
@@ -773,50 +775,52 @@ using namespace std;
 	
 	if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Instigate Checkpoint : "<<(checkpoint++)<<endl;
 
-	MPI_Reduce(sender_grid, sender_grid_buffer, num_procs * num_procs, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
-	
-	if(rank == 0)
-	{
-	    cout<<endl;
-	    for(int i =-1; i< 16; i++){
-		cout<<i<<" :"<<setw(10);
-		for(int j = 0; j < 16; j++){
-		    if(i == -1)
-			cout<<j<<setw(5);
-		    else
-			cout<<sender_grid_buffer[i*16+j]<<setw(5);
-		}
+	if(DEBUG_PRINT_TABLE && rank == 0){
+	    MPI_Reduce(sender_grid, sender_grid_buffer, num_procs * num_procs, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+	    
+	    if(rank == 0)
+	    {
 		cout<<endl;
+		for(int i =-1; i< 16; i++){
+		    cout<<i<<" :"<<setw(10);
+		    for(int j = 0; j < 16; j++){
+			if(i == -1)
+			    cout<<j<<setw(5);
+			else
+			    cout<<sender_grid_buffer[i*16+j]<<setw(5);
+		    }
+		    cout<<endl;
 	
+		}
 	    }
-	}
 	
 
-	if(rank == 0){
-	    for(int r = 0; r<num_procs; r++)
-	    {
-		for(int s = 0; s<num_procs; s++)
+	    if(rank == 0){
+		for(int r = 0; r<num_procs; r++)
 		{
-	    
-	    
-	    
-		    if(sender_grid_buffer[r*num_procs + s] != receiver_grid_buffer[s*num_procs +r])
+		    for(int s = 0; s<num_procs; s++)
 		    {
+	    
+	    
+	    
+			if(sender_grid_buffer[r*num_procs + s] != receiver_grid_buffer[s*num_procs +r])
+			{
 		
-			if(sender_grid_buffer[r*num_procs + s])
-			    cout<<" Receiver : "<<grid->get_proc_addr_str(r)<<" is receiving from Sender : "<<grid->get_proc_addr_str(s)<<r<<"<-"<<s<<endl;
-			else
-			    cout<<" Sender : "<<grid->get_proc_addr_str(s)<<" is sending to Receiver : "<<grid->get_proc_addr_str(r)<<s<<"->"<<r<<endl;
-		    }   
+			    if(sender_grid_buffer[r*num_procs + s])
+				cout<<" Receiver : "<<grid->get_proc_addr_str(r)<<" is receiving from Sender : "<<grid->get_proc_addr_str(s)<<r<<"<-"<<s<<endl;
+			    else
+				cout<<" Sender : "<<grid->get_proc_addr_str(s)<<" is sending to Receiver : "<<grid->get_proc_addr_str(r)<<s<<"->"<<r<<endl;
+			}   
 		    
 		    
 		    
+		    } 
+		
 		} 
-		
-	    } 
-	    //cout<<"Passed for Contr Dim "<<contr_dim<<" and  contr idx "<<contr_idx<<endl;
-	}
+		//cout<<"Passed for Contr Dim "<<contr_dim<<" and  contr idx "<<contr_idx<<endl;
+	    }
 	
+	}
 	if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Instigate Checkpoint : "<<(checkpoint++)<<endl;      
 
 	current_senders = senders;
@@ -837,47 +841,47 @@ using namespace std;
 	// Probe the address messages sent and find out the number of blocks that are coming
 	for(int i=0; i<num_senders; i++) 
 	{
-	if(senders[i] != rank)
-	{
-	//if(rank == rank) cout << rank << "  Probing for msg from " << senders[i] << endl;
-	MPI_Probe(senders[i], 1, MPI_COMM_WORLD, &status);
-	MPI_Get_count(&status, MPI_INT, &addr_size[i]);
+	    if(senders[i] != rank)
+	    {
+		//if(rank == rank) cout << rank << "  Probing for msg from " << senders[i] << endl;
+		MPI_Probe(senders[i], 1, MPI_COMM_WORLD, &status);
+		MPI_Get_count(&status, MPI_INT, &addr_size[i]);
 	
-	// Allocate memory for blocks and addresses using this count
-	if(addr_size[i] != MPI_UNDEFINED)
-	{
-	data_size[i] = (addr_size[i]/X->dims)*X->block_size;
-	temp_block_addrs[i] = new int[addr_size[i]];
-	temp_blocks[i] = new double[data_size[i]];
-    }
-    }
-    }  
+		// Allocate memory for blocks and addresses using this count
+		if(addr_size[i] != MPI_UNDEFINED)
+		{
+		    data_size[i] = (addr_size[i]/X->dims)*X->block_size;
+		    temp_block_addrs[i] = new int[addr_size[i]];
+		    temp_blocks[i] = new double[data_size[i]];
+		}
+	    }
+	}  
 	
 	// Receive
 	for(int i=0; i<num_senders; i++) 
 	{
-	MPI_Comm comm = MPI_COMM_WORLD;
-	if(senders[i] != rank)
-	{
-	// Receive addresses
-	if(addr_size[i] != MPI_UNDEFINED)
-	{
-	tag = 1; 
-	//cout << grid->get_proc_addr_str(rank) << " receiving addr_size " << addr_size[i] << " to " << grid->get_proc_addr_str(senders[i]) << endl;
-	//cout << rank << "  receiving addr_size " << addr_size[i] << " from " << senders[i] << endl;
-	MPI_Recv(temp_block_addrs[i], addr_size[i], MPI_INT, senders[i], tag, comm, &status);
-    }
+	    MPI_Comm comm = MPI_COMM_WORLD;
+	    if(senders[i] != rank)
+	    {
+		// Receive addresses
+		if(addr_size[i] != MPI_UNDEFINED)
+		{
+		    tag = 1; 
+		    //cout << grid->get_proc_addr_str(rank) << " receiving addr_size " << addr_size[i] << " to " << grid->get_proc_addr_str(senders[i]) << endl;
+		    //cout << rank << "  receiving addr_size " << addr_size[i] << " from " << senders[i] << endl;
+		    MPI_Recv(temp_block_addrs[i], addr_size[i], MPI_INT, senders[i], tag, comm, &status);
+		}
 	
-	// Receive data blocks
-	if(addr_size[i] != MPI_UNDEFINED & data_size[i] != 0)
-	{
-	tag = 2;
-	//cout << grid->get_proc_addr_str(rank) << " receiving data_size " << data_size[i] << " to " <<grid->get_proc_addr_str(senders[i]) << endl;
-	//cout << rank << "  receiving data_size " << data_size[i] << " from " << senders[i] << endl;
-	MPI_Recv(temp_blocks[i], data_size[i], MPI_DOUBLE, senders[i], tag, comm, &status);
-    }
-    }
-    }  
+		// Receive data blocks
+		if(addr_size[i] != MPI_UNDEFINED & data_size[i] != 0)
+		{
+		    tag = 2;
+		    //cout << grid->get_proc_addr_str(rank) << " receiving data_size " << data_size[i] << " to " <<grid->get_proc_addr_str(senders[i]) << endl;
+		    //cout << rank << "  receiving data_size " << data_size[i] << " from " << senders[i] << endl;
+		    MPI_Recv(temp_blocks[i], data_size[i], MPI_DOUBLE, senders[i], tag, comm, &status);
+		}
+	    }
+	}  
 	
 	// Wait for sends from this processor to finish
 	MPI_Status* statuses_addr = new MPI_Status[send_addr_count];
@@ -894,12 +898,12 @@ using namespace std;
 	
 	for(int i = 0; i<num_senders; i++)
 	{
-	if(senders[i] != rank)
-	{
-	total_block_size+=data_size[i];    
-	total_address_size+=addr_size[i];
-    }
-    }
+	    if(senders[i] != rank)
+	    {
+		total_block_size+=data_size[i];    
+		total_address_size+=addr_size[i];
+	    }
+	}
 	
 	// Merge the blocks that resided locally into the same set, removing duplicates.
 	// Duplicates are found in different block sets because same blocks can be picked up
@@ -927,14 +931,14 @@ using namespace std;
 	// Combine all the data recieved from remote processors
 	for(int i = 0; i <num_senders; i++)
 	{
-	if(senders[i] != rank)
-	{
-	memcpy(dest, temp_blocks[i], data_size[i]*sizeof(double));
-	memcpy(dest_addr, temp_block_addrs[i], addr_size[i]*sizeof(int));
-	dest += data_size[i];
-	dest_addr += addr_size[i];
-    }
-    }
+	    if(senders[i] != rank)
+	    {
+		memcpy(dest, temp_blocks[i], data_size[i]*sizeof(double));
+		memcpy(dest_addr, temp_block_addrs[i], addr_size[i]*sizeof(int));
+		dest += data_size[i];
+		dest_addr += addr_size[i];
+	    }
+	}
 	
 	
 	// Add the local (self-send) blocks to the combined data
@@ -945,21 +949,21 @@ using namespace std;
 	timer3 += MPI_Wtime();
 	
 	/* if(rank==0) 
-	  {
-	  printGetTiles(blocks, block_addrs, X->block_size, total_block_size/X->block_size , X->dims);
-	  cout<<total_block_size/X->block_size;
-	  }*/
+	   {
+	   printGetTiles(blocks, block_addrs, X->block_size, total_block_size/X->block_size , X->dims);
+	   cout<<total_block_size/X->block_size;
+	   }*/
 	
 	
 	// Free temp blocks
 	for(int i=0; i<num_senders; i++) 
 	{
-	if(senders[i] != rank  &&  addr_size[i] != MPI_UNDEFINED)
-	{
-	delete[] temp_block_addrs[i]; 
-	delete[] temp_blocks[i]; 
-    }
-    }
+	    if(senders[i] != rank  &&  addr_size[i] != MPI_UNDEFINED)
+	    {
+		delete[] temp_block_addrs[i]; 
+		delete[] temp_blocks[i]; 
+	    }
+	}
 	delete[] temp_block_addrs;
 	delete[] temp_blocks;
 	
@@ -968,17 +972,17 @@ using namespace std;
 
 	//return 0;
   
-  }
+    }
 
 
 // Gets receiver addresses for current contracting dimension and index
     int Tensor::get_receivers_rect(
 	int contr_dim,
-	    int contr_idx,
-	    int** &receivers, //out
-	    int* &matching_indices, //out
-	    int &num_matches
-	    )
+	int contr_idx,
+	int** &receivers, //out
+	int* &matching_indices, //out
+	int &num_matches
+	)
     {
 	    
 	// matching indices are the ones that are symmetric to the contraction indices
@@ -991,18 +995,18 @@ using namespace std;
 	//symmetry group then during the instigation phase,
 	//the sender and receiver are the same processors
 	if(SG_index_map[contr_dim] == NON_SYM 
-	    && contr_idx % pgrid[index_dimension_map[contr_dim]] == proc_addr[index_dimension_map[contr_dim]])
+	   && contr_idx % pgrid[index_dimension_map[contr_dim]] == proc_addr[index_dimension_map[contr_dim]])
 	{
 
-	num_matches = 1;
-	matching_indices = new int[1];
-	matching_indices[0] = contr_dim;
-	receivers = new int*[1];
-	receivers[0] = new int[grid_dims];
-	memcpy(receivers[0], proc_addr, sizeof(int)*grid_dims);
-	return 1;	    	    	    
+	    num_matches = 1;
+	    matching_indices = new int[1];
+	    matching_indices[0] = contr_dim;
+	    receivers = new int*[1];
+	    receivers[0] = new int[grid_dims];
+	    memcpy(receivers[0], proc_addr, sizeof(int)*grid_dims);
+	    return 1;	    	    	    
 	
-    }
+	}
 	    
 	// Counts the number of processors that receive from this processor
 	// and finds the indices that are symmetric to the contracting index
@@ -1013,27 +1017,27 @@ using namespace std;
  
 	for(int i =0; i < dims; i++)
 	{
-	// index i is in the same symmetry group as the contracting dimension
-	if (((SG_index_map[i] == SG_index_map[contr_dim] &&
-	    // Make sure that the index we are checking is a part of some symmetry group
-	    SG_index_map[i] != NON_SYM)  ||  
-	    // Or ensure this is the contracting dimension (then self sends)
-	    i == contr_dim)  &&  
-	    // Make sure that this processor holds the contraction index
-	    proc_addr[index_dimension_map[i]] == contr_idx % pgrid[index_dimension_map[i]])
-	{
-	// If there are multiple contraction indices belonging to the same symmetry group,
-	// this condition maintains the order between these contraction indices
-	// works only in CCSD when the size of symmetry group is 2
-	if(contr_dim < i && cntr_map[i] > 0 )
-	{
-	break;
-    }
-	match[i] = 1;
-	if(rank == RRANK && DEBUG_I && contr_dim == 2) cout<<"Match :"<<i<<endl; 
-	count++;
-    }
-    }
+	    // index i is in the same symmetry group as the contracting dimension
+	    if (((SG_index_map[i] == SG_index_map[contr_dim] &&
+		  // Make sure that the index we are checking is a part of some symmetry group
+		  SG_index_map[i] != NON_SYM)  ||  
+		 // Or ensure this is the contracting dimension (then self sends)
+		 i == contr_dim)  &&  
+		// Make sure that this processor holds the contraction index
+		proc_addr[index_dimension_map[i]] == contr_idx % pgrid[index_dimension_map[i]])
+	    {
+		// If there are multiple contraction indices belonging to the same symmetry group,
+		// this condition maintains the order between these contraction indices
+		// works only in CCSD when the size of symmetry group is 2
+		if(contr_dim < i && cntr_map[i] > 0 )
+		{
+		    break;
+		}
+		match[i] = 1;
+		if(rank == RRANK && DEBUG_I && contr_dim == 2) cout<<"Match :"<<i<<endl; 
+		count++;
+	    }
+	}
 
 
 
@@ -1065,117 +1069,117 @@ using namespace std;
 	for(int i =0; i < dims; i++)
 	{
  	
-	// If a receiver is identified for this dimension
-	if(match[i])
-	{
-	int receivers_for_matching_index = 1;
+	    // If a receiver is identified for this dimension
+	    if(match[i])
+	    {
+		int receivers_for_matching_index = 1;
 	    
-	sender_to_receiver_map[count] = new int[grid_dims];
+		sender_to_receiver_map[count] = new int[grid_dims];
 
-	//initialize the map
-	for(int j = 0; j<grid_dims; j++)
-	{
-	sender_to_receiver_map[count][j] = j;
-    }
+		//initialize the map
+		for(int j = 0; j<grid_dims; j++)
+		{
+		    sender_to_receiver_map[count][j] = j;
+		}
 				
-	sender_to_receiver_map[count][index_dimension_map[i]] = index_dimension_map[contr_dim];			  
+		sender_to_receiver_map[count][index_dimension_map[i]] = index_dimension_map[contr_dim];			  
  			
-	// Get the physical address permutation map. It tells that
-	//block dimension distributed along index_dimension_map[j]
-	//will be distribution along a different dimension to obtain
-	//the correct block address. The permutation map is used to
-	//identify multiple receiers due to permutation specially
-	//when the size of the phhysical grid along the intial
-	//dimensions and the new dimension where the block will be
-	//sent to are different
-	if(i<contr_dim)
+		// Get the physical address permutation map. It tells that
+		//block dimension distributed along index_dimension_map[j]
+		//will be distribution along a different dimension to obtain
+		//the correct block address. The permutation map is used to
+		//identify multiple receiers due to permutation specially
+		//when the size of the phhysical grid along the intial
+		//dimensions and the new dimension where the block will be
+		//sent to are different
+		if(i<contr_dim)
  
-	    for(int j = i+1; j< contr_dim+1; j++)
-		sender_to_receiver_map[count][index_dimension_map[j]] = index_dimension_map[j-1];
+		    for(int j = i+1; j< contr_dim+1; j++)
+			sender_to_receiver_map[count][index_dimension_map[j]] = index_dimension_map[j-1];
  
-	if(i>contr_dim)
+		if(i>contr_dim)
  
 
-	    for(int j = i-1; j> contr_dim-1; j--)
-		sender_to_receiver_map[count][index_dimension_map[j]] = index_dimension_map[j+1];
+		    for(int j = i-1; j> contr_dim-1; j--)
+			sender_to_receiver_map[count][index_dimension_map[j]] = index_dimension_map[j+1];
 
  
-	proc_id_per_dim[count] = new int*[grid_dims];
-	size_per_dim[count]= new int[grid_dims];
+		proc_id_per_dim[count] = new int*[grid_dims];
+		size_per_dim[count]= new int[grid_dims];
  
-	if(DEBUG_I && rank == RRANK && contr_dim == 2) cout<<"Processor : "<<rank<<" Grid_dims "<<grid_dims<<" Sender to receiver Map : ";
-	if(DEBUG_I && rank == RRANK && contr_dim == 2) print_tile_addr(grid_dims,sender_to_receiver_map[count]);
+		if(DEBUG_I && rank == RRANK && contr_dim == 2) cout<<"Processor : "<<rank<<" Grid_dims "<<grid_dims<<" Sender to receiver Map : ";
+		if(DEBUG_I && rank == RRANK && contr_dim == 2) print_tile_addr(grid_dims,sender_to_receiver_map[count]);
 
     
-	for(int l = 0; l < grid_dims; l++)
-	{
-	// only a single contraction index is being sent so
-	// there is only one receiving processor along this
-	// dimension
-	//multiple receivers can exist along the dimension
-	//to which the current dimenison is getting mapped
-	//to. The upper limit is given by Lowest Common
-	//Multiple divided by the number of processors along
-	//this dimension
-	if((sender_to_receiver_map[count][l] == index_dimension_map[contr_dim])){
+		for(int l = 0; l < grid_dims; l++)
+		{
+		    // only a single contraction index is being sent so
+		    // there is only one receiving processor along this
+		    // dimension
+		    //multiple receivers can exist along the dimension
+		    //to which the current dimenison is getting mapped
+		    //to. The upper limit is given by Lowest Common
+		    //Multiple divided by the number of processors along
+		    //this dimension
+		    if((sender_to_receiver_map[count][l] == index_dimension_map[contr_dim])){
  
-	int cdim  = index_dimension_map[contr_dim];
-	proc_id_per_dim[count][cdim] = new int[1];
-	proc_id_per_dim[count][cdim][0] =  contr_idx % pgrid[index_dimension_map[contr_dim]];
-	size_per_dim[count][cdim] = 1;
-	if(DEBUG_I && rank==RRANK && contr_dim == 2) cout<<endl<<"Processor : "<<rank<<" Addr "<<contr_idx % pgrid[index_dimension_map[contr_dim]]<<" receive dim " << cdim<<"c "<<0<<" and l is "<<l<<endl;
+			int cdim  = index_dimension_map[contr_dim];
+			proc_id_per_dim[count][cdim] = new int[1];
+			proc_id_per_dim[count][cdim][0] =  contr_idx % pgrid[index_dimension_map[contr_dim]];
+			size_per_dim[count][cdim] = 1;
+			if(DEBUG_I && rank==RRANK && contr_dim == 2) cout<<endl<<"Processor : "<<rank<<" Addr "<<contr_idx % pgrid[index_dimension_map[contr_dim]]<<" receive dim " << cdim<<"c "<<0<<" and l is "<<l<<endl;
  
-    }else{
-	int receive_dim = sender_to_receiver_map[count][l];
-	int num_receiver_per_dim = lcm(pgrid[l], pgrid[receive_dim]) / pgrid[l];
+		    }else{
+			int receive_dim = sender_to_receiver_map[count][l];
+			int num_receiver_per_dim = lcm(pgrid[l], pgrid[receive_dim]) / pgrid[l];
  
-	size_per_dim[count][receive_dim] = num_receiver_per_dim;
-	proc_id_per_dim[count][receive_dim] = new int[num_receiver_per_dim];
-	if(DEBUG_T && rank == RRANK) cout<<"Number of per dimension  is "<<num_receiver_per_dim<<endl;
+			size_per_dim[count][receive_dim] = num_receiver_per_dim;
+			proc_id_per_dim[count][receive_dim] = new int[num_receiver_per_dim];
+			if(DEBUG_T && rank == RRANK) cout<<"Number of per dimension  is "<<num_receiver_per_dim<<endl;
 			
-	for(int c =0; c< num_receiver_per_dim; c++){
+			for(int c =0; c< num_receiver_per_dim; c++){
 
-	int block_addr_along_l = c*pgrid[l] + proc_addr[l];
+			    int block_addr_along_l = c*pgrid[l] + proc_addr[l];
 			    
-	//if the block address does not exist then no need
-	//to receive from the processor that holds this
-	//block. We assume that the dimensionality of the
-	//tensor is always smaller than 99
-	if(reverse_index_map[l] < 99 
-				  && block_addr_along_l >= vgrid[reverse_index_map[l]] 
-	    && SG_index_map[reverse_index_map[l]] != CONTRACTED )
-	{
+			    //if the block address does not exist then no need
+			    //to receive from the processor that holds this
+			    //block. We assume that the dimensionality of the
+			    //tensor is always smaller than 99
+			    if(reverse_index_map[l] < 99 
+			       && block_addr_along_l >= vgrid[reverse_index_map[l]] 
+			       && SG_index_map[reverse_index_map[l]] != CONTRACTED )
+			    {
 				
-	if(DEBUG_I && rank == RRANK && contr_dim==2) cout<<"Processor : "<<rank<<" reverse_index_map "<<reverse_index_map[l]<<endl;
-	if(DEBUG_I && rank == RRANK && contr_dim==2) cout<<"Processor : "<<rank<<" vgrid[reverse_index_map[l]] "<<vgrid[reverse_index_map[l]]<<endl;
-	if(DEBUG_I && rank == RRANK && contr_dim==2) cout<<"Processor : "<<rank<<" In for c : "<<c<<" count "<<count<<" l "<<l<<endl;
-	if(DEBUG_I && rank == RRANK && contr_dim==2) cout<<"Processor : "<<rank<<" Block addr along l is "<<block_addr_along_l<<endl;
-	num_receiver_per_dim = c;
-	size_per_dim[count][receive_dim] = num_receiver_per_dim;
-	break;
-    }
+				if(DEBUG_I && rank == RRANK && contr_dim==2) cout<<"Processor : "<<rank<<" reverse_index_map "<<reverse_index_map[l]<<endl;
+				if(DEBUG_I && rank == RRANK && contr_dim==2) cout<<"Processor : "<<rank<<" vgrid[reverse_index_map[l]] "<<vgrid[reverse_index_map[l]]<<endl;
+				if(DEBUG_I && rank == RRANK && contr_dim==2) cout<<"Processor : "<<rank<<" In for c : "<<c<<" count "<<count<<" l "<<l<<endl;
+				if(DEBUG_I && rank == RRANK && contr_dim==2) cout<<"Processor : "<<rank<<" Block addr along l is "<<block_addr_along_l<<endl;
+				num_receiver_per_dim = c;
+				size_per_dim[count][receive_dim] = num_receiver_per_dim;
+				break;
+			    }
 			    
-	int addr = block_addr_along_l % pgrid[receive_dim];
-	proc_id_per_dim[count][receive_dim][c] = addr;
-	if(DEBUG_I && rank==RRANK && contr_dim == 2) cout<<endl<<"Processor : "<<rank<<" Addr "<<addr<<" receive dim " << receive_dim<<"c "<<c<<" and l is "<<l<<endl;
+			    int addr = block_addr_along_l % pgrid[receive_dim];
+			    proc_id_per_dim[count][receive_dim][c] = addr;
+			    if(DEBUG_I && rank==RRANK && contr_dim == 2) cout<<endl<<"Processor : "<<rank<<" Addr "<<addr<<" receive dim " << receive_dim<<"c "<<c<<" and l is "<<l<<endl;
     
 
-    }
+			}
 
-	receivers_for_matching_index *= num_receiver_per_dim;		     
-    }
+			receivers_for_matching_index *= num_receiver_per_dim;		     
+		    }
 		    
-    }
+		}
 
-	num_receivers += receivers_for_matching_index;
+		num_receivers += receivers_for_matching_index;
 		
-	matching_indices[count] = i;
-	if(DEBUG_T && rank == RRANK) cout<<"Number of receivers is "<<i<<endl;
-	count++;
+		matching_indices[count] = i;
+		if(DEBUG_T && rank == RRANK) cout<<"Number of receivers is "<<i<<endl;
+		count++;
 		
-    }
+	    }
 
-    }
+	}
 
 
 	receivers = new int*[num_receivers];
@@ -1187,11 +1191,11 @@ using namespace std;
 //fill up the address for the receiver
 	for(int i = 0; i< count; i++)
 	{
-	create_cross_product(proc_id_per_dim[i], size_per_dim[i], 
-	    grid_dims, cur_dim, 
-	    offset, current_address,
-	    receivers);	
-    }
+	    create_cross_product(proc_id_per_dim[i], size_per_dim[i], 
+				 grid_dims, cur_dim, 
+				 offset, current_address,
+				 receivers);	
+	}
 
 	if(DEBUG_I && rank == RRANK && contr_dim == 2) cout<<"Processor : "<<rank<<"Receiver Tile is ";
 	if(DEBUG_I && rank == RRANK && contr_dim == 2) print_tile_addr(grid_dims, receivers[0]);
@@ -1201,5 +1205,5 @@ using namespace std;
 
 	return num_receivers;
     }
-    }
+}
 

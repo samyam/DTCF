@@ -1,13 +1,13 @@
 #include "contraction.h"
 #define CCHECK 0
-#define RRANK 0
+#define RRANK 2
 #define DEBUG_TRR 0
 #define DEBUG_TDEBUG_IP 0
-#define DEBUG_TCM 0
+#define DEBUG_TCM 1
 #define DEBUG_T 0
-#define DEBUG_I 1
+#define DEBUG_I 0
 #define DEBUG_T1 0
-#define DEBUG_TR 1
+#define DEBUG_TR 0
 #define DISPLAY_TIME 0
 #define COST_EVAL 1
 namespace RRR{
@@ -15,7 +15,7 @@ namespace RRR{
 
     Contraction::Contraction(Grid* &g)
     {
-	grid = g;
+	grid = g;//new Grid(g->grid_dims,g->pgrid);
 	rank = grid->rank;
 	num_procs = grid->nprocs;
 	
@@ -36,7 +36,8 @@ namespace RRR{
 
     Contraction::Contraction(Tensor* &a, Tensor* &b, Tensor* &c, Grid* &g)
     {
-	grid = g;
+
+	grid = new Grid(g->grid_dims,g->pgrid);
 	rank = grid->rank;
 	num_procs = grid->nprocs;
 
@@ -85,7 +86,7 @@ namespace RRR{
     //Changes the grid if a redistribution is required for contraction
     void Contraction::change_grid(Grid* &g)
     {
-	grid = g;
+	grid = new Grid(g->grid_dims,g->pgrid);
 	rank = grid->rank;
 	num_procs = grid->nprocs;
 	grid_dims = grid->grid_dims;
@@ -1405,8 +1406,8 @@ namespace RRR{
 	    //if(DEBUG_I && rank == RRANK && cdim_B == 2 && k == 1) cout<<endl<<endl<<"Instigation for B"<<endl;
 	    timer4 -=MPI_Wtime();
 	    
-	    // int num_collected_B = instigate_collection(B, cdim_B, k, blocks_B, block_addr_B);
-	     int num_collected_B =0;
+	    int num_collected_B = instigate_collection(B, cdim_B, k, blocks_B, block_addr_B);
+	    //int num_collected_B =0;
 	    timer4 +=MPI_Wtime();
 	    instigation_time += MPI_Wtime();
 	    //cout << rank << " num_collected_A= " << num_collected_A<< " num_collected_B = " << num_collected_B << endl;
@@ -1499,7 +1500,7 @@ namespace RRR{
 		    cout<<"Rank "<<rank<<". Entering transpose and DGEMM"<<endl;
 		}
 		
-		//transpose_and_dgemm(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer);
+		transpose_and_dgemm(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer);
 		if(DEBUG_T && rank==RRANK){
 		    cout<<"Rank "<<rank<<". Exiting transpose and DGEMM"<<endl;
 		}
@@ -2488,9 +2489,9 @@ namespace RRR{
 	changed=eval->bestCost(idmapA,idmapB,idmapC,ndimG,npgrid);
 	
 	if(rank == RRANK && DEBUG_TCM){
-	    print_tile_addr(4,idmapA);
-	    print_tile_addr(2,idmapB);
-	    print_tile_addr(2,idmapC);
+	    print_tile_addr(A->dims,idmapA);
+	    print_tile_addr(B->dims,idmapB);
+	    print_tile_addr(C->dims,idmapC);
 	    print_tile_addr(ndimG[0],npgrid);
 	}
 	
@@ -2510,12 +2511,14 @@ namespace RRR{
 	    if(rank==RRANK && DEBUG_TCM) cout<<"Redistributing A Completed"<<endl;
 	    if(rank==RRANK && DEBUG_TCM) cout<<"Redistributing B"<<endl;
 	    GridRedistribute* Bredib = new GridRedistribute(B,idmapB,new_grid);
+	    if(rank==RRANK && DEBUG_TCM) cout<<"Redistributing B initialized"<<endl;
 	    Bredib->redistribute();	
-	    if(rank==RRANK && DEBUG_TCM) cout<<"Redistributing C"<<endl;
-	    GridRedistribute* Credib = new GridRedistribute(C,idmapC,new_grid);
-	    Credib->redistribute();	
+	    if(rank==RRANK && DEBUG_TCM) cout<<"Redistributing B Completed"<<endl;
+	   // if(rank==RRANK && DEBUG_TCM) cout<<"Redistributing C"<<endl;
+	   // GridRedistribute* Credib = new GridRedistribute(C,idmapC,new_grid);
+	   // Credib->redistribute();	
 	}	
-
+	/*
 	// Identify contracting indices in A and B
 	vector<pair<int,int>> contr_list = vector<pair<int,int>>();
 	vector<pair<int,int>> DDO_list = vector<pair<int,int>>();
@@ -2637,7 +2640,7 @@ namespace RRR{
 /*Finds the DC dimensions for the external indices. Two indices
  * are DC if they are external indices and they both map to the
  * same physical dimension*/
-	for(int i=0; i<dims_A; i++)
+/*	for(int i=0; i<dims_A; i++)
 	{
 	    for(int j=0; j<dims_B; j++)
 	    {
@@ -2726,7 +2729,7 @@ namespace RRR{
 		  C->print_all_tile_addr();
 		  cout<<"Permuted tile addresses"<<endl;
 		  int_tile_addrs(C->dims, permuted_address, C->num_actual_tiles);*/
-	    } 
+/*	    } 
 
 
 	    if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
@@ -2755,7 +2758,7 @@ namespace RRR{
 	 
 	    timer5 =- MPI_Wtime();
 
-	    rec_summa(A, B, big_matrix_C, DDO_list, p1, p2);
+	    //rec_summa(A, B, big_matrix_C, DDO_list, p1, p2);
 	    return;
 	    timer5 += MPI_Wtime();
 
@@ -2835,6 +2838,7 @@ namespace RRR{
 	//if(rank == 0) cout<<"Resetting cntr_map"<<dims_A<<endl;
 	memset(A->cntr_map, 0, sizeof(double) * dims_A);
 	memset(B->cntr_map, 0, sizeof(double)* dims_B);
+*/
     }
 
     void Contraction::display_times(){

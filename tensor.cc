@@ -10,10 +10,12 @@ namespace RRR{
 	int* &idx_map,
 	int* &tnsr_size,
 	int* &virt_grid,
-	Grid* &grid
+	Grid* &gg
 	)
     {
-	g = grid;
+	g = new Grid(gg->grid_dims,gg->pgrid);
+	Grid* grid = g;
+
 	grid_dims = grid->grid_dims;
 
 	tensor_str = tnsr_str;
@@ -165,7 +167,6 @@ namespace RRR{
 
 	memcpy(SG_index_map_permanent, SG_index_map, dims * sizeof(int));
     }
-
 
 // Destructor
     Tensor::~Tensor()
@@ -388,6 +389,47 @@ namespace RRR{
 	    block_number = 0;
 	}
     }
+
+
+    // fills up the index table
+    void Tensor::fill_index_table_tmp()
+    {
+	int virt_addr;
+	int local_addr;
+
+	//block scaling is used to produce the block number from block address
+
+
+	int block_number = 0;
+
+	is_touched = new int[num_actual_tiles];
+	for(int i = 0; i<num_actual_tiles; i++)
+	{
+	    int* addr = tile_address + i*dims;
+	    block_number = get_block_number(addr, dims, vgrid);
+	    for(int d =0; d<dims; d++)
+	    {
+		// Set virtual address at this dimension to 0, if the index is already contracted.
+		// This will limit the range for sub-tensors
+		// A contracted index is unnecessary for sub-tensor computations
+		//virt_addr = tile_address[i*dims +d];
+
+		if(SG_index_map[d] == CONTRACTED)
+		{
+		    virt_addr = 0;
+		}
+
+		local_addr = virt_addr / pgrid[index_dimension_map[d]];
+
+		index_table[d][local_addr].push_back(i);
+	    }
+
+	    block_addr_to_blk_num.insert ( std::pair<int,int>(block_number,i) );
+	    block_number = 0;
+	}
+    }
+
+
 
 // Free the memory allocated for index table
     void Tensor::free_index_table()
