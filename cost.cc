@@ -903,7 +903,7 @@ void cost::best_Cost_GGrid_4Dc(int* &curGrid, int* &curidmapA, int* &curidmapB, 
 		{
 			if(A->tensor_str.at(contA[0])=='b'){ curidmapA[contA[0]]=lar-1; curidmapA[contA[1]]=4-lar; curidmapA[contA[2]]=4-lar-1; }
 			else if(A->tensor_str.at(contA[1])=='b'){ curidmapA[contA[1]]=lar-1; curidmapA[contA[0]]=4-lar; curidmapA[contA[2]]=4-lar-1; }
-			else if(A->tensor_str.at(contA[2])=='b'){ curidmapA[contA[2]]=lar-1; curidmapA[contA[0]]=4-lar; curidmapA[contA[0]]=4-lar-1; }
+			else if(A->tensor_str.at(contA[2])=='b'){ curidmapA[contA[2]]=lar-1; curidmapA[contA[0]]=4-lar; curidmapA[contA[1]]=4-lar-1; }
 		}
 		else if(symA1f && A->tensor_str.at(contA[0]) == 'a')
 		{
@@ -1149,7 +1149,7 @@ void cost::best_Cost_GGrid_4Dd(int* &curGrid, int* &curidmapA, int* &curidmapB, 
         		}
     		}
 
-	for(int i=0;i<4;i++) {if(i!=contA[0]){ extA[ecnt]=i; ecnt++;}}
+	for(int i=0;i<2;i++) {if(i!=contA[0]){ extA[ecnt]=i; ecnt++;}}
 	ecnt=0;
 	for(int i=0;i<4;i++) {if(i!=contB[0]){ extB[ecnt]=i; ecnt++;}}
 
@@ -1158,7 +1158,7 @@ void cost::best_Cost_GGrid_4Dd(int* &curGrid, int* &curidmapA, int* &curidmapB, 
 
 	
 	int temp;
-	for(int i=1; i<3; i++){if(B->tensor_size[extB[i]] > B->tensor_size[extB[0]] ) {temp = extB[0]; extA[0]=extB[i]; extB[i]=temp;}}
+	for(int i=1; i<3; i++){if(B->tensor_size[extB[i]] > B->tensor_size[extB[0]] ) {temp = extB[0]; extB[0]=extB[i]; extB[i]=temp;}}
 	
 	
 	if(B->tensor_size[extB[0]] >= B->tensor_size[extB[1]] && B->tensor_size[extB[0]] >= B->tensor_size[extB[2]])

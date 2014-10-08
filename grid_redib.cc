@@ -2,7 +2,7 @@
 #include "tensor.h"
 
 #define DEBUG_CHECK_POINT 0
-#define RRANK 14
+#define RRANK 15
 
 #define DDbug 0
 
@@ -159,8 +159,8 @@ void GridRedistribute::redistribute()
 	    addr != rlz_addr_ptrs.end(); addr++)
         {
                 delete[] *addr;
-}
-if(DDbug == 1) cout<<"Rank3:"<<T->rank<<endl;
+	}
+
 
         //cout << T->rank << " Finished redistribute communication" << endl << fflush;
 
@@ -168,6 +168,7 @@ if(DDbug == 1) cout<<"Rank3:"<<T->rank<<endl;
         int block_count = 0;
         for(list<recv_data>::iterator it = recv_list.begin(); it != recv_list.end(); it++)
         {
+	   // if(T->rank == RRANK) cout<<"AM i here?"<<endl;	
 	    recv_data* rd = &(*it);
 	    block_count += rd->num_blocks;
         }
@@ -178,7 +179,7 @@ if(DDbug == 1) cout<<"Rank3:"<<T->rank<<endl;
         delete[] T->tile_address;
         T->tensor_tiles = new double[T->block_size * block_count];
         T->tile_address = new int[T->dims * block_count];
-if(DDbug == 1) cout<<"Rank4:"<<T->rank<<endl;	
+	if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Redistribute Checkpoint " <<(checkpoint++)<< endl;
 
         // Once all sends and receives are complete for this processor,
         // Copy the received blocks and addresses in tensor_tiles and tile_addresses.
@@ -187,19 +188,25 @@ if(DDbug == 1) cout<<"Rank4:"<<T->rank<<endl;
         double* tiles = T->tensor_tiles;
         int* tile_addrs = T->tile_address;
         int tile_offset = 0, tile_addrs_offset = 0;
+	int ik=0;
+	
         for(list<recv_data>::iterator it = recv_list.begin(); it != recv_list.end(); it++)
         {
+	    if(rank==RRANK && DEBUG_CHECK_POINT) cout<<"i:"<<(ik++)<<endl;		
 	    recv_data* rd = &(*it);
-
+	//if(rank==RRANK && DEBUG_CHECK_POINT) cout<<rd->blocks[rd->num_blocks * T->block_size-1]<<endl;	
+	//if(rank==RRANK && DEBUG_CHECK_POINT) cout<<"i:"<<(ik++)<<endl;	
 	    memcpy(tiles, rd->blocks, rd->num_blocks * T->block_size * sizeof(double));
+	//if(rank==RRANK && DEBUG_CHECK_POINT) cout<<"i:"<<(ik++)<<endl;
 	    tiles += rd->num_blocks * T->block_size;
+	//if(rank==RRANK && DEBUG_CHECK_POINT) cout<<"i:"<<(ik++)<<endl;
 	    delete[] rd->blocks;
-
+	//if(rank==RRANK && DEBUG_CHECK_POINT) cout<<"i:"<<(ik++)<<endl;
 	    memcpy(tile_addrs, rd->block_addrs, rd->num_blocks * dims * sizeof(int));
 	    tile_addrs += rd->num_blocks * dims;
 	    delete[] rd->block_addrs;
         }
-if(DDbug == 1) cout<<"Rank5:"<<T->rank<<endl;
+	if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Redistribute Checkpoint " <<(checkpoint++)<< endl;
         // Update proc address in tensor object
         memcpy(T->proc_addr, new_proc_addr, dims * sizeof(int));
 
@@ -207,21 +214,24 @@ if(DDbug == 1) cout<<"Rank5:"<<T->rank<<endl;
 {	
 	replicate(repl_dims[i]);
 }
-	if(DDbug == 1) cout<<"Rank6:"<<T->rank<<endl;
+	if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Redistribute Checkpoint " <<(checkpoint++)<< endl;
 
         // Free old index table
         T->free_index_table();
 	
 
-        // Update idmap
-        memcpy(T->index_dimension_map, new_idx_map, dims*sizeof(int));
+        
 	
 	//updates pgrid
 	T->update_pgrid(new_grid->grid_dims,new_grid->pgrid);
+	// Update idmap
+        memcpy(T->index_dimension_map, new_idx_map, dims*sizeof(int));
+	//Update grid
+	T->g=new_grid;
 
         // Recompute index_table
         T->init_index_table();
-if(DDbug == 1) cout<<"Rank7:"<<T->rank<<endl;
+	if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Redistribute Checkpoint " <<(checkpoint++)<< endl;
         T->fill_index_table();
 	
 }
@@ -397,7 +407,7 @@ void GridRedistribute::redistribute_send(int* &repl_dims, int repcount)
                                         MPI_Request req1, req2;
                                         MPI_Isend(blocks, num_blocks * T->block_size, MPI_DOUBLE, new_proc_rank[i], 3, MPI_COMM_WORLD, &req1);
                                         MPI_Isend(block_addrs, num_blocks * dims, MPI_INT, new_proc_rank[i], 4, MPI_COMM_WORLD, &req2);
-					//if(T->rank == 14 || new_proc_rank[i]==14) cout<<"Sending from "<<T->rank<<" to "<< new_proc_rank[i]<<endl;
+					if(T->rank == RRANK || new_proc_rank[i]==RRANK) cout<<"Sending from "<<T->rank<<" to "<< new_proc_rank[i]<<endl;
                                         rlz_blks_ptrs.push_back(blocks);
                                         rlz_addr_ptrs.push_back(block_addrs);
                                         req_arr[req_count++] = req1;
@@ -470,7 +480,7 @@ void GridRedistribute::redistribute_send(int* &repl_dims, int repcount)
         // Post receives from each processor identified above
         recv_list = list<recv_data>();
 	//cout<<"numtiles"<<num_tiles<<"  rank"<<T->rank<<endl;
-               
+      if(flag){         
 
         for (int i=0; i < num_procs; i++)
         {
@@ -485,9 +495,9 @@ void GridRedistribute::redistribute_send(int* &repl_dims, int repcount)
 				
 		}
 		// Sender is a different processor
-		else if(flag)
+		else 
 		{	
-				
+				//if(T->rank == RRANK) cout<<"I shouldn't be here"<<endl;
                                 recv_data rd;
                                 rd.num_blocks = num_blocks;
                                 rd.blocks = new double[num_blocks * T->block_size];
@@ -497,7 +507,7 @@ void GridRedistribute::redistribute_send(int* &repl_dims, int repcount)
 
                                 MPI_Irecv(rd.blocks, num_blocks * T->block_size, MPI_DOUBLE, i, 3, MPI_COMM_WORLD, &req1);  
                                 MPI_Irecv(rd.block_addrs, num_blocks * dims, MPI_INT, i, 4, MPI_COMM_WORLD, &req2); 
-				//if(i == 14 || T->rank==14) cout<<"Recieving from "<<i <<" to "<<T->rank<<endl;
+				if(i == RRANK || T->rank==RRANK) cout<<"Recieving from "<<i <<" to "<<T->rank<<endl;
                                 recv_list.push_back(rd);
 				req_arr[req_count++] = req1;
                                 req_arr[req_count++] = req2;
@@ -506,7 +516,7 @@ void GridRedistribute::redistribute_send(int* &repl_dims, int repcount)
 		}
 	    }
         }
-
+	}
 
         // Free allocated memory
 	//   delete[] map;
