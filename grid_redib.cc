@@ -2,7 +2,7 @@
 #include "tensor.h"
 
 #define DEBUG_CHECK_POINT 0
-#define RRANK 15
+#define RRANK 8
 
 #define DDbug 0
 
@@ -117,7 +117,7 @@ void GridRedistribute::redistribute()
 //print_tile_addr(new_grid->grid_dims,new_grid->pgrid);}
 
         // Re-compute num_max_tiles for the redistributed tensor
-        T->num_max_tiles = T->compute_num_max_tiles(new_idx_map, new_pgrid);
+        T->num_max_tiles = T->compute_num_max_tiles_rect(new_idx_map, new_pgrid);
 
         
 
@@ -208,7 +208,9 @@ void GridRedistribute::redistribute()
         }
 	if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Redistribute Checkpoint " <<(checkpoint++)<< endl;
         // Update proc address in tensor object
-        memcpy(T->proc_addr, new_proc_addr, dims * sizeof(int));
+	delete[] T->proc_addr;
+	T->proc_addr = new int[grid_dims+1];
+        memcpy(T->proc_addr, new_proc_addr, (grid_dims + 1) * sizeof(int));
 
 	for(int i=0; i<repcount; i++)
 {	
@@ -407,7 +409,7 @@ void GridRedistribute::redistribute_send(int* &repl_dims, int repcount)
                                         MPI_Request req1, req2;
                                         MPI_Isend(blocks, num_blocks * T->block_size, MPI_DOUBLE, new_proc_rank[i], 3, MPI_COMM_WORLD, &req1);
                                         MPI_Isend(block_addrs, num_blocks * dims, MPI_INT, new_proc_rank[i], 4, MPI_COMM_WORLD, &req2);
-					if(T->rank == RRANK || new_proc_rank[i]==RRANK) cout<<"Sending from "<<T->rank<<" to "<< new_proc_rank[i]<<endl;
+					//if(T->rank == RRANK || new_proc_rank[i]==RRANK) cout<<"Sending from "<<T->rank<<" to "<< new_proc_rank[i]<<endl;
                                         rlz_blks_ptrs.push_back(blocks);
                                         rlz_addr_ptrs.push_back(block_addrs);
                                         req_arr[req_count++] = req1;
@@ -426,8 +428,10 @@ void GridRedistribute::redistribute_send(int* &repl_dims, int repcount)
     }
 // and post receives for them
     void GridRedistribute::redistribute_recv(list<recv_data> &recv_list, int* &repl_dims, int repcount)
-    {
-	
+    {	
+	int checkpoint = 0;
+	int rank = T->rank;
+	if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Redistribute Recieve Checkpoint " <<(checkpoint++)<< endl; 
         int* local_indices = new int[dims];
         int offset = 0;
         int* addresses = new int[T->num_max_tiles * dims];
@@ -435,17 +439,20 @@ void GridRedistribute::redistribute_send(int* &repl_dims, int repcount)
         // Generate addresses that should reside at this processor w.r.t. the new index map
         //int num_tiles = T->num_actual_tiles;
 	int num_tiles = 0;
-	
+	if(rank==RRANK && DEBUG_CHECK_POINT){print_tile_addr(T->dims,new_idx_map); print_tile_addr(grid_dims+1,new_proc_addr); print_tile_addr(grid_dims+1,new_pgrid);}
         T->get_num_tiles(0, local_indices, offset, new_idx_map, new_proc_addr, addresses, new_pgrid, num_tiles);
-        
+        if(rank==RRANK && DEBUG_CHECK_POINT) {cout << "Rank : "<<rank<<". Redistribute Recieve Checkpoint " <<(checkpoint++)<< endl; 
+							cout<<"T->num_max_tiles"<<T->num_max_tiles<<"	num_tile:"<<num_tiles<<endl;}
 	//cout<<"New Num tiles = "<<num_tiles;
         // Allocate memory for processor addresses for each block
         //int* old_proc_addr = new int[num_tiles * old_serial];
+	if(rank==RRANK && DEBUG_CHECK_POINT) cout<<"Here??????"<<endl;
         int* old_proc_ranks = new int[num_tiles];
-
+	if(rank==RRANK && DEBUG_CHECK_POINT) cout<<"Here"<<endl;
         // Compute old processor address for each block
         for (int i=0; i < num_tiles; i++)
         {
+	    if(rank==RRANK && DEBUG_CHECK_POINT) cout<<"i"<<i<<endl;
 	    int offset = i * dims;
 	    int* old_proc_address = new int[old_serial];
 	    memset(old_proc_address, 0, old_serial * sizeof(int));
@@ -457,7 +464,7 @@ void GridRedistribute::redistribute_send(int* &repl_dims, int repcount)
 		
         }
 
-       
+       if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Redistribute Recieve Checkpoint " <<(checkpoint++)<< endl; 
 	bool flag=true;
 
 
@@ -476,7 +483,7 @@ void GridRedistribute::redistribute_send(int* &repl_dims, int repcount)
         // Find how many blocks will be received from which processor
         int* map;
         int num_procs = get_num_recv_blocks(old_proc_ranks, num_tiles, map);
-
+if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Redistribute Recieve Checkpoint " <<(checkpoint++)<< endl; 
         // Post receives from each processor identified above
         recv_list = list<recv_data>();
 	//cout<<"numtiles"<<num_tiles<<"  rank"<<T->rank<<endl;
@@ -507,7 +514,7 @@ void GridRedistribute::redistribute_send(int* &repl_dims, int repcount)
 
                                 MPI_Irecv(rd.blocks, num_blocks * T->block_size, MPI_DOUBLE, i, 3, MPI_COMM_WORLD, &req1);  
                                 MPI_Irecv(rd.block_addrs, num_blocks * dims, MPI_INT, i, 4, MPI_COMM_WORLD, &req2); 
-				if(i == RRANK || T->rank==RRANK) cout<<"Recieving from "<<i <<" to "<<T->rank<<endl;
+				//if(i == RRANK || T->rank==RRANK) cout<<"Recieving from "<<i <<" to "<<T->rank<<endl;
                                 recv_list.push_back(rd);
 				req_arr[req_count++] = req1;
                                 req_arr[req_count++] = req2;
@@ -517,7 +524,7 @@ void GridRedistribute::redistribute_send(int* &repl_dims, int repcount)
 	    }
         }
 	}
-
+if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Redistribute Recieve Checkpoint " <<(checkpoint++)<< endl; 
         // Free allocated memory
 	//   delete[] map;
 	// delete[] local_indices;

@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
     Grid* grid = new Grid(4, pgrid_4);
     Grid* grid1 = new Grid(4, pgrid_4);
 
-/*    int* size__a10043 = new int[4];
+   int* size__a10043 = new int[4];
     size__a10043[0] = Vb;
     size__a10043[1] = Vb;
     size__a10043[2] = Ob;
@@ -683,7 +683,7 @@ int main(int argc, char* argv[])
     vgrid__a13355[3] = atoi(argv[3]);
     Tensor* _a13355 = new Tensor("cccc", idmap__a13355, size__a13355, vgrid__a13355, grid);
     _a13355->initialize();
-*/
+
     int* size__a14811 = new int[2];
     size__a14811[0] = Ob;
     size__a14811[1] = Ob;
@@ -695,7 +695,7 @@ int main(int argc, char* argv[])
     vgrid__a14811[1] = atoi(argv[3]);
     Tensor* _a14811 = new Tensor("cc", idmap__a14811, size__a14811, vgrid__a14811, grid);
     _a14811->initialize();
-/*
+
     int* size__a14870 = new int[2];
     size__a14870[0] = Oa;
     size__a14870[1] = Oa;
@@ -1686,7 +1686,7 @@ int main(int argc, char* argv[])
     Tensor* _a24289 = new Tensor("cc", idmap__a24289, size__a24289, vgrid__a24289, grid);
     _a24289->initialize();
 
-*/
+
     int* size__a24849 = new int[2];
     size__a24849[0] = Va;
     size__a24849[1] = Va;
@@ -1699,7 +1699,7 @@ int main(int argc, char* argv[])
     Tensor* _a24849 = new Tensor("cc", idmap__a24849, size__a24849, vgrid__a24849, grid);
     _a24849->initialize();
 
-/*
+
     int* size__a24850 = new int[2];
     size__a24850[0] = Va;
     size__a24850[1] = Va;
@@ -2263,7 +2263,7 @@ int main(int argc, char* argv[])
     vgrid__a3029[3] = atoi(argv[3]);
     Tensor* _a3029 = new Tensor("cccc", idmap__a3029, size__a3029, vgrid__a3029, grid);
     _a3029->initialize();
-*/
+
     int* size__a30368 = new int[4];
     size__a30368[0] = Va;
     size__a30368[1] = Ob;
@@ -2281,7 +2281,7 @@ int main(int argc, char* argv[])
     vgrid__a30368[3] = atoi(argv[3]);
     Tensor* _a30368 = new Tensor("cccc", idmap__a30368, size__a30368, vgrid__a30368, grid);
     _a30368->initialize();
-/*
+
     int* size__a30369 = new int[4];
     size__a30369[0] = Va;
     size__a30369[1] = Ob;
@@ -3171,7 +3171,7 @@ int main(int argc, char* argv[])
     vgrid__a34819[3] = atoi(argv[3]);
     Tensor* _a34819 = new Tensor("cccc", idmap__a34819, size__a34819, vgrid__a34819, grid);
     _a34819->initialize();
-*/
+
     int* size__a34826 = new int[4];
     size__a34826[0] = Oa;
     size__a34826[1] = Vb;
@@ -3189,7 +3189,7 @@ int main(int argc, char* argv[])
     vgrid__a34826[3] = atoi(argv[3]);
     Tensor* _a34826 = new Tensor("cccc", idmap__a34826, size__a34826, vgrid__a34826, grid);
     _a34826->initialize();
-/*
+
     int* size__a34827 = new int[4];
     size__a34827[0] = Vb;
     size__a34827[1] = Oa;
@@ -4413,7 +4413,7 @@ int main(int argc, char* argv[])
     vgrid__a52398[3] = atoi(argv[3]);
     Tensor* _a52398 = new Tensor("ccaa", idmap__a52398, size__a52398, vgrid__a52398, grid);
     _a52398->initialize();
-*/
+
     int* size__a5246 = new int[4];
     size__a5246[0] = Oa;
     size__a5246[1] = Ob;
@@ -4431,7 +4431,7 @@ int main(int argc, char* argv[])
     vgrid__a5246[3] = atoi(argv[3]);
     Tensor* _a5246 = new Tensor("cccc", idmap__a5246, size__a5246, vgrid__a5246, grid);
     _a5246->initialize();
-/*
+
     int* size__a52784 = new int[2];
     size__a52784[0] = Oa;
     size__a52784[1] = Oa;
@@ -5158,7 +5158,7 @@ int main(int argc, char* argv[])
     Tensor* rbb_vvoo = new Tensor("cccc", idmap_rbb_vvoo, size_rbb_vvoo, vgrid_rbb_vvoo, grid);
     rbb_vvoo->initialize();
 
-*/
+
 
     int* size_ta_vo = new int[2];
     size_ta_vo[0] = Va;
@@ -5172,7 +5172,7 @@ int main(int argc, char* argv[])
     Tensor* ta_vo = new Tensor("cc", idmap_ta_vo, size_ta_vo, vgrid_ta_vo, grid);
     ta_vo->initialize();
 
-/*
+
     int* size_taa_vvoo = new int[4];
     size_taa_vvoo[0] = Va;
     size_taa_vvoo[1] = Va;
@@ -5190,7 +5190,7 @@ int main(int argc, char* argv[])
     vgrid_taa_vvoo[3] = atoi(argv[3]);
     Tensor* taa_vvoo = new Tensor("aabb", idmap_taa_vvoo, size_taa_vvoo, vgrid_taa_vvoo, grid);
     taa_vvoo->initialize();
-*/
+
     int* size_tab_vvoo = new int[4];
     size_tab_vvoo[0] = Va;
     size_tab_vvoo[1] = Vb;
@@ -5239,7 +5239,7 @@ int main(int argc, char* argv[])
     vgrid_tbb_vvoo[3] = atoi(argv[3]);
     Tensor* tbb_vvoo = new Tensor("aabb", idmap_tbb_vvoo, size_tbb_vvoo, vgrid_tbb_vvoo, grid);
     tbb_vvoo->initialize();
-/*
+
     int* size_vaa_oooo = new int[4];
     size_vaa_oooo[0] = Oa;
     size_vaa_oooo[1] = Oa;
@@ -5329,7 +5329,7 @@ int main(int argc, char* argv[])
     vgrid_vaa_vovo[3] = atoi(argv[3]);
     Tensor* vaa_vovo = new Tensor("cccc", idmap_vaa_vovo, size_vaa_vovo, vgrid_vaa_vovo, grid);
     vaa_vovo->initialize();
-*/
+
     int* size_vaa_vovv = new int[4];
     size_vaa_vovv[0] = Va;
     size_vaa_vovv[1] = Oa;
@@ -5347,7 +5347,7 @@ int main(int argc, char* argv[])
     vgrid_vaa_vovv[3] = atoi(argv[3]);
     Tensor* vaa_vovv = new Tensor("ccaa", idmap_vaa_vovv, size_vaa_vovv, vgrid_vaa_vovv, grid);
     vaa_vovv->initialize();
-/*
+
     int* size_vaa_vvoo = new int[4];
     size_vaa_vvoo[0] = Va;
     size_vaa_vvoo[1] = Va;
@@ -5455,7 +5455,7 @@ int main(int argc, char* argv[])
     vgrid_vab_oovo[3] = atoi(argv[3]);
     Tensor* vab_oovo = new Tensor("cccc", idmap_vab_oovo, size_vab_oovo, vgrid_vab_oovo, grid);
     vab_oovo->initialize();
-*/
+
     int* size_vab_oovv = new int[4];
     size_vab_oovv[0] = Oa;
     size_vab_oovv[1] = Ob;
@@ -5473,7 +5473,7 @@ int main(int argc, char* argv[])
     vgrid_vab_oovv[3] = atoi(argv[3]);
     Tensor* vab_oovv = new Tensor("cccc", idmap_vab_oovv, size_vab_oovv, vgrid_vab_oovv, grid);
     vab_oovv->initialize();
-/*
+
     int* size_vab_ovoo = new int[4];
     size_vab_ovoo[0] = Oa;
     size_vab_ovoo[1] = Vb;
@@ -5527,7 +5527,7 @@ int main(int argc, char* argv[])
     vgrid_vab_ovvo[3] = atoi(argv[3]);
     Tensor* vab_ovvo = new Tensor("cccc", idmap_vab_ovvo, size_vab_ovvo, vgrid_vab_ovvo, grid);
     vab_ovvo->initialize();
-*/
+
     int* size_vab_ovvv = new int[4];
     size_vab_ovvv[0] = Oa;
     size_vab_ovvv[1] = Vb;
@@ -5545,7 +5545,7 @@ int main(int argc, char* argv[])
     vgrid_vab_ovvv[3] = atoi(argv[3]);
     Tensor* vab_ovvv = new Tensor("cccc", idmap_vab_ovvv, size_vab_ovvv, vgrid_vab_ovvv, grid);
     vab_ovvv->initialize();
-/*
+
     int* size_vab_vooo = new int[4];
     size_vab_vooo[0] = Va;
     size_vab_vooo[1] = Ob;
@@ -5581,7 +5581,7 @@ int main(int argc, char* argv[])
     vgrid_vab_voov[3] = atoi(argv[3]);
     Tensor* vab_voov = new Tensor("cccc", idmap_vab_voov, size_vab_voov, vgrid_vab_voov, grid);
     vab_voov->initialize();
-*/
+
     int* size_vab_vovo = new int[4];
     size_vab_vovo[0] = Va;
     size_vab_vovo[1] = Ob;
@@ -5599,7 +5599,7 @@ int main(int argc, char* argv[])
     vgrid_vab_vovo[3] = atoi(argv[3]);
     Tensor* vab_vovo = new Tensor("cccc", idmap_vab_vovo, size_vab_vovo, vgrid_vab_vovo, grid);
     vab_vovo->initialize();
-/*
+
     int* size_vab_vovv = new int[4];
     size_vab_vovv[0] = Va;
     size_vab_vovv[1] = Ob;
@@ -5725,7 +5725,7 @@ int main(int argc, char* argv[])
     vgrid_vbb_oovo[3] = atoi(argv[3]);
     Tensor* vbb_oovo = new Tensor("aacc", idmap_vbb_oovo, size_vbb_oovo, vgrid_vbb_oovo, grid);
     vbb_oovo->initialize();
-*/
+
     int* size_vbb_oovv = new int[4];
     size_vbb_oovv[0] = Ob;
     size_vbb_oovv[1] = Ob;
@@ -5743,7 +5743,7 @@ int main(int argc, char* argv[])
     vgrid_vbb_oovv[3] = atoi(argv[3]);
     Tensor* vbb_oovv = new Tensor("aabb", idmap_vbb_oovv, size_vbb_oovv, vgrid_vbb_oovv, grid);
     vbb_oovv->initialize();
-/*
+
     int* size_vbb_vooo = new int[4];
     size_vbb_vooo[0] = Vb;
     size_vbb_vooo[1] = Ob;
@@ -5851,11 +5851,11 @@ int main(int argc, char* argv[])
     vgrid_vbb_vvvv[3] = atoi(argv[3]);
     Tensor* vbb_vvvv = new Tensor("aabb", idmap_vbb_vvvv, size_vbb_vvvv, vgrid_vbb_vvvv, grid);
     vbb_vvvv->initialize();
-*/
+
     double time = -MPI_Wtime();
     double max_time = 0;
 
-    /*   
+       
      if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 0: " << endl;
      Contraction* C0 = new Contraction(vaa_vovv, ta_vo, _a24849, grid);
      C0->contract( "p1a,h2a,p3a,p2a", "p3a,h2a", "p1a,p2a");
@@ -5864,14 +5864,14 @@ int main(int argc, char* argv[])
     if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 1: " << endl;
     Contraction* C1 = new Contraction(vab_oovv, tb_vo, _a5246, grid);
     C1->contract( "h2a,h1b,p2a,p1b", "p1b,h2b", "h2a,h1b,p2a,h2b");
-    */
+    
 
     if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 2: " << endl;
     Contraction* C2 = new Contraction(vbb_oovv, tbb_vvoo, _a14811, grid);
     C2->contract( "h1b,h3b,p1b,p3b", "p1b,p3b,h2b,h3b", "h1b,h2b");
   
       
-/*    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 3: " << endl;
+    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 3: " << endl;
     Contraction* C3 = new Contraction(vab_vovo, ta_vo, _a30368, grid);
     C3->contract( "p1a,h1b,p2a,h2b", "p2a,h1a", "p1a,h1b,h2b,h1a");
   
@@ -5880,7 +5880,7 @@ int main(int argc, char* argv[])
     Contraction* C4 = new Contraction(vab_ovvv, tab_vvoo, _a34826, grid);
     C4->contract( "h2a,p2b,p2a,p1b", "p2a,p1b,h1a,h2b", "h2a,p2b,h1a,h2b");
   
-/*
+
     if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 5: " << endl;
     Contraction* C5 = new Contraction(vab_vovv, tb_vo, _a9395, grid);
     C5->contract( "p1a,h1b,p2a,p1b", "p1b,h1b", "p1a,p2a");
@@ -6595,7 +6595,7 @@ int main(int argc, char* argv[])
     if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 181: " << endl;
     Contraction* C181 = new Contraction(tb_vo, _a7785, _a7798, grid);
     C181->contract( "p2b,h3b", "p1b,h3b,h2b,h1b", "p2b,p1b,h2b,h1b");
-*/    
+   
     time += MPI_Wtime();
     MPI_Reduce(&time, &max_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
     if(rank==0) cout<<endl<<endl<<"Total CAST CCSD Time = " << max_time << " seconds" << endl;

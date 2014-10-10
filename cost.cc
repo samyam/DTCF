@@ -431,7 +431,7 @@ if(curGrid[3] > curGrid[1]) lar=3;
 
 int size_A=1, size_B=1;
 for(int i=0;i<4;i++){ size_A*=A->tensor_size[i];	size_B*=B->tensor_size[i];}
-
+/////Fix for other tensor symmetry
 if(size_A > size_B)
 {	
 	
@@ -457,6 +457,11 @@ if(size_A > size_B)
 				curidmapA[extA[1]]=4-lar; curidmapA[contA[1]]=4-lar-1; curidmapA[contA[0]] =lar-1;
 				  curidmapB[extB[0]]=4-lar-1; curidmapB[extB[1]]=lar-1; curidmapB[contB[0]]=4-lar; curidmapB[contB[1]]=lar;
 				//curidmapC[0]=lar; curidmapC[1]=4-lar; curidmapC[2]=4-lar-1; curidmapC[3]=lar-1; 
+				}
+			else if((A->tensor_str.at(extA[0]) == 'a' && A->tensor_str.at(extA[1]) == 'a') || (A->tensor_str.at(extA[0]) == 'b' && A->tensor_str.at(extA[1]) == 'b'))
+				{curidmapA[extA[1]]=lar-1; curidmapA[contA[1]]=4-lar-1; curidmapA[contA[0]] =4-lar;
+				  curidmapB[extB[0]]=4-lar-1; curidmapB[extB[1]]=4-lar; curidmapB[contB[0]]=lar; curidmapB[contB[1]]=lar-1;
+				//curidmapC[0]=4-lar-1; curidmapC[1]=lar-1; curidmapC[2]=4-lar; curidmapC[3]=lar; 
 				}
 			}
 		else if((A->tensor_str.at(extA[0]) == 'a' && A->tensor_str.at(contA[0]) == 'a') || (A->tensor_str.at(extA[0]) == 'b' && A->tensor_str.at(contA[0]) == 'b'))
@@ -491,6 +496,11 @@ if(size_A > size_B)
 				{curidmapA[extA[0]]=4-lar; curidmapA[contA[1]]=4-lar-1; curidmapA[contA[0]] =lar-1;
 				  curidmapB[extB[0]]=4-lar-1; curidmapB[extB[1]]=lar-1; curidmapB[contB[0]]=4-lar; curidmapB[contB[1]]=lar;
 				//curidmapC[0]=4-lar; curidmapC[1]=lar; curidmapC[2]=4-lar-1; curidmapC[3]=lar-1; 
+				}
+			else if((A->tensor_str.at(extA[0]) == 'a' && A->tensor_str.at(extA[1]) == 'a') || (A->tensor_str.at(extA[0]) == 'b' && A->tensor_str.at(extA[1]) == 'b'))
+				{curidmapA[extA[0]]=lar-1; curidmapA[contA[1]]=4-lar-1; curidmapA[contA[0]] =4-lar;
+				  curidmapB[extB[0]]=4-lar-1; curidmapB[extB[1]]=4-lar; curidmapB[contB[0]]=lar; curidmapB[contB[1]]=lar-1;
+				//curidmapC[0]=4-lar-1; curidmapC[1]=lar-1; curidmapC[2]=4-lar; curidmapC[3]=lar; 
 				}
 			}
 		else if((A->tensor_str.at(extA[1]) == 'a' && A->tensor_str.at(contA[0]) == 'a') || (A->tensor_str.at(extA[1]) == 'b' && A->tensor_str.at(contA[0]) == 'b'))
@@ -529,6 +539,11 @@ else
 				  curidmapA[extA[0]]=4-lar-1; curidmapA[extA[1]]=lar-1; curidmapA[contA[0]]=4-lar; curidmapA[contA[1]]=lar;
 				//curidmapC[0]=4-lar-1; curidmapC[1]=lar-1; curidmapC[2]=lar; curidmapC[3]=4-lar; 
 				}
+			else if((B->tensor_str.at(extB[0]) == 'a' && B->tensor_str.at(extB[1]) == 'a') || (B->tensor_str.at(extB[0]) == 'b' && B->tensor_str.at(extB[1]) == 'b'))
+				{curidmapB[extB[1]]=lar-1; curidmapB[contB[1]]=4-lar-1; curidmapB[contB[0]] =4-lar;
+				  curidmapA[extA[0]]=4-lar-1; curidmapA[extA[1]]=4-lar; curidmapA[contA[0]]=lar; curidmapA[contA[1]]=lar-1;
+				//curidmapC[0]=4-lar-1; curidmapC[1]=lar-1; curidmapC[2]=4-lar; curidmapC[3]=lar; 
+				}
 			}
 		else if((B->tensor_str.at(extB[0]) == 'a' && B->tensor_str.at(contB[0]) == 'a') || (B->tensor_str.at(extB[0]) == 'b' && B->tensor_str.at(contB[0]) == 'b'))
 			{
@@ -561,6 +576,11 @@ else
 			else if((B->tensor_str.at(extB[0]) == 'a' && B->tensor_str.at(contB[1]) == 'a') || (B->tensor_str.at(extB[0]) == 'b' && B->tensor_str.at(contB[1]) == 'b'))
 				{curidmapB[extB[0]]=4-lar; curidmapB[contB[1]]=4-lar-1; curidmapB[contB[0]] =lar-1;
 				  curidmapA[extA[0]]=4-lar-1; curidmapA[extA[1]]=lar-1; curidmapA[contA[0]]=4-lar; curidmapA[contA[1]]=lar;
+				//curidmapC[0]=4-lar-1; curidmapC[1]=lar-1; curidmapC[2]=4-lar; curidmapC[3]=lar; 
+				}
+			else if((B->tensor_str.at(extB[0]) == 'a' && B->tensor_str.at(extB[1]) == 'a') || (B->tensor_str.at(extB[0]) == 'b' && B->tensor_str.at(extB[1]) == 'b'))
+				{curidmapB[extB[0]]=lar-1; curidmapB[contB[1]]=4-lar-1; curidmapB[contB[0]] =4-lar;
+				  curidmapA[extA[0]]=4-lar-1; curidmapA[extA[1]]=4-lar; curidmapA[contA[0]]=lar; curidmapA[contA[1]]=lar-1;
 				//curidmapC[0]=4-lar-1; curidmapC[1]=lar-1; curidmapC[2]=4-lar; curidmapC[3]=lar; 
 				}
 			}

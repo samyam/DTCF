@@ -1,6 +1,6 @@
 #include "contraction.h"
 #define CCHECK 0
-#define RRANK 2
+#define RRANK 8
 #define DEBUG_TRR 0
 #define DEBUG_TDEBUG_IP 0
 #define DEBUG_TCM 1
@@ -2519,6 +2519,7 @@ namespace RRR{
 	    Credib->redistribute();	
 	}	
 	
+if(1){
 	// Identify contracting indices in A and B
 	vector<pair<int,int>> contr_list = vector<pair<int,int>>();
 	vector<pair<int,int>> DDO_list = vector<pair<int,int>>();
@@ -2838,7 +2839,7 @@ namespace RRR{
 	//if(rank == 0) cout<<"Resetting cntr_map"<<dims_A<<endl;
 	memset(A->cntr_map, 0, sizeof(double) * dims_A);
 	memset(B->cntr_map, 0, sizeof(double)* dims_B);
-
+}
     }
 
     void Contraction::display_times(){
