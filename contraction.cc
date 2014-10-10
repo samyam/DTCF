@@ -1,10 +1,10 @@
 #include "contraction.h"
 #define CCHECK 0
-#define RRANK 8
+#define RRANK 0
 #define DEBUG_TRR 0
 #define DEBUG_TDEBUG_IP 0
 #define DEBUG_TCM 1
-#define DEBUG_T 1
+#define DEBUG_T 0
 #define DEBUG_I 0
 #define DEBUG_T1 0
 #define DEBUG_TR 0
@@ -1401,7 +1401,7 @@ namespace RRR{
 
 	    instigation_time -= MPI_Wtime();
 	    int num_collected_A = instigate_collection(A, cdim_A, k, blocks_A, block_addr_A);
-	    return ;
+
 	    //if(DEBUG_T && rank==RRANK)    printGetTiles(blocks_A, block_addr_A, A->block_size, num_collected_A, A->dims);
 	    //if(DEBUG_I && rank == RRANK && cdim_B == 2 && k == 1) cout<<endl<<endl<<"Instigation for B"<<endl;
 	    timer4 -=MPI_Wtime();
@@ -1420,7 +1420,7 @@ namespace RRR{
 	    //------------------------------------------------------------------------------------------------------------//
 
 
-
+	    
 	    //--------------------------------------------- Communicate A forward----------------------------------------//
 
 	    // Forward number of blocks
@@ -1496,12 +1496,12 @@ namespace RRR{
 	    // Compute
 	    if(contr_list.empty())
 	    {
-		if(DEBUG_T && rank==RRANK){
+		if(DEBUG_TR && rank==RRANK){
 		    cout<<"Rank "<<rank<<". Entering transpose and DGEMM"<<endl;
 		}
 		
 		transpose_and_dgemm(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer);
-		if(DEBUG_T && rank==RRANK){
+		if(DEBUG_TR && rank==RRANK){
 		    cout<<"Rank "<<rank<<". Exiting transpose and DGEMM"<<endl;
 		}
 
@@ -1590,7 +1590,7 @@ namespace RRR{
 	// multiple times
 	double* tr_blocks_buf_B =new double[num_blocks_B * B->block_size]; 
 	int tg = 0;
-	if(DEBUG_T && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
+	if(DEBUG_TR && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
 		
 
 	//-------------------------------------B-transpose---------------------------------------------//
@@ -1634,7 +1634,7 @@ namespace RRR{
 	    delete[] sym_composed_B;
 
 	}
-	if(DEBUG_T && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
+	if(DEBUG_TR && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
 
 
 	map<int, map<int, int> >* big_matrix_map_B;
@@ -1686,7 +1686,7 @@ namespace RRR{
 	    delete[] sym_composed_A;
 
 	}
-	if(DEBUG_T && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
+	if(DEBUG_TR && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
 
 	map<int, map<int, int> >* big_matrix_map_A;
 	int num_row_dim_A = A->dims - num_cntr_indices;
@@ -1739,13 +1739,13 @@ namespace RRR{
 	    cout<<"C_buf : "<<C->num_actual_tiles * C->block_size<<endl;
 
 	}
-	if(DEBUG_T && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
+	if(DEBUG_TR && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
 
 	comp_time -= MPI_Wtime();    
 	kevin_dgemm(num_row_blocks*n_a,  n_b * num_col_blocks, n_k * num_cntr_blocks, blocks_A, blocks_B, C_buffer, 0, 0, 1.0);
 	// kevin_dgemm(n_a * num_row_blocks, n_b * num_col_blocks, n_k * num_cntr_blocks, A_buff, B_buff, C_buffer, 0, 0, 1.0);
 	comp_time += MPI_Wtime();
-	if(DEBUG_T && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
+	if(DEBUG_TR && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
 
 	revert_big_matrix(A, big_matrix_map_A, 
 			  blocks_A, n_a, n_k, 
@@ -1760,7 +1760,7 @@ namespace RRR{
 			  blocks_B, n_b, n_k, 
 			  p_map_B, tr_blocks_buf_B);
     
-	if(DEBUG_T && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
+	if(DEBUG_TR && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
     
 	delete[] blocks_B;
 	blocks_B = tr_blocks_buf_B;
@@ -1807,7 +1807,7 @@ namespace RRR{
 	int *perm_address_A = new int[A->dims*num_blocks_A]; 
 	int *perm_address_B = new int[B->dims*num_blocks_B]; 
 	int tg = 0;
-	if(DEBUG_T && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
+	if(DEBUG_TR && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
 
 
 	//-------------------------------------B-transpose---------------------------------------------//
@@ -1851,8 +1851,8 @@ namespace RRR{
 	    delete[] sym_composed_B;
 
 	}
-	if(DEBUG_T && rank==rank)	cout<<"Rank "<<rank<<".  Num Blocks B"<<num_blocks_B<<endl;
-	if(DEBUG_T && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
+	if(DEBUG_TR && rank==rank)	cout<<"Rank "<<rank<<".  Num Blocks B"<<num_blocks_B<<endl;
+	if(DEBUG_TR && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
 
 
 	map<int, map<int, int> >* big_matrix_map_B;
@@ -1873,7 +1873,7 @@ namespace RRR{
 	tr_time -= MPI_Wtime();
 
 
-	if(DEBUG_T && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
+	if(DEBUG_TR && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
 
 	for(int j=0; j<num_blocks_A; j++)
 	{
@@ -1909,7 +1909,7 @@ namespace RRR{
 
 	}
 
-	if(DEBUG_T && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
+	if(DEBUG_TR && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
 
 	map<int, map<int, int> >* big_matrix_map_A;
 	int num_row_dim_A = A->dims - num_cntr_indices;
@@ -1923,7 +1923,7 @@ namespace RRR{
 			  num_row_dim_A, big_matrix_map_A, blocks_A);
     
 
-	if(DEBUG_T && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
+	if(DEBUG_TR && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
     
 	tr_time += MPI_Wtime();
 
@@ -1947,8 +1947,8 @@ namespace RRR{
 	}
 	//    kevin_dgemm(n_a*num_blocks_A, n_b*num_blocks_B, n_k, blocks_A, blocks_B, C_buffer, 0, 0, 1.0);
 	comp_time += MPI_Wtime();
-	if(DEBUG_T && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
-	if(rank == RRANK && DEBUG_T) {
+	if(DEBUG_TR && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
+	if(rank == RRANK && DEBUG_TR) {
 	    cout<<"Returning "<<endl;
 	}
 
@@ -2518,6 +2518,13 @@ namespace RRR{
 	    GridRedistribute* Credib = new GridRedistribute(C,idmapC,new_grid);
 	    Credib->redistribute();	
 	}	
+
+
+	
+	
+	//A->printInfo();
+	//B->printInfo();
+	//C->printInfo();
 	
 if(1){
 	// Identify contracting indices in A and B

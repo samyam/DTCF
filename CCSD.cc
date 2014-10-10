@@ -4,7 +4,7 @@
 #include "contraction.h"
 #include "redistribute.h"
 #define DEBUG_T 1
-#define RRANK 0
+#define RRANK 8
 using namespace RRR;
 
 int main(int argc, char* argv[])
@@ -5854,751 +5854,751 @@ int main(int argc, char* argv[])
 
     double time = -MPI_Wtime();
     double max_time = 0;
-
+/*
        
-     if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 0: " << endl;
+     if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 0: " << endl;
      Contraction* C0 = new Contraction(vaa_vovv, ta_vo, _a24849, grid);
      C0->contract( "p1a,h2a,p3a,p2a", "p3a,h2a", "p1a,p2a");
 
     
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 1: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 1: " << endl;
     Contraction* C1 = new Contraction(vab_oovv, tb_vo, _a5246, grid);
     C1->contract( "h2a,h1b,p2a,p1b", "p1b,h2b", "h2a,h1b,p2a,h2b");
     
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 2: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 2: " << endl;
     Contraction* C2 = new Contraction(vbb_oovv, tbb_vvoo, _a14811, grid);
     C2->contract( "h1b,h3b,p1b,p3b", "p1b,p3b,h2b,h3b", "h1b,h2b");
   
       
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 3: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 3: " << endl;
     Contraction* C3 = new Contraction(vab_vovo, ta_vo, _a30368, grid);
     C3->contract( "p1a,h1b,p2a,h2b", "p2a,h1a", "p1a,h1b,h2b,h1a");
   
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 4: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 4: " << endl;
     Contraction* C4 = new Contraction(vab_ovvv, tab_vvoo, _a34826, grid);
     C4->contract( "h2a,p2b,p2a,p1b", "p2a,p1b,h1a,h2b", "h2a,p2b,h1a,h2b");
   
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 5: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 5: " << endl;
     Contraction* C5 = new Contraction(vab_vovv, tb_vo, _a9395, grid);
     C5->contract( "p1a,h1b,p2a,p1b", "p1b,h1b", "p1a,p2a");
   
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 6: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 6: " << endl;
     Contraction* C6 = new Contraction(vaa_oovv, tab_vvoo, _a3071, grid);
     C6->contract( "h2a,h3a,p2a,p3a", "p3a,p2b,h3a,h2b", "h2a,p2b,p2a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 7: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 7: " << endl;
     Contraction* C7 = new Contraction(vab_vovv, tb_vo, _a3715, grid);
     C7->contract( "p1a,h1b,p2a,p1b", "p1b,h2b", "p1a,h1b,p2a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 8: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 8: " << endl;
     Contraction* C8 = new Contraction(vab_oovv, ta_vo, _a12895, grid);
     C8->contract( "h2a,h1b,p2a,p1b", "p2a,h2a", "h1b,p1b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 9: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 9: " << endl;
     Contraction* C9 = new Contraction(tab_vvoo, _a5246, _a22682, grid);
     C9->contract( "p2a,p2b,h1a,h1b", "h2a,h1b,p2a,h2b", "p2b,h2a,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 10: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 10: " << endl;
     Contraction* C10 = new Contraction(vab_oovo, tab_vvoo, _a27108, grid);
     C10->contract( "h2a,h1b,p2a,h2b", "p2a,p2b,h1a,h1b", "h2a,p2b,h2b,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 11: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 11: " << endl;
     Contraction* C11 = new Contraction(vbb_oovo, tab_vvoo, _a27232, grid);
     C11->contract( "h1b,h3b,p1b,h2b", "p1a,p1b,h1a,h3b", "h1b,p1a,h2b,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 12: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 12: " << endl;
     Contraction* C12 = new Contraction(vab_ooov, tab_vvoo, _a27231, grid);
     C12->contract( "h2a,h1b,h1a,p1b", "p1a,p1b,h2a,h2b", "h1b,p1a,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 13: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 13: " << endl;
     Contraction* C13 = new Contraction(vbb_oovv, tbb_vvoo, _a3023, grid);
     C13->contract( "h1b,h3b,p1b,p3b", "p2b,p3b,h2b,h3b", "h1b,p2b,p1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 14: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 14: " << endl;
     Contraction* C14 = new Contraction(vab_oovo, taa_vvoo, _a27296, grid);
     C14->contract( "h2a,h1b,p2a,h2b", "p1a,p2a,h1a,h2a", "h1b,p1a,h2b,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 15: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 15: " << endl;
     Contraction* C15 = new Contraction(vaa_oovv, ta_vo, _a18241, grid);
     C15->contract( "h2a,h3a,p2a,p3a", "p3a,h2a", "h3a,p2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 16: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 16: " << endl;
     Contraction* C16 = new Contraction(ta_vo, _a18241, _a18246, grid);
     C16->contract( "p2a,h1a", "h3a,p2a", "h3a,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 17: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 17: " << endl;
     Contraction* C17 = new Contraction(vbb_oovv, tb_vo, _a12781, grid);
     C17->contract( "h1b,h3b,p1b,p3b", "p1b,h3b", "h1b,p3b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 18: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 18: " << endl;
     Contraction* C18 = new Contraction(vab_oovv, tab_vvoo, _a3029, grid);
     C18->contract( "h2a,h1b,p2a,p1b", "p2a,p2b,h2a,h2b", "h1b,p2b,p1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 19: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 19: " << endl;
     Contraction* C19 = new Contraction(vab_oovv, taa_vvoo, _a3040, grid);
     C19->contract( "h2a,h1b,p2a,p1b", "p1a,p2a,h1a,h2a", "h1b,p1a,p1b,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 20: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 20: " << endl;
     Contraction* C20 = new Contraction(vab_ovvv, ta_vo, _a34268, grid);
     C20->contract( "h2a,p2b,p2a,p1b", "p2a,h1a", "h2a,p2b,p1b,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 21: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 21: " << endl;
     Contraction* C21 = new Contraction(tab_vvoo, _a34269, _a34270, grid);
     C21->contract( "p1a,p1b,h2a,h2b", "h2a,p2b,p1b,h1a", "p1a,p2b,h2b,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 22: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 22: " << endl;
     Contraction* C22 = new Contraction(tb_vo, _a3040, _a23395, grid);
     C22->contract( "p1b,h2b", "h1b,p1a,p1b,h1a", "h1b,p1a,h2b,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 23: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 23: " << endl;
     Contraction* C23 = new Contraction(vaa_oovv, ta_vo, _a28768, grid);
     C23->contract( "h2a,h3a,p3a,p2a", "p3a,h3a", "h2a,p2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 24: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 24: " << endl;
     Contraction* C24 = new Contraction(vbb_oovv, tb_vo, _a18471, grid);
     C24->contract( "h1b,h3b,p1b,p3b", "p3b,h1b", "h3b,p1b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 25: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 25: " << endl;
     Contraction* C25 = new Contraction(fa_ov, tab_vvoo, _a29926, grid);
     C25->contract( "h2a,p2a", "p2a,p2b,h1a,h2b", "h2a,p2b,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 26: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 26: " << endl;
     Contraction* C26 = new Contraction(tb_vo, _a18471, _a18476, grid);
     C26->contract( "p1b,h2b", "h3b,p1b", "h3b,h2b");
-
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 27: " << endl;
+*/
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 27: " << endl;
     Contraction* C27 = new Contraction(vab_oovv, tab_vvoo, _a4801, grid);
     C27->contract( "h2a,h1b,p2a,p1b", "p2a,p2b,h2a,h1b", "p2b,p1b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 28: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 28: " << endl;
     Contraction* C28 = new Contraction(vaa_vovv, ta_vo, _a3685, grid);
     C28->contract( "p1a,h2a,p2a,p3a", "p2a,h1a", "p1a,h2a,p3a,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 29: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 29: " << endl;
     Contraction* C29 = new Contraction(vab_ovvo, ta_vo, _a30499, grid);
     C29->contract( "h2a,p2b,p2a,h2b", "p2a,h1a", "h2a,p2b,h2b,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 30: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 30: " << endl;
     Contraction* C30 = new Contraction(vab_vovv, tab_vvoo, _a34818, grid);
     C30->contract( "p1a,h1b,p2a,p1b", "p2a,p1b,h1a,h2b", "p1a,h1b,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 31: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 31: " << endl;
     Contraction* C31 = new Contraction(vbb_oovv, tbb_vvoo, _a4981, grid);
     C31->contract( "h1b,h3b,p1b,p3b", "p2b,p3b,h1b,h3b", "p2b,p1b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 32: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 32: " << endl;
     Contraction* C32 = new Contraction(vab_vvov, tb_vo, _a10340, grid);
     C32->contract( "p1a,p2b,h1a,p1b", "p1b,h2b", "p1a,p2b,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 33: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 33: " << endl;
     Contraction* C33 = new Contraction(vaa_oovo, ta_vo, _a19150, grid);
     C33->contract( "h2a,h3a,p2a,h1a", "p2a,h2a", "h3a,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 34: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 34: " << endl;
     Contraction* C34 = new Contraction(vbb_oovv, tab_vvoo, _a3197, grid);
     C34->contract( "h1b,h2b,p1b,p2b", "p2a,p2b,h2a,h2b", "h1b,p2a,p1b,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 35: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 35: " << endl;
     Contraction* C35 = new Contraction(vab_oovv, tab_vvoo, _a13050, grid);
     C35->contract( "h2a,h1b,p2a,p1b", "p2a,p1b,h1a,h1b", "h2a,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 36: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 36: " << endl;
     Contraction* C36 = new Contraction(vab_voov, tb_vo, _a30095, grid);
     C36->contract( "p1a,h1b,h1a,p1b", "p1b,h2b", "p1a,h1b,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 37: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 37: " << endl;
     Contraction* C37 = new Contraction(fb_ov, tab_vvoo, _a30094, grid);
     C37->contract( "h1b,p1b", "p1a,p1b,h1a,h2b", "h1b,p1a,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 38: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 38: " << endl;
     Contraction* C38 = new Contraction(tb_vo, _a12895, _a18706, grid);
     C38->contract( "p1b,h2b", "h1b,p1b", "h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 39: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 39: " << endl;
     Contraction* C39 = new Contraction(fa_ov, ta_vo, _a19350, grid);
     C39->contract( "h2a,p2a", "p2a,h1a", "h2a,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 40: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 40: " << endl;
     Contraction* C40 = new Contraction(vab_vovv, ta_vo, _a3655, grid);
     C40->contract( "p1a,h1b,p2a,p1b", "p2a,h1a", "p1a,h1b,p1b,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 41: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 41: " << endl;
     Contraction* C41 = new Contraction(tb_vo, _a24960, _a26520, grid);
     C41->contract( "p1b,h2b", "h1b,p1a,p1b,h1a", "h1b,p1a,h2b,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 42: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 42: " << endl;
     Contraction* C42 = new Contraction(vab_oovv, ta_vo, _a5130, grid);
     C42->contract( "h2a,h1b,p2a,p1b", "p2a,h1a", "h2a,h1b,p1b,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 43: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 43: " << endl;
     Contraction* C43 = new Contraction(tbb_vvoo, _a5130, _a22677, grid);
     C43->contract( "p2b,p1b,h2b,h1b", "h2a,h1b,p1b,h1a", "p2b,h2a,h2b,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 44: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 44: " << endl;
     Contraction* C44 = new Contraction(vab_ovvv, ta_vo, _a9575, grid);
     C44->contract( "h2a,p2b,p2a,p1b", "p2a,h2a", "p2b,p1b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 45: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 45: " << endl;
     Contraction* C45 = new Contraction(ta_vo, tb_vo, _a34095, grid);
     C45->contract( "p2a,h1a", "p1b,h2b", "p2a,p1b,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 46: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 46: " << endl;
     Contraction* C46 = new Contraction(vab_vvvv, _a34096, _a34097, grid);
     C46->contract( "p1a,p2b,p2a,p1b", "p2a,p1b,h1a,h2b", "p1a,p2b,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 47: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 47: " << endl;
     Contraction* C47 = new Contraction(vab_oovo, ta_vo, _a19210, grid);
     C47->contract( "h2a,h1b,p2a,h2b", "p2a,h2a", "h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 48: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 48: " << endl;
     Contraction* C48 = new Contraction(vaa_oovo, tab_vvoo, _a27056, grid);
     C48->contract( "h2a,h3a,p2a,h1a", "p2a,p2b,h3a,h2b", "h2a,p2b,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 49: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 49: " << endl;
     Contraction* C49 = new Contraction(vab_ovov, tb_vo, _a29927, grid);
     C49->contract( "h2a,p2b,h1a,p1b", "p1b,h2b", "h2a,p2b,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 50: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 50: " << endl;
     Contraction* C50 = new Contraction(vbb_vovv, tb_vo, _a3775, grid);
     C50->contract( "p2b,h1b,p1b,p3b", "p1b,h2b", "p2b,h1b,p3b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 51: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 51: " << endl;
     Contraction* C51 = new Contraction(tab_vvoo, _a34382, _a34383, grid);
     C51->contract( "p1a,p1b,h1a,h1b", "h1b,p2b,p1b,h2b", "p1a,p2b,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 52: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 52: " << endl;
     Contraction* C52 = new Contraction(vab_oovv, tb_vo, _a12541, grid);
     C52->contract( "h2a,h1b,p2a,p1b", "p1b,h1b", "h2a,p2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 53: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 53: " << endl;
     Contraction* C53 = new Contraction(ta_vo, _a12541, _a18015, grid);
     C53->contract( "p2a,h1a", "h2a,p2a", "h2a,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 54: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 54: " << endl;
     Contraction* C54 = new Contraction(ta_vo, _a28769, _a34717, grid);
     C54->contract( "p1a,h2a", "h2a,p2a", "p1a,p2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 55: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 55: " << endl;
     Contraction* C55 = new Contraction(vab_ooov, tbb_vvoo, _a27055, grid);
     C55->contract( "h2a,h1b,h1a,p1b", "p2b,p1b,h2b,h1b", "h2a,p2b,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 56: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 56: " << endl;
     Contraction* C56 = new Contraction(vab_oovv, tab_vvoo, _a13021, grid);
     C56->contract( "h2a,h1b,p2a,p1b", "p2a,p1b,h2a,h2b", "h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 57: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 57: " << endl;
     Contraction* C57 = new Contraction(vaa_oovv, taa_vvoo, _a5011, grid);
     C57->contract( "h2a,h3a,p2a,p3a", "p1a,p3a,h2a,h3a", "p1a,p2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 58: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 58: " << endl;
     Contraction* C58 = new Contraction(vab_oovo, ta_vo, _a10295, grid);
     C58->contract( "h2a,h1b,p2a,h2b", "p2a,h1a", "h2a,h1b,h2b,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 59: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 59: " << endl;
     Contraction* C59 = new Contraction(fb_ov, tb_vo, _a19380, grid);
     C59->contract( "h1b,p1b", "p1b,h2b", "h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 60: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 60: " << endl;
     Contraction* C60 = new Contraction(vab_ovvv, tb_vo, _a3805, grid);
     C60->contract( "h2a,p2b,p2a,p1b", "p1b,h2b", "h2a,p2b,p2a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 61: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 61: " << endl;
     Contraction* C61 = new Contraction(vab_oooo, tb_vo, _a34780, grid);
     C61->contract( "h2a,h1b,h1a,h2b", "p2b,h1b", "h2a,p2b,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 62: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 62: " << endl;
     Contraction* C62 = new Contraction(vab_ooov, tb_vo, _a19120, grid);
     C62->contract( "h2a,h1b,h1a,p1b", "p1b,h1b", "h2a,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 63: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 63: " << endl;
     Contraction* C63 = new Contraction(tab_vvoo, _a34239, _a34240, grid);
     C63->contract( "p3a,p2b,h2a,h2b", "p1a,h2a,p3a,h1a", "p2b,p1a,h2b,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 64: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 64: " << endl;
     Contraction* C64 = new Contraction(vab_ooov, tb_vo, _a10265, grid);
     C64->contract( "h2a,h1b,h1a,p1b", "p1b,h2b", "h2a,h1b,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 65: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 65: " << endl;
     Contraction* C65 = new Contraction(ta_vo, _a27051, _a30369, grid);
     C65->contract( "p1a,h2a", "h2a,h1b,h1a,h2b", "p1a,h1b,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 66: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 66: " << endl;
     Contraction* C66 = new Contraction(vbb_vovv, tb_vo, _a9515, grid);
     C66->contract( "p2b,h1b,p1b,p3b", "p1b,h1b", "p2b,p3b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 67: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 67: " << endl;
     Contraction* C67 = new Contraction(tab_vvoo, _a34888, _a34889, grid);
     C67->contract( "p1a,p1b,h1a,h2b", "p2b,p1b", "p1a,p2b,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 68: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 68: " << endl;
     Contraction* C68 = new Contraction(taa_vvoo, _a34809, _a34810, grid);
     C68->contract( "p1a,p2a,h1a,h2a", "h2a,p2b,p2a,h2b", "p1a,p2b,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 69: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 69: " << endl;
     Contraction* C69 = new Contraction(vab_vvvo, ta_vo, _a10345, grid);
     C69->contract( "p1a,p2b,p2a,h2b", "p2a,h1a", "p1a,p2b,h2b,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 70: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 70: " << endl;
     Contraction* C70 = new Contraction(vab_oovv, tab_vvoo, _a3125, grid);
     C70->contract( "h2a,h1b,p2a,p1b", "p1a,p1b,h2a,h2b", "h1b,p1a,p2a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 71: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 71: " << endl;
     Contraction* C71 = new Contraction(tab_vvoo, _a34520, _a34521, grid);
     C71->contract( "p2a,p2b,h1a,h1b", "h1b,p1a,p2a,h2b", "p2b,p1a,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 72: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 72: " << endl;
     Contraction* C72 = new Contraction(ta_vo, _a3125, _a23391, grid);
     C72->contract( "p2a,h1a", "h1b,p1a,p2a,h2b", "h1b,p1a,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 73: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 73: " << endl;
     Contraction* C73 = new Contraction(vab_oovv, tab_vvoo, _a4861, grid);
     C73->contract( "h2a,h1b,p2a,p1b", "p1a,p1b,h2a,h1b", "p1a,p2a");
     
-    if(rank==0 && DEBUG_T) tab_vvoo->printInfo();
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 74: " << endl;
+    if(rank==RRANK && DEBUG_T) tab_vvoo->printInfo();
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 74: " << endl;
     Contraction* C74 = new Contraction(tab_vvoo, _a34896, _a34897, grid);
     C74->contract( "p2a,p2b,h1a,h2b", "p1a,p2a", "p2b,p1a,h1a,h2b");
-    //if(rank==0 && DEBUG_T) taa_vvoo->printInfo();
-    //if(rank==0 && DEBUG_T) vaa_oovv->printInfo();
+    //if(rank==RRANK && DEBUG_T) taa_vvoo->printInfo();
+    //if(rank==RRANK && DEBUG_T) vaa_oovv->printInfo();
     
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 75: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 75: " << endl;
     Contraction* C75 = new Contraction(vab_oovv, tab_vvoo, _a4920, grid);
     C75->contract( "h2a,h1b,p2a,p1b", "p2a,p1b,h1a,h2b", "h2a,h1b,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 76: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 76: " << endl;
     Contraction* C76 = new Contraction(ta_vo, _a4920, _a26518, grid);
     C76->contract( "p1a,h2a", "h2a,h1b,h1a,h2b", "p1a,h1b,h1a,h2b");
     
-      if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 77: " << endl;
+      if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 77: " << endl;
     Contraction* C77 = new Contraction(tab_vvoo, _a28178, _a29111, grid);
     C77->contract( "p1a,p3b,h1a,h2b", "h1b,p3b", "p1a,h1b,h1a,h2b");
-    if(rank==0 && DEBUG_T) tab_vvoo->printInfo();
+    if(rank==RRANK && DEBUG_T) tab_vvoo->printInfo();
     
-    //if(rank==0 && DEBUG_T) grid->printInfo();
-    //if(rank==0 && DEBUG_T) grid1->printInfo();
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 78: " << endl;
+    //if(rank==RRANK && DEBUG_T) grid->printInfo();
+    //if(rank==RRANK && DEBUG_T) grid1->printInfo();
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 78: " << endl;
     Contraction* C78 = new Contraction(vaa_oovv, taa_vvoo, _a14870, grid);
     C78->contract( "h2a,h3a,p2a,p3a", "p2a,p3a,h1a,h2a", "h3a,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 79: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 79: " << endl;
     Contraction* C79 = new Contraction(tab_vvoo, _a34932, _a34933, grid);
     C79->contract( "p1a,p2b,h2a,h2b", "h2a,h1a", "p1a,p2b,h2b,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 80: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 80: " << endl;
     Contraction* C80 = new Contraction(vbb_oovo, tb_vo, _a19180, grid);
     C80->contract( "h1b,h3b,p1b,h2b", "p1b,h1b", "h3b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 81: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 81: " << endl;
     Contraction* C81 = new Contraction(tab_vvoo, _a34924, _a34925, grid);
     C81->contract( "p1a,p2b,h1a,h1b", "h1b,h2b", "p1a,p2b,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 82: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 82: " << endl;
     Contraction* C82 = new Contraction(ta_vo, _a25416, _a34676, grid);
     C82->contract( "p2a,h1a", "h2a,p2b,p2a,h2b", "h2a,p2b,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 83: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 83: " << endl;
     Contraction* C83 = new Contraction(ta_vo, _a34952, _a34953, grid);
     C83->contract( "p1a,h2a", "p2b,h2a,h2b,h1a", "p1a,p2b,h2b,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 84: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 84: " << endl;
     Contraction* C84 = new Contraction(tbb_vvoo, _a34463, _a34464, grid);
     C84->contract( "p2b,p1b,h2b,h1b", "h1b,p1a,p1b,h1a", "p2b,p1a,h2b,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 85: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 85: " << endl;
     Contraction* C85 = new Contraction(ta_vo, _a5246, _a9160, grid);
     C85->contract( "p2a,h1a", "h2a,h1b,p2a,h2b", "h2a,h1b,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 86: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 86: " << endl;
     Contraction* C86 = new Contraction(tab_vvoo, _a34878, _a34879, grid);
     C86->contract( "p1a,p2b,h2a,h1b", "h2a,h1b,h1a,h2b", "p1a,p2b,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 87: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 87: " << endl;
     Contraction* C87 = new Contraction(ta_vo, _a9160, _a29106, grid);
     C87->contract( "p1a,h2a", "h2a,h1b,h1a,h2b", "p1a,h1b,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 88: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 88: " << endl;
     Contraction* C88 = new Contraction(tb_vo, _a34944, _a34945, grid);
     C88->contract( "p2b,h1b", "h1b,p1a,h1a,h2b", "p2b,p1a,h1a,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 89: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 89: " << endl;
     Contraction* C89 = new Contraction(vaa_vovv, taa_vvoo, _a4601, grid);
     C89->contract( "p1a,h3a,p3a,p4a", "p3a,p4a,h1a,h2a", "p1a,h3a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 90: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 90: " << endl;
     Contraction* C90 = new Contraction(vaa_oovv, taa_vvoo, _a10790, grid);
     C90->contract( "h3a,h4a,p3a,p4a", "p3a,p4a,h1a,h2a", "h3a,h4a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 91: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 91: " << endl;
     Contraction* C91 = new Contraction(vaa_vovv, ta_vo, _a9455, grid);
     C91->contract( "p1a,h2a,p2a,p3a", "p2a,h2a", "p1a,p3a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 92: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 92: " << endl;
     Contraction* C92 = new Contraction(vaa_oovo, taa_vvoo, _a9891, grid);
     C92->contract( "h3a,h4a,p3a,h1a", "p2a,p3a,h2a,h4a", "h3a,p2a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 93: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 93: " << endl;
     Contraction* C93 = new Contraction(ta_vo, _a9891, _a9894, grid);
     C93->contract( "p1a,h3a", "h3a,p2a,h1a,h2a", "p1a,p2a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 94: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 94: " << endl;
     Contraction* C94 = new Contraction(vaa_oovv, taa_vvoo, _a46510, grid);
     C94->contract( "h3a,h4a,p3a,p4a", "p3a,p4a,h2a,h4a", "h3a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 95: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 95: " << endl;
     Contraction* C95 = new Contraction(taa_vvoo, _a9395, _a10354, grid);
     C95->contract( "p2a,p3a,h1a,h2a", "p1a,p3a", "p2a,p1a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 96: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 96: " << endl;
     Contraction* C96 = new Contraction(fa_ov, taa_vvoo, _a18991, grid);
     C96->contract( "h3a,p3a", "p2a,p3a,h1a,h2a", "h3a,p2a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 97: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 97: " << endl;
     Contraction* C97 = new Contraction(vaa_vvvo, ta_vo, _a10540, grid);
     C97->contract( "p1a,p2a,p3a,h1a", "p3a,h2a", "p1a,p2a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 98: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 98: " << endl;
     Contraction* C98 = new Contraction(vab_ooov, tab_vvoo, _a9861, grid);
     C98->contract( "h3a,h1b,h1a,p1b", "p2a,p1b,h2a,h1b", "h3a,p2a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 99: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 99: " << endl;
     Contraction* C99 = new Contraction(ta_vo, _a9861, _a9864, grid);
     C99->contract( "p1a,h3a", "h3a,p2a,h1a,h2a", "p1a,p2a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 100: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 100: " << endl;
     Contraction* C100 = new Contraction(vaa_oovo, ta_vo, _a10910, grid);
     C100->contract( "h3a,h4a,p3a,h1a", "p3a,h2a", "h3a,h4a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 101: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 101: " << endl;
     Contraction* C101 = new Contraction(vaa_oovo, ta_vo, _a42744, grid);
     C101->contract( "h4a,h3a,p3a,h2a", "p3a,h4a", "h3a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 102: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 102: " << endl;
     Contraction* C102 = new Contraction(tab_vvoo, _a3655, _a3869, grid);
     C102->contract( "p2a,p1b,h2a,h1b", "p1a,h1b,p1b,h1a", "p2a,p1a,h2a,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 103: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 103: " << endl;
     Contraction* C103 = new Contraction(vaa_oovv, ta_vo, _a10551, grid);
     C103->contract( "h3a,h4a,p3a,p4a", "p4a,h2a", "h3a,h4a,p3a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 104: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 104: " << endl;
     Contraction* C104 = new Contraction(ta_vo, _a10551, _a10556, grid);
     C104->contract( "p3a,h1a", "h3a,h4a,p3a,h2a", "h3a,h4a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 105: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 105: " << endl;
     Contraction* C105 = new Contraction(taa_vvoo, _a5011, _a9818, grid);
     C105->contract( "p1a,p3a,h1a,h2a", "p2a,p3a", "p1a,p2a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 106: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 106: " << endl;
     Contraction* C106 = new Contraction(ta_vo, _a28769, _a52784, grid);
     C106->contract( "p3a,h2a", "h3a,p3a", "h3a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 107: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 107: " << endl;
     Contraction* C107 = new Contraction(tab_vvoo, _a3040, _a3283, grid);
     C107->contract( "p1a,p1b,h1a,h1b", "h1b,p2a,p1b,h2a", "p1a,p2a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 108: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 108: " << endl;
     Contraction* C108 = new Contraction(tab_vvoo, _a5130, _a5959, grid);
     C108->contract( "p2a,p1b,h2a,h1b", "h3a,h1b,p1b,h1a", "p2a,h3a,h2a,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 109: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 109: " << endl;
     Contraction* C109 = new Contraction(ta_vo, _a5959, _a5967, grid);
     C109->contract( "p1a,h3a", "p2a,h3a,h2a,h1a", "p1a,p2a,h2a,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 110: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 110: " << endl;
     Contraction* C110 = new Contraction(vab_voov, tab_vvoo, _a4490, grid);
     C110->contract( "p1a,h1b,h1a,p1b", "p2a,p1b,h2a,h1b", "p1a,p2a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 111: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 111: " << endl;
     Contraction* C111 = new Contraction(vaa_vovo, ta_vo, _a13260, grid);
     C111->contract( "p1a,h3a,p3a,h1a", "p3a,h2a", "p1a,h3a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 112: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 112: " << endl;
     Contraction* C112 = new Contraction(vaa_vovo, taa_vvoo, _a4495, grid);
     C112->contract( "p1a,h3a,p3a,h1a", "p2a,p3a,h2a,h3a", "p1a,p2a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 113: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 113: " << endl;
     Contraction* C113 = new Contraction(ta_vo, _a13260, _a13265, grid);
     C113->contract( "p2a,h3a", "p1a,h3a,h1a,h2a", "p2a,p1a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 114: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 114: " << endl;
     Contraction* C114 = new Contraction(ta_vo, _a3685, _a6775, grid);
     C114->contract( "p4a,h2a", "p1a,h3a,p4a,h1a", "p1a,h3a,h2a,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 115: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 115: " << endl;
     Contraction* C115 = new Contraction(taa_vvoo, _a3685, _a3919, grid);
     C115->contract( "p2a,p4a,h2a,h3a", "p1a,h3a,p4a,h1a", "p2a,p1a,h2a,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 116: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 116: " << endl;
     Contraction* C116 = new Contraction(taa_vvoo, _a9455, _a10379, grid);
     C116->contract( "p2a,p4a,h1a,h2a", "p1a,p4a", "p2a,p1a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 117: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 117: " << endl;
     Contraction* C117 = new Contraction(taa_vvoo, _a4861, _a5043, grid);
     C117->contract( "p1a,p3a,h1a,h2a", "p2a,p3a", "p1a,p2a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 118: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 118: " << endl;
     Contraction* C118 = new Contraction(vaa_oovv, ta_vo, _a12666, grid);
     C118->contract( "h2a,h3a,p2a,p3a", "p2a,h3a", "h2a,p3a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 119: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 119: " << endl;
     Contraction* C119 = new Contraction(taa_vvoo, _a12666, _a15737, grid);
     C119->contract( "p2a,p4a,h1a,h2a", "h3a,p4a", "p2a,h3a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 120: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 120: " << endl;
     Contraction* C120 = new Contraction(tab_vvoo, _a3197, _a3200, grid);
     C120->contract( "p1a,p1b,h1a,h1b", "h1b,p2a,p1b,h2a", "p1a,p2a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 121: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 121: " << endl;
     Contraction* C121 = new Contraction(ta_vo, _a6775, _a6788, grid);
     C121->contract( "p2a,h3a", "p1a,h3a,h2a,h1a", "p2a,p1a,h2a,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 122: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 122: " << endl;
     Contraction* C122 = new Contraction(vaa_oooo, ta_vo, _a42703, grid);
     C122->contract( "h3a,h4a,h1a,h2a", "p1a,h3a", "h4a,p1a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 123: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 123: " << endl;
     Contraction* C123 = new Contraction(taa_vvoo, _a12541, _a15498, grid);
     C123->contract( "p2a,p3a,h1a,h2a", "h3a,p3a", "p2a,h3a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 124: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 124: " << endl;
     Contraction* C124 = new Contraction(taa_vvoo, _a121238, _a121239, grid);
     C124->contract( "p1a,p2a,h1a,h3a", "h3a,h2a", "p1a,p2a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 125: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 125: " << endl;
     Contraction* C125 = new Contraction(vaa_vvvv, taa_vvoo, _a3645, grid);
     C125->contract( "p1a,p2a,p3a,p4a", "p3a,p4a,h1a,h2a", "p1a,p2a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 126: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 126: " << endl;
     Contraction* C126 = new Contraction(taa_vvoo, _a107369, _a107370, grid);
     C126->contract( "p1a,p2a,h2a,h3a", "h3a,h1a", "p1a,p2a,h2a,h1a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 127: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 127: " << endl;
     Contraction* C127 = new Contraction(ta_vo, _a45798, _a48054, grid);
     C127->contract( "p2a,h4a", "h3a,h4a,h1a,h2a", "p2a,h3a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 128: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 128: " << endl;
     Contraction* C128 = new Contraction(ta_vo, _a86275, _a86276, grid);
     C128->contract( "p1a,h3a", "p2a,h3a,h1a,h2a", "p1a,p2a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 129: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 129: " << endl;
     Contraction* C129 = new Contraction(taa_vvoo, _a57517, _a57518, grid);
     C129->contract( "p1a,p2a,h3a,h4a", "h3a,h4a,h1a,h2a", "p1a,p2a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 130: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 130: " << endl;
     Contraction* C130 = new Contraction(vaa_oovv, taa_vvoo, _a3331, grid);
     C130->contract( "h3a,h4a,p3a,p4a", "p2a,p4a,h2a,h4a", "h3a,p2a,p3a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 131: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 131: " << endl;
     Contraction* C131 = new Contraction(ta_vo, _a3331, _a8218, grid);
     C131->contract( "p3a,h1a", "h3a,p2a,p3a,h2a", "h3a,p2a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 132: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 132: " << endl;
     Contraction* C132 = new Contraction(ta_vo, _a8218, _a8227, grid);
     C132->contract( "p1a,h3a", "h3a,p2a,h1a,h2a", "p1a,p2a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 133: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 133: " << endl;
     Contraction* C133 = new Contraction(taa_vvoo, _a3331, _a3334, grid);
     C133->contract( "p1a,p3a,h1a,h3a", "h3a,p2a,p3a,h2a", "p1a,p2a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 134: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 134: " << endl;
     Contraction* C134 = new Contraction(fa_vv, taa_vvoo, _a10530, grid);
     C134->contract( "p1a,p3a", "p2a,p3a,h1a,h2a", "p1a,p2a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 135: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 135: " << endl;
     Contraction* C135 = new Contraction(ta_vo, _a93335, _a93336, grid);
     C135->contract( "p2a,h3a", "h3a,p1a,h1a,h2a", "p2a,p1a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 136: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 136: " << endl;
     Contraction* C136 = new Contraction(vaa_vvvv, ta_vo, _a4511, grid);
     C136->contract( "p1a,p2a,p3a,p4a", "p4a,h2a", "p1a,p2a,p3a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 137: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 137: " << endl;
     Contraction* C137 = new Contraction(ta_vo, _a4511, _a4514, grid);
     C137->contract( "p3a,h1a", "p1a,p2a,p3a,h2a", "p1a,p2a,h1a,h2a");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 138: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 138: " << endl;
     Contraction* C138 = new Contraction(tb_vo, _a3029, _a7197, grid);
     C138->contract( "p3b,h1b", "h3b,p2b,p3b,h2b", "h3b,p2b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 139: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 139: " << endl;
     Contraction* C139 = new Contraction(tab_vvoo, _a3071, _a3543, grid);
     C139->contract( "p1a,p1b,h1a,h1b", "h1a,p2b,p1a,h2b", "p1b,p2b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 140: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 140: " << endl;
     Contraction* C140 = new Contraction(vbb_vovo, tb_vo, _a13350, grid);
     C140->contract( "p1b,h3b,p3b,h1b", "p3b,h2b", "p1b,h3b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 141: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 141: " << endl;
     Contraction* C141 = new Contraction(tbb_vvoo, _a4981, _a10043, grid);
     C141->contract( "p1b,p3b,h1b,h2b", "p2b,p3b", "p1b,p2b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 142: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 142: " << endl;
     Contraction* C142 = new Contraction(tbb_vvoo, _a4801, _a5089, grid);
     C142->contract( "p1b,p3b,h1b,h2b", "p2b,p3b", "p1b,p2b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 143: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 143: " << endl;
     Contraction* C143 = new Contraction(tb_vo, _a3023, _a8628, grid);
     C143->contract( "p3b,h1b", "h3b,p2b,p3b,h2b", "h3b,p2b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 144: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 144: " << endl;
     Contraction* C144 = new Contraction(fb_ov, tbb_vvoo, _a19071, grid);
     C144->contract( "h3b,p3b", "p2b,p3b,h1b,h2b", "h3b,p2b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 145: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 145: " << endl;
     Contraction* C145 = new Contraction(vbb_vvvo, tb_vo, _a10545, grid);
     C145->contract( "p1b,p2b,p3b,h1b", "p3b,h2b", "p1b,p2b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 146: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 146: " << endl;
     Contraction* C146 = new Contraction(vbb_vovo, tbb_vvoo, _a4500, grid);
     C146->contract( "p1b,h3b,p3b,h1b", "p2b,p3b,h2b,h3b", "p1b,p2b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 147: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 147: " << endl;
     Contraction* C147 = new Contraction(vab_ovvo, tab_vvoo, _a4505, grid);
     C147->contract( "h1a,p1b,p1a,h1b", "p1a,p2b,h1a,h2b", "p1b,p2b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 148: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 148: " << endl;
     Contraction* C148 = new Contraction(vbb_vvvv, tb_vo, _a4541, grid);
     C148->contract( "p1b,p2b,p3b,p4b", "p4b,h2b", "p1b,p2b,p3b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 149: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 149: " << endl;
     Contraction* C149 = new Contraction(tb_vo, _a4541, _a4544, grid);
     C149->contract( "p3b,h1b", "p1b,p2b,p3b,h2b", "p1b,p2b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 150: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 150: " << endl;
     Contraction* C150 = new Contraction(tbb_vvoo, _a3775, _a4209, grid);
     C150->contract( "p2b,p4b,h2b,h3b", "p1b,h3b,p4b,h1b", "p2b,p1b,h2b,h1b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 151: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 151: " << endl;
     Contraction* C151 = new Contraction(tbb_vvoo, _a12781, _a16377, grid);
     C151->contract( "p2b,p4b,h1b,h2b", "h3b,p4b", "p2b,h3b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 152: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 152: " << endl;
     Contraction* C152 = new Contraction(tb_vo, _a13350, _a13355, grid);
     C152->contract( "p2b,h3b", "p1b,h3b,h1b,h2b", "p2b,p1b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 153: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 153: " << endl;
     Contraction* C153 = new Contraction(tbb_vvoo, _a9575, _a10469, grid);
     C153->contract( "p2b,p3b,h1b,h2b", "p1b,p3b", "p2b,p1b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 154: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 154: " << endl;
     Contraction* C154 = new Contraction(vbb_oovv, tbb_vvoo, _a10850, grid);
     C154->contract( "h3b,h4b,p3b,p4b", "p3b,p4b,h1b,h2b", "h3b,h4b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 155: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 155: " << endl;
     Contraction* C155 = new Contraction(tbb_vvoo, _a12895, _a16595, grid);
     C155->contract( "p2b,p3b,h1b,h2b", "h3b,p3b", "p2b,h3b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 156: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 156: " << endl;
     Contraction* C156 = new Contraction(vbb_oovo, tb_vo, _a11010, grid);
     C156->contract( "h3b,h4b,p3b,h1b", "p3b,h2b", "h3b,h4b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 157: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 157: " << endl;
     Contraction* C157 = new Contraction(vbb_oovo, tbb_vvoo, _a10086, grid);
     C157->contract( "h3b,h4b,p3b,h1b", "p2b,p3b,h2b,h4b", "h3b,p2b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 158: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 158: " << endl;
     Contraction* C158 = new Contraction(tb_vo, _a10086, _a10089, grid);
     C158->contract( "p1b,h3b", "h3b,p2b,h1b,h2b", "p1b,p2b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 159: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 159: " << endl;
     Contraction* C159 = new Contraction(tb_vo, _a7197, _a7206, grid);
     C159->contract( "p1b,h3b", "h3b,p2b,h1b,h2b", "p1b,p2b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 160: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 160: " << endl;
     Contraction* C160 = new Contraction(tb_vo, _a8628, _a8637, grid);
     C160->contract( "p1b,h3b", "h3b,p2b,h1b,h2b", "p1b,p2b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 161: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 161: " << endl;
     Contraction* C161 = new Contraction(vbb_vovv, tbb_vvoo, _a4701, grid);
     C161->contract( "p1b,h3b,p3b,p4b", "p3b,p4b,h1b,h2b", "p1b,h3b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 162: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 162: " << endl;
     Contraction* C162 = new Contraction(tab_vvoo, _a3805, _a4259, grid);
     C162->contract( "p1a,p2b,h1a,h2b", "h1a,p1b,p1a,h1b", "p2b,p1b,h2b,h1b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 163: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 163: " << endl;
     Contraction* C163 = new Contraction(vbb_vvvv, tbb_vvoo, _a3650, grid);
     C163->contract( "p1b,p2b,p3b,p4b", "p3b,p4b,h1b,h2b", "p1b,p2b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 164: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 164: " << endl;
     Contraction* C164 = new Contraction(vbb_oovv, tb_vo, _a10671, grid);
     C164->contract( "h3b,h4b,p3b,p4b", "p4b,h2b", "h3b,h4b,p3b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 165: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 165: " << endl;
     Contraction* C165 = new Contraction(tbb_vvoo, _a3029, _a3499, grid);
     C165->contract( "p1b,p3b,h1b,h3b", "h3b,p2b,p3b,h2b", "p1b,p2b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 166: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 166: " << endl;
     Contraction* C166 = new Contraction(tb_vo, _a10671, _a10676, grid);
     C166->contract( "p3b,h1b", "h3b,h4b,p3b,h2b", "h3b,h4b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 167: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 167: " << endl;
     Contraction* C167 = new Contraction(tbb_vvoo, _a9515, _a10444, grid);
     C167->contract( "p2b,p4b,h1b,h2b", "p1b,p4b", "p2b,p1b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 168: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 168: " << endl;
     Contraction* C168 = new Contraction(tbb_vvoo, _a3023, _a3473, grid);
     C168->contract( "p1b,p3b,h1b,h3b", "h3b,p2b,p3b,h2b", "p1b,p2b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 169: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 169: " << endl;
     Contraction* C169 = new Contraction(vab_oovo, tab_vvoo, _a10116, grid);
     C169->contract( "h1a,h3b,p1a,h1b", "p1a,p2b,h1a,h2b", "h3b,p2b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 170: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 170: " << endl;
     Contraction* C170 = new Contraction(tb_vo, _a10116, _a10119, grid);
     C170->contract( "p1b,h3b", "h3b,p2b,h1b,h2b", "p1b,p2b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 171: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 171: " << endl;
     Contraction* C171 = new Contraction(vbb_oovv, tbb_vvoo, _a174692, grid);
     C171->contract( "h3b,h4b,p3b,p4b", "p3b,p4b,h1b,h3b", "h4b,h1b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 172: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 172: " << endl;
     Contraction* C172 = new Contraction(tbb_vvoo, _a241201, _a241202, grid);
     C172->contract( "p1b,p2b,h2b,h3b", "h3b,h1b", "p1b,p2b,h2b,h1b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 173: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 173: " << endl;
     Contraction* C173 = new Contraction(tbb_vvoo, _a254814, _a254815, grid);
     C173->contract( "p1b,p2b,h1b,h3b", "h3b,h2b", "p1b,p2b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 174: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 174: " << endl;
     Contraction* C174 = new Contraction(vbb_oooo, tb_vo, _a177605, grid);
     C174->contract( "h3b,h4b,h1b,h2b", "p1b,h3b", "h4b,p1b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 175: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 175: " << endl;
     Contraction* C175 = new Contraction(tb_vo, _a227425, _a227426, grid);
     C175->contract( "p2b,h3b", "h3b,p1b,h1b,h2b", "p2b,p1b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 176: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 176: " << endl;
     Contraction* C176 = new Contraction(tb_vo, _a180621, _a182867, grid);
     C176->contract( "p2b,h4b", "h3b,h4b,h1b,h2b", "p2b,h3b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 177: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 177: " << endl;
     Contraction* C177 = new Contraction(tbb_vvoo, _a192257, _a192258, grid);
     C177->contract( "p1b,p2b,h3b,h4b", "h3b,h4b,h1b,h2b", "p1b,p2b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 178: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 178: " << endl;
     Contraction* C178 = new Contraction(tb_vo, _a220495, _a220496, grid);
     C178->contract( "p1b,h3b", "p2b,h3b,h1b,h2b", "p1b,p2b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 179: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 179: " << endl;
     Contraction* C179 = new Contraction(fb_vv, tbb_vvoo, _a10535, grid);
     C179->contract( "p1b,p3b", "p2b,p3b,h1b,h2b", "p1b,p2b,h1b,h2b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 180: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 180: " << endl;
     Contraction* C180 = new Contraction(tb_vo, _a3775, _a7785, grid);
     C180->contract( "p4b,h2b", "p1b,h3b,p4b,h1b", "p1b,h3b,h2b,h1b");
 
-    if(rank==0 && DEBUG_T) cout << endl << endl << "Contraction 181: " << endl;
+    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 181: " << endl;
     Contraction* C181 = new Contraction(tb_vo, _a7785, _a7798, grid);
     C181->contract( "p2b,h3b", "p1b,h3b,h2b,h1b", "p2b,p1b,h2b,h1b");
    
     time += MPI_Wtime();
     MPI_Reduce(&time, &max_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-    if(rank==0) cout<<endl<<endl<<"Total CAST CCSD Time = " << max_time << " seconds" << endl;
+    if(rank==RRANK) cout<<endl<<endl<<"Total CAST CCSD Time = " << max_time << " seconds" << endl;
        
     MPI_Finalize();
 }

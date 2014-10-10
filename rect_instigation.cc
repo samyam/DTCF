@@ -14,14 +14,14 @@ namespace RRR{
 //from index to processor dimension
     int Tensor::get_rect_bouncers(int contr_dim, int contr_idx,  int** &senders)
     {
-
-
+	int checkpoint = 0;
+	if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Get Rect Bouncers Checkpoint : "<<(checkpoint++)<<endl;
 
 	//if this processor is not an instigator
 	if(contr_idx % pgrid[index_dimension_map[contr_dim]] != proc_addr[index_dimension_map[contr_dim]])
 	    return 0;
 
-
+	if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Get Rect Bouncers Checkpoint : "<<(checkpoint++)<<endl;
 	//In case where the contraction index dimension is not part of any symmetry group
 	if (SG_index_map[contr_dim] > 1){
 	    int num_bouncers = 1;
@@ -31,14 +31,22 @@ namespace RRR{
 	    return num_bouncers;	    
 	}
 
+	if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Get Rect Bouncers Checkpoint : "<<(checkpoint++)<<endl;
+
 	// Get the list of all dimensions which belong to the same symmetry group
 	// as the contracting index
 
 	list<int>* br_index = get_bounce_indx(contr_dim);
 	int num_matches = br_index->size();
+	
 
-	int* match = new int[grid_dims];
-	memset(match,0,sizeof(int)*grid_dims);
+	
+	if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Get Rect Bouncers Checkpoint : "<<(checkpoint++)<<endl;
+
+	int* match = new int[dims];
+	memset(match,0,sizeof(int)*dims);
+
+	if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Get Rect Bouncers Checkpoint : "<<(checkpoint++)<<endl;
 
 	//get the matching indices belonging to the same symmetry
 	//group as an array.  The rest of the code uses an array
@@ -50,6 +58,8 @@ namespace RRR{
 	    match[*it] = 1;
 
 	}
+	
+	if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Get Rect Bouncers Checkpoint : "<<(checkpoint++)<<endl;
 
 	//stores the permutation used for altering the block
 	//address due to symmetry
@@ -82,7 +92,8 @@ namespace RRR{
 	    // If a receiver is identified for this dimension
 	    if(match[i])
 	    {
-
+		
+		if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Match : "<<i<<" Get Rect Bouncers Checkpoint : "<<(checkpoint++)<<endl;
 		senders_for_matching_index = 1;
 		sender_map[count] = new int[grid_dims];
 		
@@ -271,6 +282,9 @@ namespace RRR{
 	) 
     {
 
+	int checkpoint = 0;
+	if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Send Instigate Checkpoint : "<<(checkpoint++)<<endl;
+
 
 	//initialize count variables that are either output variables or
 	//private/public variables to this class
@@ -284,11 +298,13 @@ namespace RRR{
 	int** receivers;
 	int num_receivers;
 
+	if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Send Instigate Checkpoint : "<<(checkpoint++)<<endl;
 	// Find matching indices that are part of the same symmetry group
 	// that hold the current contraction index along dimension contr_dim
 	num_receivers = X->get_receivers_rect(contr_dim, contr_idx, receivers, matching_indices, num_matches);
 	if(DEBUG_I && rank == RRANK && contr_dim == 2) cout<<" "<<endl<<"Processor : "<<rank<<". The number of receivers are :"<<num_receivers<<endl;
 	
+	if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Send Instigate Checkpoint : "<<(checkpoint++)<<endl;
 	//for each reciever rank, it stores a list of all the blocks that
 	//will be sent to the receiver. The first part of the pair stores
 	//matching index( not really the index itselfbut just a counter for
@@ -300,6 +316,8 @@ namespace RRR{
 	//variable used for debugging. It is a grid storing receivers for each rank
 	int* receiver_grid = new int[num_procs*num_procs];
 	memset(receiver_grid,0,sizeof(int)*num_procs*num_procs);
+
+	if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Send Instigate Checkpoint : "<<(checkpoint++)<<endl;
 	
 	//initialize the list of tiles to be sent to each of the
 	//instigators this list of receivers may be larger than
@@ -325,6 +343,8 @@ namespace RRR{
 	    if(rank == RRANK && DEBUG_I && contr_dim == 2) cout<<"Rank : "<<rank<<".Receivers rank : "<<receiver_rank<<" Receiver str addr "<<grid->get_proc_addr_str(grid->get_proc_rank(receivers[i]))<<endl<<" "<<endl;
 	    
 	}
+
+	if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Send Instigate Checkpoint : "<<(checkpoint++)<<endl;
 	
 
 	
@@ -345,6 +365,7 @@ namespace RRR{
 	    }
 	}
 	
+	if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Send Instigate Checkpoint : "<<(checkpoint++)<<endl;
 
 	if(rank == RRANK && DEBUG_T) cout<<"May rank is "<<rank<<" and I have "<<msg_receiver_count.size()<<" receivers."<<endl;
 
@@ -728,6 +749,7 @@ namespace RRR{
 	// Find all the processors to get the data from
 	int** bouncers;
 	int* senders;
+	if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Instigate Checkpoint : "<<(checkpoint++)<<endl;
 	num_senders = X->get_rect_bouncers(contr_dim, contr_idx, bouncers);
 
 	if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Instigate Checkpoint : "<<(checkpoint++)<<endl;
@@ -735,21 +757,24 @@ namespace RRR{
 
 	grid->get_proc_ranks(num_senders, bouncers, senders);
 
+	if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Instigate Checkpoint : "<<(checkpoint++)<<endl;
 	// Free memory allocated for bouncer addresses, now that ranks are stored
 	for(int i=0; i<num_senders; i++) 
 	{
 	    delete[] bouncers[i];
 	}
+	if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Instigate Checkpoint : "<<(checkpoint++)<<endl;
 
 	if (num_senders > 0)
 	    delete[] bouncers;
+	if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Instigate Checkpoint : "<<(checkpoint++)<<endl;
 
 	//there mught be redundant ranks in senders. By storing in a set, we
 	//only keep unique ranks
 	set<int> unique_senders (senders, senders+num_senders);
 	num_senders = unique_senders.size();
 	senders = new int[num_senders];
-	
+	if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Instigate Checkpoint : "<<(checkpoint++)<<endl;
 	
 	int* sender_grid = new int[num_procs*num_procs];
 	memset(sender_grid, 0, sizeof(int) * num_procs*num_procs);
