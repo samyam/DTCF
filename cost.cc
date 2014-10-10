@@ -946,7 +946,7 @@ void cost::best_Cost_GGrid_4Dc(int* &curGrid, int* &curidmapA, int* &curidmapB, 
 		
 		if(!symB1f && !symB2f)
 		{
-			curidmapB[extB[0]]=lar-1; curidmapB[contB[0]]=lar; curidmapB[contB[1]]=4-lar; curidmapB[contB[2]]=4-lar-1;
+			curidmapB[extB[0]]=lar-1; curidmapB[contB[0]]=lar; curidmapB[contB[1]]=4-lar-1; curidmapB[contB[2]]=4-lar;
 			curidmapC[0]=lar; curidmapC[1]=lar-1;
 		}
 		else if(symB1f && B->tensor_str.at(extB[0]) == 'a')
