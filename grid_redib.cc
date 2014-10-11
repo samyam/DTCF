@@ -588,8 +588,9 @@ if(DDbug == 1) cout<<"Replication dimension is"<<rep_dim;
 
 
 	int count = T->num_actual_tiles;
+	
 
-        MPI_Bcast(&count, 1, MPI_INT,dim_group_ranks[0],new_comm);
+        MPI_Bcast(&count, 1, MPI_INT,0,new_comm);
 
 	//  //cout<<count<<"at rank"<<T->rank<<endl;
 
