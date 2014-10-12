@@ -2,7 +2,7 @@
 #include "tensor.h"
 
 #define DEBUG_CHECK_POINT 0
-#define RRANK 8
+#define RRANK 1
 
 #define DDbug 0
 
@@ -175,6 +175,7 @@ void GridRedistribute::redistribute()
 	if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Redistribute Checkpoint " <<(checkpoint++)<< endl; 
 
         T->num_actual_tiles = block_count;
+	if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Redistribute Checkpoint " <<(checkpoint++)<<"T->num_actual_tiles"<<T->num_actual_tiles<< endl; 
         delete[] T->tensor_tiles;
         delete[] T->tile_address;
         T->tensor_tiles = new double[T->block_size * block_count];
@@ -207,6 +208,7 @@ void GridRedistribute::redistribute()
 	    delete[] rd->block_addrs;
         }
 	if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Redistribute Checkpoint " <<(checkpoint++)<< endl;
+	if(rank==RRANK && DEBUG_CHECK_POINT) print_tile_addr(8,T->tile_address);
         // Update proc address in tensor object
 	delete[] T->proc_addr;
 	T->proc_addr = new int[grid_dims+1];
@@ -216,6 +218,8 @@ void GridRedistribute::redistribute()
 {	
 	replicate(repl_dims[i]);
 }
+	if(rank==RRANK && DEBUG_CHECK_POINT) cout <<"T->num_actual_tiles"<<T->num_actual_tiles<< endl; 
+	if(rank==RRANK && DEBUG_CHECK_POINT) print_tile_addr(8,T->tile_address);
 	if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Redistribute Checkpoint " <<(checkpoint++)<< endl;
 
         // Free old index table
@@ -234,8 +238,9 @@ void GridRedistribute::redistribute()
         // Recompute index_table
         T->init_index_table();
 	if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Redistribute Checkpoint " <<(checkpoint++)<< endl;
+	if(rank==RRANK && DEBUG_CHECK_POINT) cout <<T->num_actual_tiles<< endl;
         T->fill_index_table();
-	
+	if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Redistribute Checkpoint " <<(checkpoint++)<< endl;
 }
 
 
@@ -595,7 +600,7 @@ if(DDbug == 1) cout<<"Replication dimension is"<<rep_dim;
 	//  //cout<<count<<"at rank"<<T->rank<<endl;
 
 	if(count>0){
-	    if(T->num_actual_tiles==0)
+	    if(T->rank!=dim_group_ranks[0])
 	    {
 		delete[] T->tensor_tiles;
 		delete[] T->tile_address;
@@ -608,8 +613,8 @@ if(DDbug == 1) cout<<"Replication dimension is"<<rep_dim;
 	    
         
 	    // Gather addresses and blocks in this dimension
-	    MPI_Bcast( T->tile_address, T->num_actual_tiles * dims, MPI_INT,dim_group_ranks[0], new_comm);
-	    MPI_Bcast( T->tensor_tiles, T->num_actual_tiles * T->block_size, MPI_DOUBLE,dim_group_ranks[0], new_comm);
+	    MPI_Bcast( T->tile_address, T->num_actual_tiles * dims, MPI_INT,0, new_comm);
+	    MPI_Bcast( T->tensor_tiles, T->num_actual_tiles * T->block_size, MPI_DOUBLE,0, new_comm);
 	}
 	if(rank==RRANK && DEBUG_CHECK_POINT) cout << "Rank : "<<rank<<". Replicate Redistribute Checkpoint " <<(checkpoint++)<< endl; 
 /*
