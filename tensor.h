@@ -106,6 +106,10 @@ namespace RRR {
 	//along O or V corresponds to.
 	/////////////////////////////////////////////////////////////////////////
 	bool enable_spatial_sym, enable_spin_sym, enable_spin_restricted;
+
+	//store if an index belongs to index O or V
+	int* O_or_V;
+	int irrep;
 	vector<int> spatial_sym[2];
 	vector<int> spin_sym[2];	
 	//////////////////////////////////////////////////////////////////////////
@@ -149,19 +153,19 @@ namespace RRR {
 	//checks non zero blocks for spatial symmetry. Do not know
 	//exactly how this works but just immitating what ctce code
 	//does
-	bool Tensor::is_spatial_non_zero(int* tile_address, int sval);
+	bool is_spatial_non_zero(int* tile_address, int sval);
 
 	//checks non zero blocks for spin symmetry. Do not know
 	//exactly how this works but just immitating what ctce code
 	//does
-	bool Tensor::is_spin_non_zero(int* tile_address);
+	bool is_spin_non_zero(int* tile_address);
 
 	//checks non zero blocks for spin symmetry. Do not know
 	//exactly how this works but just immitating what ctce code
 	//does
-	bool Tensor::is_spin_restricted_non_zero(int* tile_address, int sval);
+	bool is_spin_restricted_non_zero(int* tile_address, int sval);
 
-	bool Tensor::is_sym_non_zero(int* tile_address);
+	bool is_sym_non_zero(int* tile_address);
 
 	///////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////
@@ -265,7 +269,7 @@ namespace RRR {
 	void set_get_value(double (*value_function)(int* &indices));
 
 	//Initialize with spatial and spin symmetry
-	void initialize_with_symetry(vector<Integer> spatial_s, vector<Integer> spin_s);
+	void initialize_with_symmetry(vector<int> spatial_s[2], vector<int> spin_s[2]);
 
 	// Initializes the tensor (fills in values)
 	void initialize();
@@ -442,12 +446,12 @@ namespace RRR {
 	// Check if the address satisfies tensor symmetry criterion
 	bool satisfies_sym(int* &addr);
 
+	void set_index_name_and_type(int* index_name, int* index_type);
 
-	void set_index_name(int* index_name);
 
 	// Getter functions
 	void set_cntr_map(int dim, int value)   { cntr_map[dim] = value;}
-	void set_symmetry(bool enable_spatial, bool enable_spin, bool enable spin_restricted);       
+	void set_extra_symmetry(bool enable_spatial, bool enable_spin, bool enable_spin_restricted);       
 	int get_block_size()                    { return block_size;}
 	int* get_block_range()                  { return block_range;}
 	int  get_dims() 			{ return dims; }

@@ -315,7 +315,7 @@ namespace RRR{
 
     
     //Initialize with spatial and spin symmetry
-    void initialize_with_symmetry(vector<int> spatial_s[2], vector<int> spin_s[2]){
+    void Tensor::initialize_with_symmetry(vector<int> spatial_s[2], vector<int> spin_s[2]){
 
 	    spatial_sym[0] = spatial_s[0];
 	    spatial_sym[1] = spatial_s[1];
@@ -640,7 +640,7 @@ namespace RRR{
 	    lval ^= spatial_sym[O_or_V[i]][tile_address[i]];
 	}
 
-	return ((!enable_spatil_sym) || lval==sval);
+	return ((!enable_spatial_sym) || lval==sval);
 
     }
 
@@ -674,9 +674,9 @@ namespace RRR{
 
     bool Tensor::is_sym_non_zero(int* tile_address)
     {
-	if(!is_spatial_non_zero(tile_address)) return false;
+	if(!is_spatial_non_zero(tile_address, irrep)) return false;
 	if(!is_spin_non_zero(tile_address)) return false;
-	if(!is_spin_restricted_non_zero(tile_address)) return false;
+	if(!is_spin_restricted_non_zero(tile_address, 2*dims)) return false;
 	return true;
 
     }
@@ -709,7 +709,7 @@ namespace RRR{
 	    }
 	}
 
-	bool ret_value = is_non_zero_sym(virtual_address);
+	bool ret_value = is_sym_non_zero(virtual_address);
 
 
 	//if(rank==1) print_tile_addr(dims, virtual_address);
@@ -1334,9 +1334,15 @@ namespace RRR{
 			    }
     }
     
-    void Tensor::set_index_name(int* index_name){
-	for(int i =0; i< dims; i++)
+    //the index name corresponds to indices defined in define.h in
+    //ctce. index_type tells if an index is O or V. 0 represents O
+    //and 1 represents V
+    void Tensor::set_index_name_and_type(int* index_name, int* index_type){
+	for(int i =0; i< dims; i++){
 	    ctce_index_name[i] = index_name[i];
+
+	    O_or_V[i] = index_type[i];
+	}
     }
     
 
