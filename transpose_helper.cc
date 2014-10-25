@@ -2,7 +2,8 @@
 #include "transpose_helper.h"
 #include <iostream>
 #define DEBUG_T 0
-#define RRANK 0
+#define DEBUG_TT 0
+#define RRANK 7
 
 namespace RRR{
     using namespace std;
@@ -103,7 +104,9 @@ void create_big_matrix(Tensor* &T, double* &tensor_tiles, int* &permuted_address
     }
 
     big_matrix = new double[num_tiles * T->get_block_size()];
-    if(DEBUG_T && T->get_rank() == 0) cout<<"size created "<<num_tiles * T->get_block_size()<<endl;
+    
+    if(DEBUG_TT) cout<<"Rank : "<<T->get_rank()<<" size created "<<num_tiles * T->get_block_size()<<endl;
+
     int row_count =0;
     int column_count =0;
 

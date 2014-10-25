@@ -4,6 +4,7 @@
 namespace RRR{
     using namespace std;
 
+    
 // Constructor
     Tensor::Tensor(
 	string tnsr_str,
@@ -24,6 +25,7 @@ namespace RRR{
 
 	// Set block range
 	block_range = new int[dims];
+	ctce_index_name = new int[dims];
 	for(int i=0; i<dims; i++)
 	{
 	    block_range[i] = tensor_size[i] / virt_grid[i];
@@ -468,10 +470,10 @@ namespace RRR{
 	     iterator != index_table[dim][local_addr].end(); ++iterator) {
 
 	    //fill out virtual addresses for the set of tiles
-	      for(int i = 0; i< dims; i++)
+	    for(int i = 0; i< dims; i++)
 	    {
 		v_addr[i + dims * counter] = tile_address[i+(*iterator)*dims];
-		}
+	    }
 
 	    t_location[counter] = *iterator;
 
@@ -836,10 +838,10 @@ namespace RRR{
 //it is not important to distinguish them
     void Tensor::printInfo()
     {
-	cout<<endl<<"Index | Symmetry Group | Is Contraction |Index Dimension Map\n";
+	cout<<endl<<"Index | Symmetry Group | Is Contraction |Index Dimension Map | Tensor Size | Vgrid\n";
 	for(int i = 0; i<dims; i++)
 	{
-	    cout<<" "<<i<<"                "<<SG_index_map[i]<<"              "<<cntr_map[i]<<"                   "<<index_dimension_map[i]<<"\n";
+	    cout<<" "<<i<<"                "<<SG_index_map[i]<<"              "<<cntr_map[i]<<"                   "<<index_dimension_map[i]<<"               "<<tensor_size[i]<<"        "<<vgrid[i]<<"\n";
 
 	}
     }
@@ -1257,7 +1259,14 @@ namespace RRR{
 		cout<<bouncers[i][j]<<", ";
 	    }
 	    cout<<"]\n";
-	}
+			    }
     }
+    
+    void Tensor::set_index_name(int* index_name){
+	for(int i =0; i< dims; i++)
+	    ctce_index_name[i] = index_name[i];
+    }
+    
+
 }
 

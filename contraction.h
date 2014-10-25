@@ -97,7 +97,7 @@ private:
 
     double max_instigation_time, max_forward_receive_time;
 
-    map<int, list<pair<int*,int*>>> CRCT_map;
+    map<int, list<pair<int*,int*> > > CRCT_map;
     //returns a permutation map that combines the affect of 
     //applying map1 and map2 consecutively
     void compose_p_maps(Tensor* &T, int* &map1, int* &map2, int* &composed_map);
@@ -107,7 +107,7 @@ private:
     void get_symm_permutation(Tensor* &T, int* &tile_address, int* &sym_permutation);
 
     //generates permutation maps for A, B and C for doing transpose before local dgemm can be performed
-    void generate_permutation_map(Tensor* &A, Tensor* &B, Tensor* &C, std::vector<pair<int,int>> &contr_list);
+    void generate_permutation_map(Tensor* &A, Tensor* &B, Tensor* &C, std::vector<pair<int,int> > &contr_list);
 
     //gives the mapping of external indicies in the input to external
     //indicies in the output. This mapping is used to find tile address
@@ -196,19 +196,19 @@ private:
 
     // Check if the new idmaps are not aligning same contraction indices along one dimension,
     // figure out new idmap by remapping contraction indices
-    void realign_new_idmap(int* &idmap_A, int* &idmap_B, vector<pair<int,int>> &contr_list,
+    void realign_new_idmap(int* &idmap_A, int* &idmap_B, vector<pair<int,int> > &contr_list,
 			   bool &redistr_A, bool &redistr_B);
 
     // Performs recursive SUMMA
-    void rec_summa(Tensor* &A, Tensor* &B, double* &C_buffer, std::vector<std::pair<int,int>> contr_list,
+    void rec_summa(Tensor* &A, Tensor* &B, double* &C_buffer, std::vector<std::pair<int,int> > contr_list,
 		   std::pair<int,int> prev_cdim1, std::pair<int,int> prev_cdim2);
 
-    void rec_summa1(Tensor* &A, Tensor* &B, Tensor* &C, vector<std::pair<int,int>> contr_list,
+    void rec_summa1(Tensor* &A, Tensor* &B, Tensor* &C, vector<std::pair<int,int> > contr_list,
 		    std::pair<int,int> prev_cdim1, std::pair<int,int> prev_cdim2);
-    void rec_summa2(Tensor* &A, Tensor* &B, Tensor* &C, vector<std::pair<int,int>> contr_list,
+    void rec_summa2(Tensor* &A, Tensor* &B, Tensor* &C, vector<std::pair<int,int> > contr_list,
 		    std::pair<int,int> prev_cdim1, std::pair<int,int> prev_cdim2);
 
-    void temp_rec_summa(Tensor* &A, Tensor* &B, Tensor* &C, vector<pair<int,int>> contr_list, 
+    void temp_rec_summa(Tensor* &A, Tensor* &B, Tensor* &C, vector<pair<int,int> > contr_list, 
 			pair<int,int> prev_cdim1, pair<int,int> prev_cdim2);
  
     // Perform transpose as required on input tensor blocks and call dgemm
@@ -223,19 +223,19 @@ private:
     // Print information about the performance of this contraction
     void print_time_flops();
 
-    void CRCT_generate_map(vector<pair<int,int>> contr_list);
+    void CRCT_generate_map(vector<pair<int,int> > contr_list);
 
     void CRCT_print_map();
 
-    list<pair<int*,int*>> CRCT_enumerate_AB_addrs(int* &C_addr, int num_contr_idx, vector<pair<int,int>> contr_list);
+    list<pair<int*,int*> > CRCT_enumerate_AB_addrs(int* &C_addr, int num_contr_idx, vector<pair<int,int> > contr_list);
 
     void CRCT_check_blocks(int* &addrs_A, int num_blocks_A,	int* &addrs_B, int num_blocks_B);
 
     void CRCT_final_validation();
 
 
-    void CRCT_get_AB_addr(list<pair<int*,int*>> &AB_addr_list, int* &A_addr, int* &B_addr, 
-			  vector<pair<int,int>> contr_list, int k, int num_contr_idx, int* &contr_dim_sizes);
+    void CRCT_get_AB_addr(list<pair<int*,int*> > &AB_addr_list, int* &A_addr, int* &B_addr, 
+			  vector<pair<int,int> > contr_list, int k, int num_contr_idx, int* &contr_dim_sizes);
 
 
 public:
@@ -267,7 +267,7 @@ public:
 		     * in place.*/
     void reduction(int* &reduction_dims, double* &reduction_buffer, int count, int allORreducex);  
 
-    void rotate(Tensor* &T_input, Tensor*& T_output, vector<pair<int,int>> &contr_list, 
+    void rotate(Tensor* &T_input, Tensor*& T_output, vector<pair<int,int> > &contr_list, 
 		int is_rotate_A, list<int> &rotate_dims, Tensor* &T_rotate, 
 		double* &data_buffer, int* &address_buffer, int &count);
 

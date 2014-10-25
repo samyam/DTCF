@@ -1,13 +1,14 @@
 #include "contraction.h"
 #define CCHECK 0
-#define RRANK 0
+#define RRANK 7
 #define DEBUG_TRR 0
 #define DEBUG_TDEBUG_IP 0
-#define DEBUG_TCM 1
+#define DEBUG_TCM 0
 #define DEBUG_T 0
 #define DEBUG_I 0
 #define DEBUG_T1 0
 #define DEBUG_TR 0
+#define DEBUG_TTRR 0
 #define DISPLAY_TIME 0
 #define COST_EVAL 1
 namespace RRR{
@@ -1340,7 +1341,7 @@ namespace RRR{
 	    int* block_addr_B = B->tile_address;
 
 	
-	    //transpose_and_dgemm_preserve(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer);
+	    transpose_and_dgemm_preserve(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer);
 	    if(CCHECK) CRCT_check_blocks(A->tile_address, A->num_actual_tiles, B->tile_address, B->num_actual_tiles);
 	    return;
 	    
@@ -1400,12 +1401,15 @@ namespace RRR{
 	    int *block_addr_A, *block_addr_B;
 
 	    instigation_time -= MPI_Wtime();
+	    
+	    if(DEBUG_I && rank == RRANK) cout<<endl<<endl<<"Instigation for A"<<endl;
 	    int num_collected_A = instigate_collection(A, cdim_A, k, blocks_A, block_addr_A);
 
 	    //if(DEBUG_T && rank==RRANK)    printGetTiles(blocks_A, block_addr_A, A->block_size, num_collected_A, A->dims);
 	    //if(DEBUG_I && rank == RRANK && cdim_B == 2 && k == 1) cout<<endl<<endl<<"Instigation for B"<<endl;
 	    timer4 -=MPI_Wtime();
 	    
+	    if(DEBUG_I && rank == RRANK) cout<<endl<<endl<<"Instigation for B"<<endl;
 	    int num_collected_B = instigate_collection(B, cdim_B, k, blocks_B, block_addr_B);
 	    //int num_collected_B =0;
 	    timer4 +=MPI_Wtime();
@@ -1496,12 +1500,12 @@ namespace RRR{
 	    // Compute
 	    if(contr_list.empty())
 	    {
-		if(DEBUG_TR && rank==RRANK){
+		if(DEBUG_TTRR && rank==RRANK){
 		    cout<<"Rank "<<rank<<". Entering transpose and DGEMM"<<endl;
 		}
 		
 		transpose_and_dgemm(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer);
-		if(DEBUG_TR && rank==RRANK){
+		if(DEBUG_TTRR && rank==RRANK){
 		    cout<<"Rank "<<rank<<". Exiting transpose and DGEMM"<<endl;
 		}
 
@@ -1798,7 +1802,7 @@ namespace RRR{
 	      cout << endl;*/
 	}
 
-
+	
 
 	// Transpose blocks of B here because the outer for-loop requires the tranposed blocks of B
 	// multiple times
@@ -1847,8 +1851,8 @@ namespace RRR{
 	    }
 
 
-	    delete[] sym_perm_B;
-	    delete[] sym_composed_B;
+	     delete[] sym_perm_B;
+	     delete[] sym_composed_B;
 
 	}
 	if(DEBUG_TR && rank==rank)	cout<<"Rank "<<rank<<".  Num Blocks B"<<num_blocks_B<<endl;
@@ -1865,9 +1869,9 @@ namespace RRR{
 			  p_map_B, num_blocks_B ,n_b, n_k, 
 			  num_row_dim_B, big_matrix_map_B, blocks_B);
 
-	delete[] tr_blocks_buf_B;
+	 delete[] tr_blocks_buf_B;
 
-	tr_time += MPI_Wtime();
+	 tr_time += MPI_Wtime();
 
 	double* tr_blocks_buf_A =new double[num_blocks_A * A->block_size]; 
 	tr_time -= MPI_Wtime();
@@ -1933,29 +1937,41 @@ namespace RRR{
 
 	//if(!rank) cout<<"product of blocks of A and B"<<num_blocks_A * num_blocks_B<<endl;
 	//if(!rank) cout<<"Num threads = "<<omp_get_num_threads()<<endl<<fflush;
-	delete[] tr_blocks_buf_A;
+	 delete[] tr_blocks_buf_A;
 
 
 	int num_row_blocks = big_matrix_map_A->size();
 	int num_col_blocks = big_matrix_map_B->size();
 	int num_cntr_blocks = num_blocks_A / num_row_blocks;
-//    if(rank == 0) cout<<"Num col blocks B is "<<num_col_blocks<<endl;
+	//if(rank == 0) cout<<"Num col blocks B is "<<num_col_blocks<<endl;
+	//if(rank == 0) cout<<"Num col blocks A is "<<num_row_blocks<<endl;
 	// dgemm
+	
 	comp_time -= MPI_Wtime();
 	if(num_blocks_A>0 && num_blocks_B>0){
-	    kevin_dgemm(num_row_blocks*n_a,  n_b * num_col_blocks, n_k * num_cntr_blocks, blocks_A, blocks_B, C_buffer, 0, 0, 1.0);
+
+	    //double* C_tmp = new double[64*64];
+	    //memcpy(C_tmp,C_buffer,64*64*sizeof(double));
+	    
+	    kevin_dgemm(num_row_blocks*n_a ,  n_b * num_col_blocks , n_k * num_cntr_blocks, blocks_A, blocks_B, C_buffer, 0, 0, 1.0);
+	    //kevin_dgemm(num_row_blocks*n_a ,  n_b * num_col_blocks , n_k * num_cntr_blocks, blocks_A, blocks_B, C_tmp, 0, 0, 1.0);
+	    //memcpy(C_buffer,C_tmp,64*64*sizeof(double));
+	    //delete[] C_tmp;
+
 	}
 	//    kevin_dgemm(n_a*num_blocks_A, n_b*num_blocks_B, n_k, blocks_A, blocks_B, C_buffer, 0, 0, 1.0);
+
 	comp_time += MPI_Wtime();
+	/*
 	if(DEBUG_TR && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
 	if(rank == RRANK && DEBUG_TR) {
 	    cout<<"Returning "<<endl;
 	}
-
-    
+	*/
+	
 	delete[] blocks_A;
 	delete[] blocks_B;
-
+	
 
     }
 
@@ -1967,7 +1983,8 @@ namespace RRR{
 //#pragma omp critical
 	local_num_dgemm++;
     
-	//if(rank == RRANK && DEBUG_T) cout<<endl<<local_num_dgemm<<"th Dgemm with na : "<<n_a<<" n_b : "<<n_b<<" and n_k : "<<n_k<<"."<<endl;
+	//if(rank == RRANK) cout<<endl<<local_num_dgemm<<"th Dgemm with na : "<<n_a<<" n_b : "<<n_b<<" and n_k : "<<n_k<<"."<<endl;
+
 
 	dgemm_time -= MPI_Wtime();
 	local_contraction(n_a, n_b, n_k, A_buf, B_buf, C_buf, at, bt, alpha);
@@ -2517,8 +2534,13 @@ namespace RRR{
 	    if(rank==RRANK && DEBUG_TCM) cout<<"Redistributing C"<<endl;
 	    GridRedistribute* Credib = new GridRedistribute(C,idmapC,new_grid);
 	    Credib->redistribute();	
-	}	
 
+//	    cout<<"Rank : "<<rank<<" Address : "<<new_grid->get_proc_addr_str(rank)<<" Tensor A num tiles is : "<<A->num_actual_tiles<<" block size is "<<A->block_size<<endl;
+//	    cout<<"Rank : "<<rank<<" Address : "<<new_grid->get_proc_addr_str(rank)<<" Tensor B num tiles is : "<<B->num_actual_tiles<<" block size is "<<B->block_size<<endl;
+//	    cout<<"Rank : "<<rank<<" Address : "<<new_grid->get_proc_addr_str(rank)<<" Tensor C num tiles is : "<<C->num_actual_tiles<<" block size is "<<C->block_size<<endl;
+
+	}	
+	
 
 	
 	

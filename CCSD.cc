@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
     Grid* grid = new Grid(4, pgrid_4);
     Grid* grid1 = new Grid(4, pgrid_4);
 
-   int* size__a10043 = new int[4];
+/*   int* size__a10043 = new int[4];
     size__a10043[0] = Vb;
     size__a10043[1] = Vb;
     size__a10043[2] = Ob;
@@ -4281,7 +4281,7 @@ int main(int argc, char* argv[])
     vgrid__a49220[3] = atoi(argv[3]);
     Tensor* _a49220 = new Tensor("ccaa", idmap__a49220, size__a49220, vgrid__a49220, grid);
     _a49220->initialize();
-
+*/
     int* size__a4981 = new int[2];
     size__a4981[0] = Vb;
     size__a4981[1] = Vb;
@@ -4293,7 +4293,7 @@ int main(int argc, char* argv[])
     vgrid__a4981[1] = atoi(argv[3]);
     Tensor* _a4981 = new Tensor("cc", idmap__a4981, size__a4981, vgrid__a4981, grid);
     _a4981->initialize();
-
+/*
     int* size__a5011 = new int[2];
     size__a5011[0] = Va;
     size__a5011[1] = Va;
@@ -5220,7 +5220,7 @@ int main(int argc, char* argv[])
     vgrid_tb_vo[1] = atoi(argv[3]);
     Tensor* tb_vo = new Tensor("cc", idmap_tb_vo, size_tb_vo, vgrid_tb_vo, grid);
     tb_vo->initialize();
-
+*/
 
     int* size_tbb_vvoo = new int[4];
     size_tbb_vvoo[0] = Vb;
@@ -5239,7 +5239,7 @@ int main(int argc, char* argv[])
     vgrid_tbb_vvoo[3] = atoi(argv[3]);
     Tensor* tbb_vvoo = new Tensor("aabb", idmap_tbb_vvoo, size_tbb_vvoo, vgrid_tbb_vvoo, grid);
     tbb_vvoo->initialize();
-
+/*
     int* size_vaa_oooo = new int[4];
     size_vaa_oooo[0] = Oa;
     size_vaa_oooo[1] = Oa;
@@ -5725,7 +5725,7 @@ int main(int argc, char* argv[])
     vgrid_vbb_oovo[3] = atoi(argv[3]);
     Tensor* vbb_oovo = new Tensor("aacc", idmap_vbb_oovo, size_vbb_oovo, vgrid_vbb_oovo, grid);
     vbb_oovo->initialize();
-
+*/
     int* size_vbb_oovv = new int[4];
     size_vbb_oovv[0] = Ob;
     size_vbb_oovv[1] = Ob;
@@ -5743,7 +5743,7 @@ int main(int argc, char* argv[])
     vgrid_vbb_oovv[3] = atoi(argv[3]);
     Tensor* vbb_oovv = new Tensor("aabb", idmap_vbb_oovv, size_vbb_oovv, vgrid_vbb_oovv, grid);
     vbb_oovv->initialize();
-
+/*
     int* size_vbb_vooo = new int[4];
     size_vbb_vooo[0] = Vb;
     size_vbb_vooo[1] = Ob;
@@ -5851,7 +5851,7 @@ int main(int argc, char* argv[])
     vgrid_vbb_vvvv[3] = atoi(argv[3]);
     Tensor* vbb_vvvv = new Tensor("aabb", idmap_vbb_vvvv, size_vbb_vvvv, vgrid_vbb_vvvv, grid);
     vbb_vvvv->initialize();
-
+*/
     double time = -MPI_Wtime();
     double max_time = 0;
 /*
@@ -5969,7 +5969,7 @@ int main(int argc, char* argv[])
     if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 26: " << endl;
     Contraction* C26 = new Contraction(tb_vo, _a18471, _a18476, grid);
     C26->contract( "p1b,h2b", "h3b,p1b", "h3b,h2b");
-*/
+
     if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 27: " << endl;
     Contraction* C27 = new Contraction(vab_oovv, tab_vvoo, _a4801, grid);
     C27->contract( "h2a,h1b,p2a,p1b", "p2a,p2b,h2a,h1b", "p2b,p1b");
@@ -5985,12 +5985,12 @@ int main(int argc, char* argv[])
     if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 30: " << endl;
     Contraction* C30 = new Contraction(vab_vovv, tab_vvoo, _a34818, grid);
     C30->contract( "p1a,h1b,p2a,p1b", "p2a,p1b,h1a,h2b", "p1a,h1b,h1a,h2b");
-
+*/
     if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 31: " << endl;
     Contraction* C31 = new Contraction(vbb_oovv, tbb_vvoo, _a4981, grid);
     C31->contract( "h1b,h3b,p1b,p3b", "p2b,p3b,h1b,h3b", "p2b,p1b");
 
-    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 32: " << endl;
+/*    if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 32: " << endl;
     Contraction* C32 = new Contraction(vab_vvov, tb_vo, _a10340, grid);
     C32->contract( "p1a,p2b,h1a,p1b", "p1b,h2b", "p1a,p2b,h1a,h2b");
 
@@ -6595,7 +6595,7 @@ int main(int argc, char* argv[])
     if(rank==RRANK && DEBUG_T) cout << endl << endl << "Contraction 181: " << endl;
     Contraction* C181 = new Contraction(tb_vo, _a7785, _a7798, grid);
     C181->contract( "p2b,h3b", "p1b,h3b,h2b,h1b", "p2b,p1b,h2b,h1b");
-   
+*/   
     time += MPI_Wtime();
     MPI_Reduce(&time, &max_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
     if(rank==RRANK) cout<<endl<<endl<<"Total CAST CCSD Time = " << max_time << " seconds" << endl;

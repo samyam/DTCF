@@ -1,11 +1,13 @@
 #include "tensor.h"
 #include "contraction.h"
+#include <iomanip>
 #define DEBUG_I 0
 #define DEBUG_T 0
 #define DEBUG_TT 0
 #define DEBUG_CHECK_POINT 0
 #define DEBUG_PRINT_TABLE 0
-#define RRANK 0
+
+#define RRANK 7
 namespace RRR{
     using namespace std;
 //returns number of processor addresses from which data needs to be
@@ -400,6 +402,8 @@ namespace RRR{
 	for(int i=0; i < num_matches; i++)
 	{
 	
+	    if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Send Instigate: Matches loop "<<matching_indices[i]<<" Checkpoint : "<<(checkpoint++)<<endl;
+
 	    //set the receiver address to current processor address
 	    int* receiver_address = new int[grid_dims];
 	    memcpy(receiver_address,my_address,sizeof(int)*grid_dims);
@@ -409,10 +413,12 @@ namespace RRR{
 	    //if(rank == 0) cout<<"matching index of reciever "<<i<<"is "<<matching_indices[i]<<endl;
 	    //if(rank==0)X->print_all_tile_addr();
 	
+	    if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Send Instigate: Matches loop "<<matching_indices[i]<<" Checkpoint : "<<(checkpoint++)<<endl;
 	    // Retrieve data to be sent 
 	    num_tiles[i] = X->getTileAddresses(matching_indices[i], contr_idx, block_location[i], tmp_block_addrs[i]);
 	    //int* temp_tile = new int[tdims];
 	    
+	    if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Send Instigate: Matches loop "<<matching_indices[i]<<" Checkpoint : "<<(checkpoint++)<<endl;
 	    // Permute virtual block address to match the contraction dimension.  Also find the receivers address
 	    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -421,6 +427,7 @@ namespace RRR{
 	    //Matching index is comes before the contraction dimension
 	    if(matching_indices[i]  <= contr_dim)
 	    {
+
 		for(int j = 0; j< num_tiles[i]; j++)
 		{
 		    //memcpy(temp_tile, &tmp_block_addrs[i][j*tdims], sizeof(int)*tdims);
@@ -506,7 +513,7 @@ namespace RRR{
 	    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+	    if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Send Instigate: Matches loop "<<matching_indices[i]<<" Checkpoint : "<<(checkpoint++)<<endl;
 	
 	}
 
@@ -525,6 +532,7 @@ namespace RRR{
 	    }
 	}
 
+	if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Send Instigate Checkpoint : "<<(checkpoint++)<<endl;
 	//if(rank == rank) cout << rank << " num_self_sends = " << num_self_sends << endl << fflush;
 
 	// Allocate MPI_Requests so that we can wait on them later
@@ -547,6 +555,7 @@ namespace RRR{
 	    self_data_sizes = 0;
 	}
 
+	if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Send Instigate Checkpoint : "<<(checkpoint++)<<endl;
 	//reset
 	num_self_sends = 0;
 	count_addr_sends = 0;
@@ -562,7 +571,8 @@ namespace RRR{
     
 	    // Find receiver rank
 	    int receiver = it->first;
-	    
+
+	    if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Send Instigate to receiver "<<receiver<<" Checkpoint : "<<(checkpoint++)<<endl;
 	    
 	    int num_tiles = it->second.size();
 	
@@ -613,7 +623,8 @@ namespace RRR{
 		}
 
 	    }
-	
+
+	    if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Send Instigate to receiver "<<receiver<<" Checkpoint : "<<(checkpoint++)<<endl;
 	    //cout << rank << " receiver = "<<receiver<< endl;
 
 	    // Send addresses and blocks if receivers are not this processor (sender)
@@ -625,6 +636,7 @@ namespace RRR{
 		MPI_Isend(block_addrs, addr_size, MPI_INT, receiver, addr_tag, comm, &send_req_addr[count_addr_sends]);
 		count_addr_sends++;
 
+		if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Send Instigate to receiver "<<receiver<<" Checkpoint : "<<(checkpoint++)<<endl;
 		// Send Data
 		if(addr_size)
 		{
@@ -633,6 +645,8 @@ namespace RRR{
 		    MPI_Isend(blocks, data_size, MPI_DOUBLE, receiver, data_tag, comm, &send_req_data[count_data_sends]);
 		    count_data_sends++;
 		}
+
+		if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Send Instigate to receiver "<<receiver<<" Checkpoint : "<<(checkpoint++)<<endl;
 	    }
 	    else // if receiver is this processor (sender)
 	    { 
@@ -645,6 +659,9 @@ namespace RRR{
 		num_self_sends++;
 	    }
 	}
+
+	
+	if(DEBUG_CHECK_POINT && rank ==RRANK ) cout<<" Rank : "<<rank<<" Send Instigate Checkpoint Final : "<<(checkpoint++)<<endl;
 	delete[] matching_indices;
     }
 

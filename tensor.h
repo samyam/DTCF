@@ -14,7 +14,7 @@
 #include <map>
 #include <climits>
 #include <set>
-#include "dltc_tensor.h"
+//#include "dltc_tensor.h"
 #include "helper.h"
 #include "grid.h"
 #include <vector>
@@ -24,10 +24,10 @@
 #define CONTRACTED 4
 namespace RRR {
 
-using namespace std;
+    using namespace std;
 
-class Tensor
-{
+    class Tensor
+    {
 
     private:
 
@@ -43,8 +43,6 @@ class Tensor
 
 	// Dimension of the tensor and the physical grid
 	int dims, grid_dims;
-	
-
 
 	// Tensor string
 	std::string tensor_str;
@@ -63,6 +61,8 @@ class Tensor
 
 	//stores the range of virtual indices of each dimension
 	int* tensor_range;
+
+
 
 	//holds the actual tensor data. 
 	//stored as contiguous array of virtual blocks
@@ -170,18 +170,18 @@ class Tensor
 
 
 	void redistribute_point_to_point(int* &new_idx_map,
-						 int bcast_proc_count,
-						 int* bcast_dims_sizes,
-						 int* &old_repl_dims, 
-						 int* &new_repl_dims,
-						 int old_repl_dims_count, 
-						 int new_repl_dims_count, 
-						 int* &bcast_dims, 
-						 int bcast_dims_count,
-						 int* common_repl_dims,
-						 int common_repl_dims_count,
-						 int* non_common_repl_dims,
-						 int non_common_repl_dims_count);
+					 int bcast_proc_count,
+					 int* bcast_dims_sizes,
+					 int* &old_repl_dims, 
+					 int* &new_repl_dims,
+					 int old_repl_dims_count, 
+					 int new_repl_dims_count, 
+					 int* &bcast_dims, 
+					 int bcast_dims_count,
+					 int* common_repl_dims,
+					 int common_repl_dims_count,
+					 int* non_common_repl_dims,
+					 int non_common_repl_dims_count);
 
 	map<int, int> compile_senders_data(map<int, list<int> > proc_block_map,
 					   double** &send_blocks,
@@ -191,11 +191,19 @@ class Tensor
 					   int old_repl_dims_count);
     
     public:
+	//uses ints to idetify different indices. Each integer
+	//value corresponds to a particular index defined in ctce
+	//code
+	int* ctce_index_name;
 
+	
 	//number of elements per block
 	int block_size;
 
-	// Constructor
+	// Default Constructor
+	Tensor(){};
+
+	//Main Constructor
 	Tensor(std::string tnsr_str, int* &idx_map, int* &tnsr_size, int* &virt_grid, Grid* &grid);
 
 	// Destructor
@@ -340,58 +348,61 @@ class Tensor
 
 	// Create generic proc address for broadcast receivers from the sender for redistribution
 	map<int, list<int> > get_generic_proc_addresses(
-		int* &tile_addresses, 
-		int num_tiles, 
-		int* &new_idx_map,
-		int non_common_repl_dims_count, 
-		int* &non_common_repl_dims);
+	    int* &tile_addresses, 
+	    int num_tiles, 
+	    int* &new_idx_map,
+	    int non_common_repl_dims_count, 
+	    int* &non_common_repl_dims);
 
 
 	// Find senders for all the blocks this processor will hold after redistribution
 	// and return a map of sender rank with a list of block offsets that will be received from it
 	map<int, list<int> > get_recv_proc_block_map(
-		int* &new_idx_map,
-		int old_repl_dims_count,
-		int* &old_repl_dims,
-		int &num_new_tiles);
+	    int* &new_idx_map,
+	    int old_repl_dims_count,
+	    int* &old_repl_dims,
+	    int &num_new_tiles);
 
 	// Create broadcast group for redistribution from the sender
 	void get_bcast_groups(
-		map<int, list<int> > proc_block_map, 
-		map<int, list<int> > recv_proc_block_map, 
-		int old_repl_dims_count,
-		int* &old_repl_dims,
-		int bcast_dims_count,
-		int* &bcast_dims,
-		MPI_Comm &recv_comm,
-		MPI_Comm* &bcast_send_comm,
-		MPI_Comm* &bcast_recv_comm);
+	    map<int, list<int> > proc_block_map, 
+	    map<int, list<int> > recv_proc_block_map, 
+	    int old_repl_dims_count,
+	    int* &old_repl_dims,
+	    int bcast_dims_count,
+	    int* &bcast_dims,
+	    MPI_Comm &recv_comm,
+	    MPI_Comm* &bcast_send_comm,
+	    MPI_Comm* &bcast_recv_comm);
 
 // Post MPI_Intercomm_Create from senders
 	void post_send_creates(
-		map<int, list<int> > recv_leader_block_map,
-		int bcast_dims_count,
-		int* &bcast_dims,
-		MPI_Comm &self_comm,
-		MPI_Comm &recv_comm,
-		MPI_Comm* &bcast_send_comm);
+	    map<int, list<int> > recv_leader_block_map,
+	    int bcast_dims_count,
+	    int* &bcast_dims,
+	    MPI_Comm &self_comm,
+	    MPI_Comm &recv_comm,
+	    MPI_Comm* &bcast_send_comm);
 
 // Post sends for redistribute
 	void post_broadcast_sends(
-		map< int, list<int> > &proc_block_map,
-		MPI_Comm* &bcast_send_comm,
-		MPI_Comm &recv_intra_comm,
-		int intra_comm_rank,
-		double** &bcast_blocks,
-		int** &bcast_addr,
-		double* &bcast_recv_blocks,
-		int* &bcast_recv_addr,
-		int &offset);
+	    map< int, list<int> > &proc_block_map,
+	    MPI_Comm* &bcast_send_comm,
+	    MPI_Comm &recv_intra_comm,
+	    int intra_comm_rank,
+	    double** &bcast_blocks,
+	    int** &bcast_addr,
+	    double* &bcast_recv_blocks,
+	    int* &bcast_recv_addr,
+	    int &offset);
 
 	void copy_bcast_send_data(map< int, list<int> > proc_block_map, double** &bcast_blocks, int** &bcast_addr);
 
 	// Check if the address satisfies tensor symmetry criterion
 	bool satisfies_sym(int* &addr);
+
+
+	void set_index_name(int* index_name);
 
 	// Getter functions
 	void set_cntr_map(int dim, int value)   { cntr_map[dim] = value;}
@@ -407,6 +418,6 @@ class Tensor
 	double* get_tensor_tiles()              { return tensor_tiles;}
 	int* get_tile_addresses()               { return tile_address;}
 	int get_rank()                          { return rank;}
-};
+    };
 }
 #endif
