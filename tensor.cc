@@ -313,23 +313,19 @@ namespace RRR{
   get_value = Tensor::value_function;
   }*/
 
-    //Initialize with spatial and spin symmetry
-    void initialize_with_symmetry(vector<Integer> spatial_s, vector<Integer> spin_s);
-    {
-	spatial_sym = spatial_s;
-	spin_s = spin_s;
-	enable_spatial_sym = 1;
-	enable_spin_sym = 1;	    
-	initialize();
-    }
-
     
     //Initialize with spatial and spin symmetry
-    void initialize_with_symmetry(vector<Integer> spatial_s, vector<Integer> spin_s){
-	    spatial_sym = spatial_s;
-	    spin_s = spin_s;
-	    enable_spatial_sym = 1;
-	    enable_spin_sym = 1;	    
+    void initialize_with_symmetry(vector<int> spatial_s[2], vector<int> spin_s[2]){
+
+	    spatial_sym[0] = spatial_s[0];
+	    spatial_sym[1] = spatial_s[1];
+
+	    spin_sym[0] = spin_s[0];
+	    spin_sym[1] = spin_s[1];
+
+	    enable_spatial_sym = true;
+	    enable_spin_sym = true;	    
+	    enable_spin_restricted = true;
 	    initialize();
     }
     
@@ -635,6 +631,56 @@ namespace RRR{
     }
 
 
+    //checks non zero blocks for spatial symmetry. Do not know
+    //exactly how this works but just immitating what ctce code
+    //does
+    bool Tensor::is_spatial_non_zero(int* tile_address, int sval){
+	int lval = 0;
+	for(int i = 0; i<dims; i++){
+	    lval ^= spatial_sym[O_or_V[i]][tile_address[i]];
+	}
+
+	return ((!enable_spatil_sym) || lval==sval);
+
+    }
+
+    //checks non zero blocks for spin symmetry. Do not know
+    //exactly how this works but just immitating what ctce code
+    //does
+    bool Tensor::is_spin_non_zero(int* tile_address)
+    {
+	int lval = 0;
+	int rval = 0;
+	assert(dims  % 2 == 0);
+	for(int i =0; i<dims/2; i++) lval += spin_sym[O_or_V[i]][tile_address[i]];
+	for(int i =dims/2; i<dims; i++) rval += spin_sym[O_or_V[i]][tile_address[i]];
+	return ((!enable_spin_sym) || (lval==rval));
+    }
+
+
+    //checks non zero blocks for spin symmetry. Do not know
+    //exactly how this works but just immitating what ctce code
+    //does
+    bool Tensor::is_spin_restricted_non_zero(int* tile_address, int sval)
+    {
+	
+	int lval = 0;
+	int rval = 0;
+	assert(dims  % 2 == 0);
+	for(int i =0; i<dims; i++) lval += spin_sym[O_or_V[i]][tile_address[i]];
+
+	return ((!enable_spin_restricted) || (lval!=sval));
+    }
+
+    bool Tensor::is_sym_non_zero(int* tile_address)
+    {
+	if(!is_spatial_non_zero(tile_address)) return false;
+	if(!is_spin_non_zero(tile_address)) return false;
+	if(!is_spin_restricted_non_zero(tile_address)) return false;
+	return true;
+
+    }
+
 //returns true if the data block is unique given the symmetry
     bool Tensor::isValid(int* &cur_indices, int* &processor_addr, int* &idmap, int* &phy_grid)
     {
@@ -663,7 +709,7 @@ namespace RRR{
 	    }
 	}
 
-	bool ret_value = is_non_zero_sym(virtual_addres);
+	bool ret_value = is_non_zero_sym(virtual_address);
 
 
 	//if(rank==1) print_tile_addr(dims, virtual_address);
@@ -673,7 +719,6 @@ namespace RRR{
     }
 
 
-    bool Tensor::is_non_zero_sym
 
 // Generate sample values in the tensor
     void Tensor::generate_data(int cur_dim, int* &cur_indices, int &offset)

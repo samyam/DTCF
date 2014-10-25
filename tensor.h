@@ -105,9 +105,9 @@ namespace RRR {
 	//region along O or V does a particular block-index value
 	//along O or V corresponds to.
 	/////////////////////////////////////////////////////////////////////////
-	bool enable_symmetry;
-	vector<Integer> spatial_sym[2];
-	vector<Integer> spin_sym[2];	
+	bool enable_spatial_sym, enable_spin_sym, enable_spin_restricted;
+	vector<int> spatial_sym[2];
+	vector<int> spin_sym[2];	
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
@@ -142,6 +142,30 @@ namespace RRR {
 
 	// fills up the index table
 	void fill_index_table_tmp();
+
+	/////////////////Symmetric validity related functions///////
+	////////////////////////////////////////////////////////////
+
+	//checks non zero blocks for spatial symmetry. Do not know
+	//exactly how this works but just immitating what ctce code
+	//does
+	bool Tensor::is_spatial_non_zero(int* tile_address, int sval);
+
+	//checks non zero blocks for spin symmetry. Do not know
+	//exactly how this works but just immitating what ctce code
+	//does
+	bool Tensor::is_spin_non_zero(int* tile_address);
+
+	//checks non zero blocks for spin symmetry. Do not know
+	//exactly how this works but just immitating what ctce code
+	//does
+	bool Tensor::is_spin_restricted_non_zero(int* tile_address, int sval);
+
+	bool Tensor::is_sym_non_zero(int* tile_address);
+
+	///////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////
+
 
 	// Return a value based on the index passed
 	double default_get_value(int* &indices);
