@@ -46,6 +46,7 @@ namespace RRR {
 
 	// Tensor string
 	std::string tensor_str;
+	
 
 	// Tensor Size
 	int* tensor_size;
@@ -61,8 +62,6 @@ namespace RRR {
 
 	//stores the range of virtual indices of each dimension
 	int* tensor_range;
-
-
 
 	//holds the actual tensor data. 
 	//stored as contiguous array of virtual blocks
@@ -97,6 +96,21 @@ namespace RRR {
 	int sym_dims[2];	// Number of dimensions in each symmetry
 	int sym_ratio[2];     // Length of symmetric dimension of local tensor in each symmetry
 
+
+	//////////////////////////////////////////////////////////////////////////
+	///////////////////Spatial Symmetry and Spin Symmetry Information/////////
+	//////////////////////////////////////////////////////////////////////////
+	//[0] represents the O indices and [1] represents V
+	//indices. The vectors tells which spatial/spin symmetric
+	//region along O or V does a particular block-index value
+	//along O or V corresponds to.
+	/////////////////////////////////////////////////////////////////////////
+	bool enable_symmetry;
+	vector<Integer> spatial_sym[2];
+	vector<Integer> spin_sym[2];	
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
 
 	// 1 if an index is contraction index 0 otherwise
 	int *cntr_map; 
@@ -225,6 +239,9 @@ namespace RRR {
 
 	//sets function to the get_value function
 	void set_get_value(double (*value_function)(int* &indices));
+
+	//Initialize with spatial and spin symmetry
+	void initialize_with_symetry(vector<Integer> spatial_s, vector<Integer> spin_s);
 
 	// Initializes the tensor (fills in values)
 	void initialize();
@@ -406,6 +423,7 @@ namespace RRR {
 
 	// Getter functions
 	void set_cntr_map(int dim, int value)   { cntr_map[dim] = value;}
+	void set_symmetry(bool enable_spatial, bool enable_spin, bool enable spin_restricted);       
 	int get_block_size()                    { return block_size;}
 	int* get_block_range()                  { return block_range;}
 	int  get_dims() 			{ return dims; }

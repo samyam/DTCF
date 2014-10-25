@@ -170,6 +170,8 @@ namespace RRR{
 	memcpy(SG_index_map_permanent, SG_index_map, dims * sizeof(int));
     }
 
+
+
 // Destructor
     Tensor::~Tensor()
     {
@@ -311,6 +313,26 @@ namespace RRR{
   get_value = Tensor::value_function;
   }*/
 
+    //Initialize with spatial and spin symmetry
+    void initialize_with_symmetry(vector<Integer> spatial_s, vector<Integer> spin_s);
+    {
+	spatial_sym = spatial_s;
+	spin_s = spin_s;
+	enable_spatial_sym = 1;
+	enable_spin_sym = 1;	    
+	initialize();
+    }
+
+    
+    //Initialize with spatial and spin symmetry
+    void initialize_with_symmetry(vector<Integer> spatial_s, vector<Integer> spin_s){
+	    spatial_sym = spatial_s;
+	    spin_s = spin_s;
+	    enable_spatial_sym = 1;
+	    enable_spin_sym = 1;	    
+	    initialize();
+    }
+    
 
     void Tensor::initialize()
     {
@@ -641,12 +663,17 @@ namespace RRR{
 	    }
 	}
 
+	bool ret_value = is_non_zero_sym(virtual_addres);
+
+
 	//if(rank==1) print_tile_addr(dims, virtual_address);
 
 	delete[] virtual_address;
-	return true;
+	return ret_value;
     }
 
+
+    bool Tensor::is_non_zero_sym
 
 // Generate sample values in the tensor
     void Tensor::generate_data(int cur_dim, int* &cur_indices, int &offset)
