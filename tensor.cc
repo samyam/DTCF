@@ -168,6 +168,11 @@ namespace RRR{
 	}
 
 	memcpy(SG_index_map_permanent, SG_index_map, dims * sizeof(int));
+	enable_spin_sym = 0;
+	enable_spatial_sym=0;
+	enable_spin_restricted=0;
+	
+
     }
 
 
@@ -315,7 +320,7 @@ namespace RRR{
 
     
     //Initialize with spatial and spin symmetry
-    void Tensor::initialize_with_symmetry(vector<int> spatial_s[2], vector<int> spin_s[2]){
+    void Tensor::initialize_with_symmetry(vector<int> spatial_s[2], vector<int> spin_s[2], vector<int> index_type, int irrepp){
 
 	    spatial_sym[0] = spatial_s[0];
 	    spatial_sym[1] = spatial_s[1];
@@ -323,9 +328,14 @@ namespace RRR{
 	    spin_sym[0] = spin_s[0];
 	    spin_sym[1] = spin_s[1];
 
-	    enable_spatial_sym = true;
-	    enable_spin_sym = true;	    
-	    enable_spin_restricted = true;
+	    O_or_V = index_type;
+
+	    enable_spatial_sym = 1;
+	    enable_spin_sym = 1;	    
+	    enable_spin_restricted = -1;
+
+	    irrep = irrepp;
+	    
 	    initialize();
     }
     
@@ -1337,12 +1347,8 @@ namespace RRR{
     //the index name corresponds to indices defined in define.h in
     //ctce. index_type tells if an index is O or V. 0 represents O
     //and 1 represents V
-    void Tensor::set_index_name_and_type(int* index_name, int* index_type){
-	for(int i =0; i< dims; i++){
-	    ctce_index_name[i] = index_name[i];
-
-	    O_or_V[i] = index_type[i];
-	}
+    void Tensor::set_index_type(vector<int> index_type){
+	O_or_V = index_type;
     }
     
 

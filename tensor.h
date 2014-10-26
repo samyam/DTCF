@@ -108,7 +108,7 @@ namespace RRR {
 	bool enable_spatial_sym, enable_spin_sym, enable_spin_restricted;
 
 	//store if an index belongs to index O or V
-	int* O_or_V;
+	vector<int> O_or_V;
 	int irrep;
 	vector<int> spatial_sym[2];
 	vector<int> spin_sym[2];	
@@ -446,9 +446,9 @@ namespace RRR {
 	// Check if the address satisfies tensor symmetry criterion
 	bool satisfies_sym(int* &addr);
 
-	void set_index_name_and_type(int* index_name, int* index_type);
 
-
+	
+	void set_index_type(vector<int> index_type);
 	// Getter functions
 	void set_cntr_map(int dim, int value)   { cntr_map[dim] = value;}
 	void set_extra_symmetry(bool enable_spatial, bool enable_spin, bool enable_spin_restricted);       

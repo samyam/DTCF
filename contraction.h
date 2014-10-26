@@ -30,7 +30,12 @@ private:
     Grid* grid;
     int rank, num_procs; 
     int *my_address;
+
+
+    //this variablie tells if local contraction should be done as
+    //a single dgemm or multiple smaller dgemms in parallel
     int block_wise_contraction;
+
     //these are debugging buffers to ensure that for every send there is a matching receive. 
     int* receiver_grid_buffer;
     int* sender_grid_buffer;
@@ -249,6 +254,8 @@ public:
     // Constructor
     Contraction(Tensor* &a, Tensor* &b, Tensor* &c, Grid* &g);
         
+    Contraction(Tensor* &a, Tensor* &b, Tensor* &c, Grid* &g, int is_block_wise);
+
     // Destructor
     ~Contraction();
 

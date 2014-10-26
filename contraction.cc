@@ -34,6 +34,10 @@ namespace RRR{
 	sender_grid_buffer = new int[num_procs*num_procs];
 	
     }
+    Contraction::Contraction(Tensor* &a, Tensor* &b, Tensor* &c, Grid* &g, int is_block_wise){
+	Contraction(a, b, c, g);
+	block_wise_contraction = is_block_wise;
+    }
 
     Contraction::Contraction(Tensor* &a, Tensor* &b, Tensor* &c, Grid* &g)
     {
@@ -81,7 +85,7 @@ namespace RRR{
 	//debugging
 	receiver_grid_buffer = new int[num_procs*num_procs];
 	sender_grid_buffer = new int[num_procs*num_procs];
-	
+	block_wise_contraction = 0;
     }
 
     //Changes the grid if a redistribution is required for contraction
