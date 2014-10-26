@@ -214,8 +214,11 @@ private:
     // Perform transpose as required on input tensor blocks and call dgemm
     void transpose_and_dgemm_preserve(int num_blocks_A, int num_blocks_B, double* &blocks_A, double* &blocks_B, int* &block_addr_A, int* &block_addr_B, double* &C_buffer);
 
-    // Perform transpose as required on input tensor blocks and call dgemm
+    // Perform transpose as required on input tensor blocks and calls parallel dgemm 
     void transpose_and_dgemm(int num_blocks_A, int num_blocks_B, double* &blocks_A, double* &blocks_B, int* &block_addr_A, int* &block_addr_B, double* &C_buffer);
+
+    // Perform transpose as required on input tensor blocks and call sequential dgemm one block at a time
+    void transpose_and_dgemm_blockwise(int num_blocks_A, int num_blocks_B, double* &blocks_A, double* &blocks_B, int* &block_addr_A, int* &block_addr_B, double* &C_buffer);
 
     // Perform 2D matrix multiplication
     void kevin_dgemm(int n_a, int n_b, int n_k, double* &A, double* &B, double* &C, int at, int bt, double alpha);

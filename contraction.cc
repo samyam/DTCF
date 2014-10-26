@@ -1320,12 +1320,6 @@ namespace RRR{
 				pair<int,int> prev_cdim1, pair<int,int> prev_cdim2)
     {
 
-	//if(rank==RRANK && DEBUG_T) {
-	//	A->printInfo();
-	//	B->printInfo();
-	//}
-
-
 	if(contr_list.empty())
 	{
 	    if(DEBUG_T && rank == RRANK) grid->print_proc_addr(RRANK);
@@ -1340,15 +1334,23 @@ namespace RRR{
 	    int* block_addr_A = A->tile_address;
 	    int* block_addr_B = B->tile_address;
 
-	
-	    transpose_and_dgemm_preserve(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer);
+	    //block_wise contraction computes one block at a
+	    //time instead of fusing all the dgemms into one
+	    //large dgemm. The reason for doing this is that
+	    //it also to only run those dgemms that we want
+	    //based on spatial symmetry
+	    if(block_wise_contraction){
+		transpose_and_dgemm_blockwise(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer,0);
+	    }else{
+		transpose_and_dgemm_preserve(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer);
+			
+	    }
 	    if(CCHECK) CRCT_check_blocks(A->tile_address, A->num_actual_tiles, B->tile_address, B->num_actual_tiles);
 	    return;
 	    
 	}
 	// List should not be empty here
 	assert(contr_list.empty() == false);
-
 
 	// Get the contracting dimension pair to work on
 	pair<int,int> p = contr_list.front();
@@ -1357,40 +1359,24 @@ namespace RRR{
 	int cdim_A = p.first;
 	int cdim_B = p.second;
 
-	/*if(rank == RRANK && DEBUG_T){
-	  cout<<"Matching Contraction indices A "<<cdim_A
-	  <<" and B"<<cdim_B<<endl;
-	  }*/
-
-
 	// Find the upper bound for contraction index k
 	int k_bound = A->vgrid[cdim_A];
-
-	/*if(rank == RRANK && DEBUG_T){
-	  cout<<"Previous cdim in symmetry group 1 is "<<prev_cdim1.first<<endl;
-	  cout<<"Previous cdim in symmetry group 2 is "<<prev_cdim2.first<<endl;
-	  }*/
 
 	if(prev_cdim1.first != -1  
 	   &&  A->SG_index_map[cdim_A] == A->SG_index_map_permanent[prev_cdim1.first])
 	{
-	    //cout<<"sym 1"<<endl;
 	    k_bound = prev_cdim1.second+1;
 	}
 
 	if(prev_cdim2.first != -1  
 	   &&  A->SG_index_map[cdim_A] == A->SG_index_map_permanent[prev_cdim2.first])
 	{
-	    //cout<<"sym 2"<<endl;
 	    k_bound = prev_cdim2.second+1;
 	}
 
-	//A->printInfo();
-	// Contraction loop
-	
+	// Contraction loop	
 	for(int k = 0; k < k_bound; k++)
 	{
-	    //if(rank == 0) A->printInfo();
 
 	    // Start measuring communication time
 	    comm_time -= MPI_Wtime();
@@ -1405,18 +1391,14 @@ namespace RRR{
 	    if(DEBUG_I && rank == RRANK) cout<<endl<<endl<<"Instigation for A"<<endl;
 	    int num_collected_A = instigate_collection(A, cdim_A, k, blocks_A, block_addr_A);
 
-	    //if(DEBUG_T && rank==RRANK)    printGetTiles(blocks_A, block_addr_A, A->block_size, num_collected_A, A->dims);
-	    //if(DEBUG_I && rank == RRANK && cdim_B == 2 && k == 1) cout<<endl<<endl<<"Instigation for B"<<endl;
 	    timer4 -=MPI_Wtime();
 	    
 	    if(DEBUG_I && rank == RRANK) cout<<endl<<endl<<"Instigation for B"<<endl;
 	    int num_collected_B = instigate_collection(B, cdim_B, k, blocks_B, block_addr_B);
-	    //int num_collected_B =0;
+
 	    timer4 +=MPI_Wtime();
 	    instigation_time += MPI_Wtime();
-	    //cout << rank << " num_collected_A= " << num_collected_A<< " num_collected_B = " << num_collected_B << endl;
-	    
-	    //if(rank==4)    printGetTiles(blocks_B, block_addr_B, B->block_size, num_collected_B, B->dims);
+	   
 	    bool is_instigator_A = (k % pgrid[A->index_dimension_map[cdim_A]] == my_address[A->index_dimension_map[cdim_A]]);
 	    bool is_instigator_B = (k % pgrid[B->index_dimension_map[cdim_B]] == my_address[B->index_dimension_map[cdim_B]]);
 	    
@@ -1492,19 +1474,25 @@ namespace RRR{
 
 	    
 	    //---------------------------------------Base Case Do the local dgemm ---------------------------------------//
-	    //if(DEBUG_T && rank==RRANK){
-	    //   cout<<"k is "<<k<<endl;
-	    //}
-	    
-	    
+
 	    // Compute
 	    if(contr_list.empty())
 	    {
 		if(DEBUG_TTRR && rank==RRANK){
 		    cout<<"Rank "<<rank<<". Entering transpose and DGEMM"<<endl;
 		}
+		//block_wise contraction computes one block at a
+		//time instead of fusing all the dgemms into one
+		//large dgemm. The reason for doing this is that
+		//it also to only run those dgemms that we want
+		//based on spatial symmetry
+		if(block_wise_contraction){
+		    transpose_and_dgemm_block_wise(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer,1);
+		}else{
+		    transpose_and_dgemm(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer);
+
+		}
 		
-		transpose_and_dgemm(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer);
 		if(DEBUG_TTRR && rank==RRANK){
 		    cout<<"Rank "<<rank<<". Exiting transpose and DGEMM"<<endl;
 		}
@@ -1520,7 +1508,6 @@ namespace RRR{
 		Tensor* sub_A = A->generate_tensor(cdim_A, blocks_A, block_addr_A, num_blocks_A);
 		Tensor* sub_B = B->generate_tensor(cdim_B, blocks_B, block_addr_B, num_blocks_B);
 		
-		//if(rank == 0) sub_A->printInfo();
 		// Create pairs of contracting dimensions with current contr_idx and pass them on
 		// for contracting next index. They will be used if the next contracting dimensions
 		// are symmetric with this one.
@@ -1528,7 +1515,6 @@ namespace RRR{
 		if((A->SG_index_map[cdim_A] == A->SG_index_map[prev_cdim1.first] 
 		    || prev_cdim1.first == -1) &&  A->SG_index_map[cdim_A] ==0)
 		{
-		    //if (DEBUG_T && rank ==0) cout<<"creating sym pair 1 with k "<<k<<endl;
 		    p1 = make_pair(cdim_A, k);
 		}
 		else
@@ -1539,7 +1525,6 @@ namespace RRR{
 		if((A->SG_index_map[cdim_A] == A->SG_index_map[prev_cdim2.first]
 		    || prev_cdim1.first == -1) &&  A->SG_index_map[cdim_A] == 1)
 		{
-		    //if(DEBUG_T && rank == 0) cout<<"creating sym pair 2 with k "<<k<<endl;
 		    p2 = make_pair(cdim_A, k);
 		}
 		else
@@ -1778,8 +1763,6 @@ namespace RRR{
 // Perform transpose as required on input tensor blocks and call dgemm
     void Contraction::transpose_and_dgemm(int num_blocks_A, int num_blocks_B, double* &blocks_A, double* &blocks_B, int* &block_addr_A, int* &block_addr_B, double* &C_buffer)
     {
-     
-
     
 	if(num_blocks_B == 0 || num_blocks_A == 0) return;
 	// Contract each block in sub-tensor A with each block in sub-tensor B
@@ -1811,6 +1794,7 @@ namespace RRR{
 	int *perm_address_A = new int[A->dims*num_blocks_A]; 
 	int *perm_address_B = new int[B->dims*num_blocks_B]; 
 	int tg = 0;
+
 	if(DEBUG_TR && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
 
 
@@ -1949,26 +1933,13 @@ namespace RRR{
 	
 	comp_time -= MPI_Wtime();
 	if(num_blocks_A>0 && num_blocks_B>0){
-
-	    //double* C_tmp = new double[64*64];
-	    //memcpy(C_tmp,C_buffer,64*64*sizeof(double));
-	    
 	    kevin_dgemm(num_row_blocks*n_a ,  n_b * num_col_blocks , n_k * num_cntr_blocks, blocks_A, blocks_B, C_buffer, 0, 0, 1.0);
-	    //kevin_dgemm(num_row_blocks*n_a ,  n_b * num_col_blocks , n_k * num_cntr_blocks, blocks_A, blocks_B, C_tmp, 0, 0, 1.0);
-	    //memcpy(C_buffer,C_tmp,64*64*sizeof(double));
-	    //delete[] C_tmp;
 
 	}
 	//    kevin_dgemm(n_a*num_blocks_A, n_b*num_blocks_B, n_k, blocks_A, blocks_B, C_buffer, 0, 0, 1.0);
 
 	comp_time += MPI_Wtime();
-	/*
-	if(DEBUG_TR && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
-	if(rank == RRANK && DEBUG_TR) {
-	    cout<<"Returning "<<endl;
-	}
-	*/
-	
+
 	delete[] blocks_A;
 	delete[] blocks_B;
 	
@@ -2748,68 +2719,84 @@ if(1){
 	{
 
 	    if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
-	    //cmbines individial tiles of C into a 2D matrix called big_matrix_C
-	    std::map<int, std::map<int, int> >* big_matrix_map_C;
-	    double* big_matrix_C;
-	    int num_row_dim_C = C->dims - (B->dims - num_cntr_indices);
-	 
-	    if(rank ==0)
-	    {
-		/*cout<<"All tiles"<<endl;
-		  C->print_all_tile_addr();
-		  cout<<"Permuted tile addresses"<<endl;
-		  int_tile_addrs(C->dims, permuted_address, C->num_actual_tiles);*/
-	    } 
-
-
-	    if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
-	    bm_time -= MPI_Wtime();
-	    //if(DEBUG_T && C->get_rank() == RRANK) cout<<endl<<"Printing C"<<endl<<fflush;
-	    create_big_matrix(C, C->tensor_tiles, permuted_address,
-			      p_map_C, C->num_actual_tiles ,n_a, n_b, 
-			      num_row_dim_C, big_matrix_map_C, big_matrix_C);
-	 
-	 
 	    delete[] block_to_transpose;
-	    bm_time += MPI_Wtime();
-	        	    
-	    // Recursive SUMMA
-	    pair<int,int> p1(-1,-1);
-	    pair<int,int> p2(-1,-1);
-	 
-	    if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
-	    //if(rank==RRANK) A->printInfo();
-	    //if(rank==RRANK) B->printInfo();
-	    //if(rank==RRANK) C->printInfo();
-	    if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Entering RSUMMA " <<endl; 
-	    //if(rank==RRANK && DEBUG_T) {
-	    //cout<<"Entering Rec_SUMMA"<<endl<<endl;
-	    //}
-	 
-	    timer5 =- MPI_Wtime();
 
-	    rec_summa(A, B, big_matrix_C, DDO_list, p1, p2);
-
-	    timer5 += MPI_Wtime();
-
-	    timer6 =- MPI_Wtime();
-	    //Does reduction with all Reduce
-	    if(need_reduction)
+	    if(!block_wise_contraction)
 	    {
-		reduction(reduction_dims, big_matrix_C, C->num_actual_tiles * C->block_size, 1);
-	    }
-	    timer6 += MPI_Wtime();
+		//cmbines individial tiles of C into a 2D matrix called big_matrix_C
+		std::map<int, std::map<int, int> >* big_matrix_map_C;
+		double* big_matrix_C;
+		int num_row_dim_C = C->dims - (B->dims - num_cntr_indices);
+
+		if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
+		bm_time -= MPI_Wtime();
+		//if(DEBUG_T && C->get_rank() == RRANK) cout<<endl<<"Printing C"<<endl<<fflush;
+		create_big_matrix(C, C->tensor_tiles, permuted_address,
+				  p_map_C, C->num_actual_tiles ,n_a, n_b, 
+				  num_row_dim_C, big_matrix_map_C, big_matrix_C);
+	 
+	 
+
+		bm_time += MPI_Wtime();
+	        	    
+		// Recursive SUMMA
+		pair<int,int> p1(-1,-1);
+		pair<int,int> p2(-1,-1);
+	 
+		if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
+		if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Entering RSUMMA " <<endl; 
+	 
+		timer5 =- MPI_Wtime();
+
+		rec_summa(A, B, big_matrix_C, DDO_list, p1, p2);
+
+		timer5 += MPI_Wtime();
+
+		timer6 =- MPI_Wtime();
+
+		//Does reduction with all Reduce
+		if(need_reduction)
+		{
+		    reduction(reduction_dims, big_matrix_C, C->num_actual_tiles * C->block_size, 1);
+		}
+		timer6 += MPI_Wtime();
      
-	    //------------------------Reduction and Rotation Done ------------------------//
+		//------------------------Reduction and Rotation Done ------------------------//
 	
-	    //if(DEBUG_T && rank == RRANK) cout<<"Printing C"<<endl<<fflush;
-	    bm_time -= MPI_Wtime();
-	    //changes the 2D representation to individial tiles
-	    revert_big_matrix(C, big_matrix_map_C, 
-			      big_matrix_C, n_a, n_b, 
-			      p_map_C, C->tensor_tiles);
-	    bm_time += MPI_Wtime();
- 
+		//if(DEBUG_T && rank == RRANK) cout<<"Printing C"<<endl<<fflush;
+		bm_time -= MPI_Wtime();
+		//changes the 2D representation to individial tiles
+		revert_big_matrix(C, big_matrix_map_C, 
+				  big_matrix_C, n_a, n_b, 
+				  p_map_C, C->tensor_tiles);
+		bm_time += MPI_Wtime();
+		
+	    }else{ // block wise contraction. This is necessary for contractions with spatial symmetry
+	        	    
+		// Recursive SUMMA
+		pair<int,int> p1(-1,-1);
+		pair<int,int> p2(-1,-1);
+	 
+		if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
+
+		if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Entering RSUMMA " <<endl; 
+	 
+		timer5 =- MPI_Wtime();
+
+		rec_summa(A, B, C->tensor_tiles, DDO_list, p1, p2);
+
+		timer5 += MPI_Wtime();
+
+		timer6 =- MPI_Wtime();
+
+		//Does reduction with all Reduce
+		if(need_reduction)
+		{
+		    reduction(reduction_dims, C->tensor_tiles, C->num_actual_tiles * C->block_size, 1);
+		}
+		timer6 += MPI_Wtime();
+
+	    }
 	}
 	//---------------------------------------------------------------------------------//
 	if(rank==RRANK && DEBUG_T) cout << "Rank : "<<rank<<". Checkpoint " <<(checkpoint++)<< endl; 
