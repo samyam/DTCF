@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
 
     Tensor* A = new Tensor("aabb", idmap_A, size_A, block_grid_A, grid);
     A->initialize_with_symmetry(spatial, spin, index_type_A, 0);
-
+    //A->initialize();
     if(rank == 0) cout<<"Tensor A initialized"<<endl;
 
     int* size_B = new int[4];
@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
 
     Tensor* B = new Tensor("aabb", idmap_B, size_B, block_grid_B, grid);
     B->initialize_with_symmetry(spatial, spin, index_type_B, 0);
-    
+    //B->initialize();
     if(rank == 0) cout<<"Tensor B initialized"<<endl;
 
     int* size_C = new int[4];
@@ -129,21 +129,23 @@ int main(int argc, char* argv[])
     idmap_C[2] = 2;
     idmap_C[3] = 3;
     
-    vector<int> index_type_B;
-    index_type_B.push_back(0);
-    index_type_B.push_back(0);
-    index_type_B.push_back(0);
-    index_type_B.push_back(0);
+    vector<int> index_type_C;
+    index_type_C.push_back(0);
+    index_type_C.push_back(0);
+    index_type_C.push_back(0);
+    index_type_C.push_back(0);
     
 
     Tensor* C = new Tensor("aabb", idmap_C, size_C, block_grid_C, grid);
     C->initialize_with_symmetry(spatial, spin, index_type_C, 0);
-    
+    //C->initialize();
     if(rank == 0) cout<<"Tensor C initialized"<<endl;
-
+    MPI_Barrier(MPI_COMM_WORLD);
     double time =0.0;
-    if(rank==0) cout<<"C [h10,h11,h1,h2] = A [p7,p8,h1,h2 ] x B [h10,h11,p7,p8 ]"<<endl;
-    Contraction* C0 = new Contraction(A, B, C, grid,1);
+    if(rank==0) cout<<"asdC [h10,h11,h1,h2] = A [p7,p8,h1,h2 ] x B [h10,h11,p7,p8 ]"<<endl;
+    Contraction* C0 = new Contraction(A, B, C, grid);
+    C0->set_block_wise(1);
+    if(rank==0) cout<<"Constructor done"<<endl;
     time =-MPI_Wtime();
     C0->contract( "p7,p8,h1,h2", "h10,h11,p7,p8", "h10,h11,h1,h2");
 

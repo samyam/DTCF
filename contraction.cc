@@ -14,6 +14,11 @@
 namespace RRR{
     using namespace std;
 
+    void Contraction::set_block_wise(int is_block_wise){
+	block_wise_contraction = is_block_wise;
+    }
+
+
     Contraction::Contraction(Grid* &g)
     {
 	grid = g;//new Grid(g->grid_dims,g->pgrid);
@@ -34,14 +39,10 @@ namespace RRR{
 	sender_grid_buffer = new int[num_procs*num_procs];
 	
     }
-    Contraction::Contraction(Tensor* &a, Tensor* &b, Tensor* &c, Grid* &g, int is_block_wise){
-	Contraction(a, b, c, g);
-	block_wise_contraction = is_block_wise;
-    }
 
     Contraction::Contraction(Tensor* &a, Tensor* &b, Tensor* &c, Grid* &g)
     {
-
+	if(rank==0) cout<<"In Constructor"<<endl;
 	grid = new Grid(g->grid_dims,g->pgrid);
 	rank = grid->rank;
 	num_procs = grid->nprocs;
@@ -2941,4 +2942,7 @@ if(1){
 
 	}
     }
+
+
+
 }

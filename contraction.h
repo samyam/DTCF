@@ -283,7 +283,7 @@ public:
 
     void display_times();
 
-
+    void set_block_wise(int is_block_wise);
 
 };
 }

@@ -1,17 +1,17 @@
-mvapich2(4):ERROR:105: Unable to locate a modulefile for 'mvapich2/1.9-icc-slurm'
 Grid about to initialized
 Grid initialized
 Tensor A initialized
 Tensor B initialized
 Tensor C initialized
-C [h10,h11,h1,h2] = A [p7,p8,h1,h2 ] x B [h10,h11,p7,p8 ]
-Communication time      = 0.581131
-Computation time        = 9.94205e-05
-Transpose Time          = 0.538471
-Big Transpose Time      = 0.0010891
-RSUMMA time             = 0.643033
-Reduction time          = 0
-Total time              = 0.711878
-# dgemms                = 5616
-Total Time =0.674646
+asdC [h10,h11,h1,h2] = A [p7,p8,h1,h2 ] x B [h10,h11,p7,p8 ]
+Constructor done
+Communication time      = 0.565075
+Computation time        = 0.652985
+Transpose Time          = 0.24453
+Big Transpose Time      = 0
+RSUMMA time             = 0.937019
+Reduction time          = 9.53674e-07
+Total time              = 0.94714
+# dgemms                = 66209
+Total Time =0.944932
 

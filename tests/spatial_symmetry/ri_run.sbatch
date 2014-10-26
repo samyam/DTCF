@@ -14,7 +14,7 @@
 #
 # Load your modules
 module load intel/latest
-module load mvapich2/1.9-icc-slurm
+module load mvapich2/2.0-icc-slurm
 export MV2_ENABLE_AFFINITY=0
 export MV2_DEFAULT_TIME_OUT=16
 export MV2_DEFAULT_RETRY_COUNT=10
@@ -33,7 +33,7 @@ then
 else
 	n=$1
 fi
-EXE=m223.x #tests/ga_interface/gaintface.x 
+EXE=spatial_sym.x #tests/ga_interface/gaintface.x 
 srun -N $1 -n $n ./$EXE $2 $3 $4 $5 $6 $7 $8 $9 $10
 #srun -N 16 -n 16 ./$EXE 16 4 4 2 2 2 2 #$2 $3 $4 $5 $6 $7 $8 $9 $10
 #make

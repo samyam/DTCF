@@ -645,12 +645,13 @@ namespace RRR{
     //exactly how this works but just immitating what ctce code
     //does
     bool Tensor::is_spatial_non_zero(int* tile_address, int sval){
+	if (!enable_spatial_sym)  return true;
 	int lval = 0;
 	for(int i = 0; i<dims; i++){
 	    lval ^= spatial_sym[O_or_V[i]][tile_address[i]];
 	}
 
-	return ((!enable_spatial_sym) || lval==sval);
+	return (lval==sval);
 
     }
 
@@ -659,12 +660,14 @@ namespace RRR{
     //does
     bool Tensor::is_spin_non_zero(int* tile_address)
     {
+	if(!enable_spin_sym) return true;
+
 	int lval = 0;
 	int rval = 0;
 	assert(dims  % 2 == 0);
 	for(int i =0; i<dims/2; i++) lval += spin_sym[O_or_V[i]][tile_address[i]];
 	for(int i =dims/2; i<dims; i++) rval += spin_sym[O_or_V[i]][tile_address[i]];
-	return ((!enable_spin_sym) || (lval==rval));
+	return (lval==rval);
     }
 
 
@@ -674,12 +677,13 @@ namespace RRR{
     bool Tensor::is_spin_restricted_non_zero(int* tile_address, int sval)
     {
 	
+	if (!enable_spin_restricted) return true;
 	int lval = 0;
 	int rval = 0;
 	assert(dims  % 2 == 0);
 	for(int i =0; i<dims; i++) lval += spin_sym[O_or_V[i]][tile_address[i]];
 
-	return ((!enable_spin_restricted) || (lval!=sval));
+	return (lval!=sval);
     }
 
     bool Tensor::is_sym_non_zero(int* tile_address)

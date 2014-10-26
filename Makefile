@@ -51,13 +51,13 @@ ifdef TIMER
 	FLAGS+=-DTIMER=$(TIMER)
 endif
 
-MAIN = tests/m223/m223
+MAIN = tests/spatial_symmetry/spatial_sym
 LINK = $(CC)
 
-EXE = tests/m223/m223.x
+EXE = $(MAIN).x
 OBJS_DLTC = DLTC/dltc_tensor.o DLTC/compute.o DLTC/transp-kernel-omp.o DLTC/exec.o DLTC/ccd-t2.o DLTC/ccsd-t1.o DLTC/ccsd-t2.o DLTC/task.o DLTC/expr.o DLTC/loops.o DLTC/profiler.o DLTC/cache.o DLTC/transp.o DLTC/main.o
 
-OBJS_RRR = tensor.o redistribute.o grid_redib.o cost.o contraction.o helper.o transpose_helper.o localcontract.o block_grid.o grid.o correct.o rect_instigation.o transpose_and_dgemms.o tests/m223/m223.o
+OBJS_RRR = tensor.o redistribute.o grid_redib.o cost.o contraction.o helper.o transpose_helper.o localcontract.o block_grid.o grid.o correct.o rect_instigation.o transpose_and_dgemms.o $(MAIN).o
 
 
 

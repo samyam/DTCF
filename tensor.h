@@ -269,7 +269,8 @@ namespace RRR {
 	void set_get_value(double (*value_function)(int* &indices));
 
 	//Initialize with spatial and spin symmetry
-	void initialize_with_symmetry(vector<int> spatial_s[2], vector<int> spin_s[2]);
+	void initialize_with_symmetry(vector<int> spatial_s[2], vector<int> spin_s[2], vector<int> it, int irrrep);
+
 
 	// Initializes the tensor (fills in values)
 	void initialize();
