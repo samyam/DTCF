@@ -1487,7 +1487,7 @@ namespace RRR{
 		//it also to only run those dgemms that we want
 		//based on spatial symmetry
 		if(block_wise_contraction){
-		    transpose_and_dgemm_block_wise(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer,1);
+		    transpose_and_dgemm_blockwise(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer,1);
 		}else{
 		    transpose_and_dgemm(num_blocks_A, num_blocks_B, blocks_A, blocks_B, block_addr_A, block_addr_B, C_buffer);
 

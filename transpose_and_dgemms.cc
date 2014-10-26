@@ -1,4 +1,7 @@
 #include "contraction.h"
+#include "omp.h"
+#define CCHECK 0
+#define DEBUG_TR 0
 namespace RRR{
 
     using namespace std;
@@ -85,7 +88,7 @@ namespace RRR{
 	if(DEBUG_TR && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
 
 	if(delete_buffers)
-	    delete blocks_B[];
+	    delete[] blocks_B;
 
 
 	tr_time += MPI_Wtime();
@@ -140,13 +143,13 @@ namespace RRR{
 
 	//if(!rank) cout<<"product of blocks of A and B"<<num_blocks_A * num_blocks_B<<endl;
 	//if(!rank) cout<<"Num threads = "<<omp_get_num_threads()<<endl<<fflush;
-	if(delete_buffer)
+	if(delete_buffers)
 	    delete[] blocks_A;
 	
 	comp_time -= MPI_Wtime();
 	if(num_blocks_A>0 && num_blocks_B>0){
 
-#pragma parallel for
+#pragma omp parallel for
 	    for(int b = 0; b< num_blocks_A * num_blocks_B; b++){
 
 		int i = b / num_blocks_B;
@@ -161,9 +164,9 @@ namespace RRR{
 
 		//if this location exists and is not an empty block
 		if(location_of_C != -1){
-		    int* block_A = tr_blocks_buf_A + i* A->block_size;
-		    int* block_B = tr_blocks_buf_B + j * B->block_size;		    
-		    int* block_C = C_buffer + location_of_C * C->block_size;
+		    double* block_A = tr_blocks_buf_A + i* A->block_size;
+		    double* block_B = tr_blocks_buf_B + j * B->block_size;		    
+		    double* block_C = C_buffer + location_of_C * C->block_size;
 		    
 		    kevin_dgemm(n_a , n_b , n_k, block_A, block_B, C_buffer, 0, 0, 1.0);
 		}
@@ -172,8 +175,8 @@ namespace RRR{
 	
 	comp_time += MPI_Wtime();
 	
-	delete tr_blocks_buf_B[];
-	delete tr_blocks_buf_A[];
+	delete[] tr_blocks_buf_B;
+	delete[] tr_blocks_buf_A;
 	
     }
 }
