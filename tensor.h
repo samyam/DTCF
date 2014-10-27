@@ -448,7 +448,7 @@ namespace RRR {
 	bool satisfies_sym(int* &addr);
 
 
-	
+	void set_index_name(int* index_name);
 	void set_index_type(vector<int> index_type);
 	// Getter functions
 	void set_cntr_map(int dim, int value)   { cntr_map[dim] = value;}

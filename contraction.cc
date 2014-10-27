@@ -42,7 +42,7 @@ namespace RRR{
 
     Contraction::Contraction(Tensor* &a, Tensor* &b, Tensor* &c, Grid* &g)
     {
-	if(rank==0) cout<<"In Constructor"<<endl;
+	//if(rank==0) cout<<"In Constructor"<<endl;
 	grid = new Grid(g->grid_dims,g->pgrid);
 	rank = grid->rank;
 	num_procs = grid->nprocs;

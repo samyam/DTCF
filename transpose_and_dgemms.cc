@@ -149,7 +149,7 @@ namespace RRR{
 	comp_time -= MPI_Wtime();
 	if(num_blocks_A>0 && num_blocks_B>0){
 
-#pragma omp parallel for
+/*#pragma omp parallel for
 	    for(int b = 0; b< num_blocks_A * num_blocks_B; b++){
 
 		int i = b / num_blocks_B;
@@ -170,7 +170,7 @@ namespace RRR{
 		    
 		    kevin_dgemm(n_a , n_b , n_k, block_A, block_B, C_buffer, 0, 0, 1.0);
 		}
-	    }
+		}*/
 	}
 	
 	comp_time += MPI_Wtime();

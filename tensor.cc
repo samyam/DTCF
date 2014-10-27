@@ -1354,6 +1354,14 @@ namespace RRR{
     void Tensor::set_index_type(vector<int> index_type){
 	O_or_V = index_type;
     }
+
+
+    void Tensor::set_index_name(int* index_name){
+	for(int i =0; i< dims; i++){
+	    ctce_index_name[i] =index_name[i];
+	}
+
+    }
     
 
 }
