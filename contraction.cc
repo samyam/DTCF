@@ -1746,7 +1746,7 @@ namespace RRR{
 	if(DEBUG_TR && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
 
 	comp_time -= MPI_Wtime();    
-	kevin_dgemm(num_row_blocks*n_a,  n_b * num_col_blocks, n_k * num_cntr_blocks, blocks_A, blocks_B, C_buffer, 0, 0, 1.0);
+	kevin_dgemm(num_row_blocks*n_a,  n_b * num_col_blocks, n_k * num_cntr_blocks, blocks_A, blocks_B, C_buffer, 0, 1, 1.0);
 	// kevin_dgemm(n_a * num_row_blocks, n_b * num_col_blocks, n_k * num_cntr_blocks, A_buff, B_buff, C_buffer, 0, 0, 1.0);
 	comp_time += MPI_Wtime();
 	if(DEBUG_TR && rank==rank)	cout<<"Rank "<<rank<<".  TG"<<tg++<<endl;
@@ -1953,7 +1953,7 @@ namespace RRR{
 	    //double* C_tmp = new double[64*64];
 	    //memcpy(C_tmp,C_buffer,64*64*sizeof(double));
 	    
-	    kevin_dgemm(num_row_blocks*n_a ,  n_b * num_col_blocks , n_k * num_cntr_blocks, blocks_A, blocks_B, C_buffer, 0, 0, 1.0);
+	    kevin_dgemm(num_row_blocks*n_a ,  n_b * num_col_blocks , n_k * num_cntr_blocks, blocks_A, blocks_B, C_buffer, 0, 1, 1.0);
 	    //kevin_dgemm(num_row_blocks*n_a ,  n_b * num_col_blocks , n_k * num_cntr_blocks, blocks_A, blocks_B, C_tmp, 0, 0, 1.0);
 	    //memcpy(C_buffer,C_tmp,64*64*sizeof(double));
 	    //delete[] C_tmp;
